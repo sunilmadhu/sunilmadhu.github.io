@@ -513,8 +513,8 @@ floor.rotation.x=-Math.PI/2;floor.position.set(0,-3.4,-70);scene.add(floor);
 const pillarTex=canvasTex(64,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"#2a2a2c");gr.addColorStop(.35,"#1a1b1e");gr.addColorStop(1,"#0e0f12");g.fillStyle=gr;g.fillRect(0,0,w,h);
   const r=rng(3);for(let i=0;i<500;i++){g.fillStyle=`rgba(255,255,255,${r()*.03})`;g.fillRect(r()*w,r()*h,1,2);}g.fillStyle="rgba(255,255,255,.05)";g.fillRect(0,0,3,h);});
 const pillarMat=new THREE.MeshBasicMaterial({map:pillarTex,fog:true});
-const beamMat=new THREE.MeshBasicMaterial({color:0x111216,fog:true});
-const lightMat=new THREE.MeshBasicMaterial({color:0x6d675c,fog:true});
+const beamMat=new THREE.MeshBasicMaterial({color:0x0c0d10,fog:true});
+const lightMat=new THREE.MeshBasicMaterial({color:0x3a3732,fog:true});
 for(let z=8;z>-170;z-=BAY){
   [-1,1].forEach(s=>{const p=new THREE.Mesh(new THREE.BoxGeometry(.9,13,.9),pillarMat);p.position.set(s*10.5,3.1,z);scene.add(p);});
   const beam=new THREE.Mesh(new THREE.BoxGeometry(22,.6,.5),beamMat);beam.position.set(0,9.4,z);scene.add(beam);
@@ -613,8 +613,14 @@ const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
 function buildPrints(){
   const img=new Image();img.onload=()=>{
     const g=lumCanvas.getContext("2d");g.drawImage(img,0,0,COLS,ROWS);const d=g.getImageData(0,0,COLS,ROWS).data;
+    // background = dark cells connected to the photo's edge; dark cells inside the silhouette (hair, jacket) are kept
+    const L=new Float32Array(COLS*ROWS);for(let i=0;i<COLS*ROWS;i++){const k=i*4;L[i]=(.2126*d[k]+.7152*d[k+1]+.0722*d[k+2])/255;}
+    const bg=new Uint8Array(COLS*ROWS),q=[];const T=.035;
+    const seed=(c,r)=>{const i=r*COLS+c;if(!bg[i]&&L[i]<T){bg[i]=1;q.push(i);}};
+    for(let c=0;c<COLS;c++){seed(c,0);seed(c,ROWS-1);}for(let r=0;r<ROWS;r++){seed(0,r);seed(COLS-1,r);}
+    while(q.length){const i=q.pop(),c=i%COLS,r=(i/COLS)|0;if(c>0)seed(c-1,r);if(c<COLS-1)seed(c+1,r);if(r>0)seed(c,r-1);if(r<ROWS-1)seed(c,r+1);}
     const list=[];
-    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const k=(r*COLS+c)*4;const lum=(.2126*d[k]+.7152*d[k+1]+.0722*d[k+2])/255;if(lum<.035)continue;list.push({c,r,lum});}
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const i=r*COLS+c;if(bg[i])continue;list.push({c,r,lum:L[i]});}
     N=list.length;aHero=new Float32Array(N*4);aKind=new Float32Array(N);aCell=new Float32Array(N);aSeed=new Float32Array(N);
     const nArt=MEDIA.articles.length;
     list.forEach((L,i)=>{
