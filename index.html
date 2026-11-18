@@ -40,7 +40,7 @@ h1,h2,h3{font-family:var(--display); font-weight:400; text-wrap:balance; margin:
 main{position:relative; z-index:3}
 .wrap{max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,48px)}
 .bar{position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px clamp(16px,4vw,48px)}
-.bar .mark{font-family:var(--display); font-style:italic; font-size:1.2rem; color:var(--text); text-decoration:none}
+.bar .mark{font-family:var(--display); font-style:italic; font-size:clamp(.82rem,1.2vw,1rem); color:var(--text); text-decoration:none; white-space:nowrap}
 .bar nav{display:flex; gap:18px; flex-wrap:wrap}
 .bar nav a{font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-decoration:none}
 .bar nav a:hover{color:var(--text)}
@@ -145,7 +145,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 <div class="grain"></div>
 <div class="progress" id="progress"></div>
 <header class="bar">
-  <a class="mark" href="#top">Sunil Madhu</a>
+  <a class="mark" href="#top" aria-label="Back to top">© 2026 Built by me ♥. All rights reserved.</a>
   <nav aria-label="Chapters">
     <a href="#origins">Origins</a><a href="#socure">Socure</a><a href="#patents">Patents</a><a href="#instnt">Instnt</a><a href="#brahma">Brahma</a><a href="#oncamera">Videos</a><a href="#numbers">Record</a><a href="#contact">Contact</a>
   </nav>
