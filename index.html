@@ -433,7 +433,7 @@ function toast(msg,ms=3200){toastEl.textContent=msg;toastEl.classList.add("show"
 const cam={on:false,stream:null,video:null,raf:0,face:null,hand:null,lastY:null,target:null,starting:false};
 const camBtn=document.getElementById("camBtn"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d"),camTip=document.getElementById("camTip"),camView=camCanvas;
 function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camCanvas.hidden=!on;
-  camTip.textContent=on?"Camera on. Push an open hand toward the screen to scroll down, pull it back to scroll up. Make a fist to pause. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
+  camTip.textContent=on?"Camera on. Hold up an open palm and the page scrolls down on its own. Make a fist to stop. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
 async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
   const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
   let pref=null;try{pref=localStorage.getItem("sm-cam");}catch(e){}
@@ -455,13 +455,13 @@ async function startCamera(){
     cam.video=document.createElement("video");cam.video.muted=true;cam.video.playsInline=true;cam.video.srcObject=cam.stream;await cam.video.play();
     setCamUI(true);toast("Loading hand and face tracking…",8000);
     await loadModels();
-    cam.on=true;look.src="camera";cam.lastY=null;
-    toast("Camera on. It stays on your device. Push an open hand toward the screen to scroll down, pull back to scroll up; fist to pause.",6000);
+    cam.on=true;look.src="camera";cam.palm=0;cam.fist=0;
+    toast("Camera on. It stays on your device. Hold up an open palm to scroll down; make a fist to stop.",6000);
     loopCamera();
   }catch(err){stopCamera(true);toast("Camera tracking isn't available here, so the portrait follows your cursor.",5000);}
   finally{cam.starting=false;camBtn.disabled=false;}
 }
-function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);camView.classList.remove("scrolling");if(!silent)toast("Camera off.");}
+function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);setAutoScroll(false);if(!silent)toast("Camera off.");}
 function extended(h,tip,pip){return h[tip].y<h[pip].y-.02;}
 let lastVT=-1,frameN=0;
 function loopCamera(){
@@ -474,25 +474,33 @@ function loopCamera(){
   if(frameN%4===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
     if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);
       camCtx.fillStyle="rgba(232,179,107,.95)";[a,b].forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,2.2,0,6.3);camCtx.fill();});}}
-  // an open hand moving up or down scrolls the page, like dragging a mouse wheel in the air
+  // hold an open palm to start the page scrolling down on its own; a fist stops it
   const hr=cam.hand.detectForVideo(v,now);const h=hr.landmarks&&hr.landmarks[0];
   if(h){
-    const open=[[8,6],[12,10],[16,14],[20,18]].filter(([t,p])=>extended(h,t,p)).length>=3;
-    // hand size in the frame stands in for distance: bigger means closer to the screen
-    const span=Math.hypot(h[5].x-h[17].x,h[5].y-h[17].y)+Math.hypot(h[0].x-h[9].x,h[0].y-h[9].y);
-    cam.size=cam.size==null?span:cam.size*.5+span*.5;
-    camCtx.fillStyle=open?"#43e07a":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
-    if(open){
-      if(cam.lastY!=null){const ds=Math.log(cam.size/cam.lastY);if(Math.abs(ds)>.006)gestureScroll(ds*innerHeight*3.5);}
-      cam.lastY=cam.size;camView.classList.add("scrolling");
-    }else{cam.lastY=null;cam.size=null;camView.classList.remove("scrolling");}
-  }else{cam.lastY=null;cam.size=null;camView.classList.remove("scrolling");}
+    const n=[[8,6],[12,10],[16,14],[20,18]].filter(([t,p])=>extended(h,t,p)).length;
+    camCtx.fillStyle=n>=3?"#43e07a":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
+    cam.palm=n>=3?(cam.palm||0)+1:0; cam.fist=n<=1?(cam.fist||0)+1:0;
+    if(cam.palm>=3)setAutoScroll(true);   // about a quarter second of open palm
+    if(cam.fist>=2)setAutoScroll(false);
+  }else{cam.palm=0;cam.fist=0;}
 }
-function gestureScroll(px){
+// auto-scroll runs on its own animation loop so it stays smooth whatever the camera frame rate is
+const auto={on:false,v:0,raf:0,t:0};
+function setAutoScroll(on){
+  if(auto.on===on)return;auto.on=on;camView.classList.toggle("scrolling",on);
+  if(on&&!auto.raf){auto.t=performance.now();auto.raf=requestAnimationFrame(autoStep);}
+}
+function autoStep(t){
+  const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
-  if(window.lenis&&lenis){cam.target=clamp((cam.target??lenis.targetScroll??scrollY)+px,0,max);lenis.scrollTo(cam.target,{lerp:.12});setTimeout(()=>{cam.target=null;},400);}
-  else window.scrollBy({top:px,behavior:"auto"});
+  auto.v+=((auto.on?innerHeight*.22:0)-auto.v)*Math.min(1,dt*3);  // ease in and out, about a fifth of a screen per second
+  const y=window.lenis?lenis.scroll:scrollY;
+  if(y>=max-1)setAutoScroll(false);
+  if(auto.v>1){const ny=Math.min(max,y+auto.v*dt);window.lenis?lenis.scrollTo(ny,{immediate:true}):window.scrollTo(0,ny);}
+  if(auto.on||auto.v>1)auto.raf=requestAnimationFrame(autoStep);else{auto.raf=0;auto.v=0;}
 }
+// any wheel, touch or key scroll by the visitor takes over from the hand
+["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(false),{passive:true}));
 detectCamera();
 
 /* ================= Renderer and warehouse ================= */
