@@ -95,22 +95,44 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .links a:hover{background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.3)}
 .links a span:last-child{color:var(--dim)}
 footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:var(--mono); font-size:.7rem; color:var(--dim)}
-.music[hidden],.music .deck[hidden]{display:none !important}
-.music{position:fixed; right:clamp(12px,2vw,24px); bottom:clamp(12px,2vw,24px); z-index:7; display:flex; align-items:flex-end; gap:10px}
-.music .deck{width:216px; background:rgba(10,11,14,.82); border:1px solid var(--line); border-radius:8px; padding:8px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); transition:opacity .3s}
-.music .deck.min{position:absolute; right:0; bottom:54px}
-.music .deck .frame{width:200px; height:200px; border-radius:4px; overflow:hidden; background:#000}
-.music .deck .frame iframe{width:200px; height:200px; border:0; display:block}
-.music .meta{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px; font-family:var(--mono); font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
-.music .meta button{all:unset; cursor:pointer; color:var(--text)}
-.music .sound{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--text); background:rgba(10,11,14,.82); border:1px solid var(--line); border-radius:99px; padding:9px 14px; cursor:pointer; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
-.music .sound:hover{border-color:rgba(255,255,255,.35)}
-.music .bars{display:inline-flex; gap:2px; align-items:flex-end; height:12px}
-.music .bars i{width:2px; background:var(--accent); height:4px}
-.music.playing .bars i{animation:eq 1s ease-in-out infinite}
-.music.playing .bars i:nth-child(2){animation-delay:.2s}.music.playing .bars i:nth-child(3){animation-delay:.4s}
-@keyframes eq{0%,100%{height:3px}50%{height:12px}}
-@media (prefers-reduced-motion:reduce){.music.playing .bars i{animation:none; height:8px}}
+.dock{position:fixed; right:clamp(12px,2vw,24px); bottom:clamp(12px,2vw,24px); z-index:8; display:flex; flex-direction:row; align-items:flex-end; gap:10px}
+.dock [hidden]{display:none !important}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+.ctl{display:flex; align-items:center; gap:8px; background:rgba(10,11,14,.9); border:1px solid var(--line); border-radius:99px; padding:6px}
+.ic{position:relative; width:40px; height:40px; border-radius:50%; border:1px solid transparent; background:transparent; color:var(--text); display:grid; place-items:center; cursor:pointer; padding:0}
+.ic svg{width:22px; height:22px}
+.ic.small{width:32px; height:32px}.ic.small svg{width:17px; height:17px}
+.ic:hover{background:rgba(255,255,255,.07)}
+.ic .led{position:absolute; right:4px; top:4px; width:7px; height:7px; border-radius:50%; background:#3a3d42; box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
+.ic.small .led{right:2px; top:2px; width:6px; height:6px}
+.ic[aria-pressed="true"] .led{background:#43e07a; box-shadow:0 0 6px 2px rgba(67,224,122,.65), 0 0 14px 4px rgba(67,224,122,.25)}
+.ic[aria-pressed="false"] .wave{opacity:.25}
+.camview{margin:0; background:rgba(10,11,14,.82); border:1px solid var(--line); border-radius:10px; padding:6px; width:190px; order:-1}
+.camview canvas{display:block; width:176px; height:132px; border-radius:6px; background:#000}
+.camview figcaption{font-family:var(--mono); font-size:.6rem; line-height:1.4; color:var(--dim); margin-top:6px}
+.camview.scrolling{border-color:rgba(67,224,122,.6)}
+.spk{position:static; display:flex}
+.pill{position:absolute; right:0; bottom:calc(100% + 8px); display:flex; align-items:center; gap:10px; width:max-content; max-width:280px; background:rgba(10,11,14,.9); border:1px solid var(--line); border-radius:99px; padding:5px 14px 5px 5px; opacity:0; transform:translateY(6px); pointer-events:none; transition:opacity .18s, transform .18s}
+.pill img{width:34px; height:34px; border-radius:50%; object-fit:cover; background:#222}
+.pill span{display:flex; flex-direction:column; min-width:0}
+.pill b{font-family:var(--ui); font-weight:600; font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px}
+.pill em{font-style:normal; font-family:var(--mono); font-size:.62rem; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px}
+.spk:hover .pill,.spk:focus-within .pill{opacity:1; transform:none}
+.spk.open .pill{opacity:0}
+.dock:has(.toast.show) .pill{opacity:0}
+@media (max-width:520px){.camview{width:142px}.camview canvas{width:128px; height:96px}.camview figcaption{display:none}}
+.pop{position:absolute; right:0; bottom:calc(100% + 8px); width:216px; background:rgba(10,11,14,.92); border:1px solid var(--line); border-radius:10px; padding:8px; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .18s, transform .18s}
+.spk.open .pop{opacity:1; transform:none; pointer-events:auto}
+.pop .frame{width:200px; height:200px; border-radius:6px; overflow:hidden; background:#000}
+.pop .frame iframe{width:200px; height:200px; border:0; display:block}
+.vol{display:flex; align-items:center; gap:6px; margin-top:8px}
+.vol input{flex:1; accent-color:#43e07a; min-width:0}
+.mini{all:unset; cursor:pointer; font-family:var(--mono); font-size:.64rem; letter-spacing:.04em; text-transform:uppercase; color:var(--text); padding:4px 6px; border-radius:4px}
+.mini:hover{background:rgba(255,255,255,.08)}
+.mini:focus-visible{outline:2px solid var(--accent)}
+.toast{position:absolute; right:0; bottom:calc(100% + 10px); margin:0; width:max-content; max-width:260px; font-family:var(--mono); font-size:.66rem; line-height:1.4; color:var(--text); background:rgba(10,11,14,.9); border:1px solid var(--line); border-radius:8px; padding:7px 10px; opacity:0; transition:opacity .2s; pointer-events:none}
+.toast.show{opacity:1}
+
 .oncam{padding:12vh 0 4vh}
 .oncam h2{font-size:clamp(2rem,4.2vw,3.2rem); letter-spacing:-.025em; margin:10px 0 24px}
 .reel{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
@@ -150,12 +172,29 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     <a href="#origins">Origins</a><a href="#socure">Socure</a><a href="#patents">Patents</a><a href="#instnt">Instnt</a><a href="#brahma">Brahma</a><a href="#oncamera">Videos</a><a href="#numbers">Record</a><a href="#contact">Contact</a>
   </nav>
 </header>
-<div class="music" id="music" hidden>
-  <div class="deck min" id="deck" hidden>
-    <div class="frame"><div id="ytplayer"></div></div>
-    <div class="meta"><span>Sunil's playlist</span><button type="button" id="nextBtn" aria-label="Next track">Next ›</button></div>
+<div class="dock" id="dock">
+  <figure class="camview" id="camView" hidden aria-label="What your camera sees">
+    <canvas id="camCanvas" width="176" height="132"></canvas>
+    <figcaption id="camHint">Open hand: move up or down to scroll. Make a fist to pause.</figcaption>
+  </figure>
+  <div class="ctl">
+    <button class="ic cam" id="camBtn" type="button" aria-pressed="false" title="Camera tracking: off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h3l1.6-2.2h8.8L18 7.5h3v11H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      <i class="led" aria-hidden="true"></i><span class="sr">Camera tracking</span>
+    </button>
+    <div class="spk" id="spk" hidden>
+      <div class="pill" id="pill" role="status" aria-live="polite"><img id="pillImg" alt=""><span><b id="pillTitle">Sunil's Music Stream</b><em id="pillArtist">Click the speaker to play</em></span></div>
+      <div class="pop" id="pop" aria-hidden="true">
+        <div class="frame"><div id="ytplayer"></div></div>
+        <div class="vol"><button type="button" id="muteBtn" class="mini">Mute</button><input id="volRange" type="range" min="0" max="100" value="45" aria-label="Volume"><button type="button" id="nextBtn" class="mini" aria-label="Next track">Next ›</button></div>
+      </div>
+      <button class="ic small" id="spkBtn" type="button" aria-pressed="false" title="Sound: off">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path class="wave" d="M15.5 9.2a4 4 0 0 1 0 5.6M18 7a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <i class="led" aria-hidden="true"></i><span class="sr">Sound</span>
+      </button>
+    </div>
   </div>
-  <button class="sound" id="soundBtn" type="button" aria-pressed="false"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="soundLabel">Sound off</span></button>
+  <p class="toast" id="toast" role="status" aria-live="polite"></p>
 </div>
 <main>
   <section class="hero wrap" id="top">
@@ -163,10 +202,8 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
       <h1>Sunil <em>Madhu</em></h1>
       <p class="lede">Founder of Socure, Instnt and Asyml8. Thirty years teaching machines to tell who is real, insuring them when they get it wrong, and now putting AI on the devices people already own.</p>
       <div class="row">
-        <button class="chip" id="camBtn" type="button" hidden><span class="dot"></span>Let the portrait follow your eyes</button>
         <span class="cue">Scroll to step inside</span>
       </div>
-      <p class="status" id="camStatus" aria-live="polite"></p>
     </div>
   </section>
 
@@ -384,25 +421,71 @@ const smooth=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0),0,1);return t*t*(3-2*t);};
 function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 const rand=rng(20260918);
 
-/* ================= Looking: cursor, tilt or camera ================= */
+/* ================= Looking and gesture scrolling: cursor, tilt or camera ================= */
 const look={tx:0,ty:0,x:0,y:0,src:"cursor"};
 addEventListener("pointermove",e=>{if(look.src!=="camera"){look.tx=(e.clientX/innerWidth-.5)*2;look.ty=-(e.clientY/innerHeight-.5)*2;}},{passive:true});
 addEventListener("deviceorientation",e=>{if(look.src==="cursor"&&MOBILE&&e.gamma!=null){look.tx=clamp(e.gamma/30,-1,1);look.ty=clamp((45-(e.beta||45))/30,-1,1);}});
-const camBtn=document.getElementById("camBtn"),camStatus=document.getElementById("camStatus");
-async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices)return;const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput"))return;camBtn.hidden=false;
-  let g=false;try{g=(await navigator.permissions.query({name:"camera"})).state==="granted";}catch(e){}if(g)startCamera();}catch(e){}}
-camBtn&&camBtn.addEventListener("click",startCamera);
-async function startCamera(){camBtn.disabled=true;camStatus.textContent="Starting camera…";
-  try{const stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:"user"},audio:false});
-    const v=document.createElement("video");v.muted=true;v.playsInline=true;v.srcObject=stream;await v.play();
-    camStatus.textContent="Loading face tracking…";
-    const vision=await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
-    const files=await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
-    const lm=await vision.FaceLandmarker.createFromOptions(files,{baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",delegate:"GPU"},runningMode:"VIDEO",numFaces:1});
-    look.src="camera";camBtn.hidden=true;camStatus.textContent="Following your eyes. The video stays on your device.";
-    let last=-1;const tick=()=>{if(v.currentTime!==last){last=v.currentTime;const r=lm.detectForVideo(v,performance.now());const f=r.faceLandmarks&&r.faceLandmarks[0];
-      if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);}}requestAnimationFrame(tick);};tick();
-  }catch(err){look.src="cursor";camBtn.hidden=true;camStatus.textContent="Camera tracking isn't available in this viewer, so the portrait follows your cursor.";}}
+const toastEl=document.getElementById("toast");let toastT=0;
+function toast(msg,ms=3200){toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove("show"),ms);}
+const cam={on:false,stream:null,video:null,raf:0,face:null,hand:null,lastY:null,target:null,starting:false};
+const camBtn=document.getElementById("camBtn"),camView=document.getElementById("camView"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d");
+function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camBtn.title=on?"Camera tracking: on (click to turn off)":"Camera tracking: off";camView.hidden=!on;}
+async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
+  const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
+  let pref=null;try{pref=localStorage.getItem("sm-cam");}catch(e){}
+  let g=false;try{g=(await navigator.permissions.query({name:"camera"})).state==="granted";}catch(e){}
+  if(g&&pref!=="off")startCamera();}catch(e){}}
+camBtn.addEventListener("click",()=>{if(cam.on||cam.starting){stopCamera();try{localStorage.setItem("sm-cam","off");}catch(e){}}else{try{localStorage.setItem("sm-cam","on");}catch(e){}startCamera();}});
+let vision=null;
+async function loadModels(){
+  vision=vision||await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
+  const files=await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+  const base="https://storage.googleapis.com/mediapipe-models/";
+  cam.hand=cam.hand||await vision.HandLandmarker.createFromOptions(files,{baseOptions:{modelAssetPath:base+"hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",delegate:"GPU"},runningMode:"VIDEO",numHands:1});
+  cam.face=cam.face||await vision.FaceLandmarker.createFromOptions(files,{baseOptions:{modelAssetPath:base+"face_landmarker/face_landmarker/float16/1/face_landmarker.task",delegate:"GPU"},runningMode:"VIDEO",numFaces:1});
+}
+async function startCamera(){
+  if(cam.starting||cam.on)return;cam.starting=true;camBtn.disabled=true;toast("Starting camera…",8000);
+  try{
+    cam.stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:"user"},audio:false});
+    cam.video=document.createElement("video");cam.video.muted=true;cam.video.playsInline=true;cam.video.srcObject=cam.stream;await cam.video.play();
+    setCamUI(true);toast("Loading hand and face tracking…",8000);
+    await loadModels();
+    cam.on=true;look.src="camera";cam.lastY=null;
+    toast("Camera on. It stays on your device. Open hand up or down to scroll; fist to pause.",5000);
+    loopCamera();
+  }catch(err){stopCamera(true);toast("Camera tracking isn't available here, so the portrait follows your cursor.",5000);}
+  finally{cam.starting=false;camBtn.disabled=false;}
+}
+function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);camView.classList.remove("scrolling");if(!silent)toast("Camera off.");}
+function extended(h,tip,pip){return h[tip].y<h[pip].y-.02;}
+let lastVT=-1,frameN=0;
+function loopCamera(){
+  if(!cam.on)return;cam.raf=requestAnimationFrame(loopCamera);
+  const v=cam.video;if(!v||v.readyState<2||v.currentTime===lastVT)return;lastVT=v.currentTime;frameN++;
+  const now=performance.now(),W=camCanvas.width,H=camCanvas.height;
+  camCtx.save();camCtx.translate(W,0);camCtx.scale(-1,1);camCtx.drawImage(v,0,0,W,H);camCtx.restore();
+  // eyes steer the portrait (every other frame keeps it light)
+  if(frameN%2===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
+    if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);
+      camCtx.fillStyle="rgba(232,179,107,.95)";[a,b].forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,2.2,0,6.3);camCtx.fill();});}}
+  // an open hand moving up or down scrolls the page, like dragging a mouse wheel in the air
+  const hr=cam.hand.detectForVideo(v,now);const h=hr.landmarks&&hr.landmarks[0];
+  if(h){
+    const open=[[8,6],[12,10],[16,14],[20,18]].filter(([t,p])=>extended(h,t,p)).length>=3;
+    const y=(h[8].y+h[12].y+h[0].y)/3;
+    camCtx.fillStyle=open?"#43e07a":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
+    if(open){
+      if(cam.lastY!=null){const dy=y-cam.lastY;if(Math.abs(dy)>.003)gestureScroll(dy*innerHeight*3.2);}
+      cam.lastY=y;camView.classList.add("scrolling");
+    }else{cam.lastY=null;camView.classList.remove("scrolling");}
+  }else{cam.lastY=null;camView.classList.remove("scrolling");}
+}
+function gestureScroll(px){
+  const max=document.documentElement.scrollHeight-innerHeight;
+  if(window.lenis&&lenis){cam.target=clamp((cam.target??lenis.targetScroll??scrollY)+px,0,max);lenis.scrollTo(cam.target,{lerp:.12});setTimeout(()=>{cam.target=null;},400);}
+  else window.scrollBy({top:px,behavior:"auto"});
+}
 detectCamera();
 
 /* ================= Renderer and warehouse ================= */
@@ -636,7 +719,7 @@ addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 /* ================= Scroll story ================= */
 gsap.registerPlugin(ScrollTrigger);
 let lenis=null;
-if(!REDUCED&&window.Lenis){lenis=new Lenis({lerp:.08,smoothWheel:true});lenis.on("scroll",ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);}
+if(!REDUCED&&window.Lenis){lenis=new Lenis({lerp:.08,smoothWheel:true});window.lenis=lenis;lenis.on("scroll",ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);}
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{const el=document.querySelector(a.getAttribute("href"));if(el){e.preventDefault();lenis?lenis.scrollTo(el,{offset:-20}):el.scrollIntoView({behavior:REDUCED?"auto":"smooth"});}}));
 ScrollTrigger.create({start:0,end:"max",onUpdate:s=>{P=s.progress;document.getElementById("progress").style.transform=`scaleX(${s.progress})`;}});
 document.querySelectorAll(".split").forEach(h=>{const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(w=>{if(!w)return;if(/^\s+$/.test(w))f.append(w);else{const s=document.createElement("span");s.className="word";s.textContent=w;f.append(s);}});c.replaceWith(f);}else walk(c);});};walk(h);});
@@ -650,32 +733,40 @@ if(!REDUCED){
   gsap.to(".hero .copy",{y:-60,opacity:0,ease:"none",scrollTrigger:{trigger:".hero",start:"top top",end:"60% top",scrub:true}});
 }
 
-/* ================= Music: a YouTube Music playlist that starts with the visit ================= */
-// Paste the playlist link or its id (the part after list=) from music.youtube.com.
+/* ================= Music: Sunil's YouTube Music playlist, controlled from the speaker icon ================= */
 const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
 (function(){
   const id=(MUSIC.playlist.match(/list=([\w-]+)/)||[])[1]||MUSIC.playlist.trim();
   if(!id)return;
-  const box=document.getElementById("music"),deck=document.getElementById("deck"),btn=document.getElementById("soundBtn"),label=document.getElementById("soundLabel");
-  box.hidden=false;deck.hidden=false;
-  let player=null,ready=false,wantSound=true,userMuted=false;
-  try{if(localStorage.getItem("sm-music-muted")==="1"){userMuted=true;wantSound=false;}}catch(e){}
-  const setUI=on=>{box.classList.toggle("playing",on);btn.setAttribute("aria-pressed",on?"true":"false");label.textContent=on?"Sound on":(ready&&!userMuted?"Tap for sound":"Sound off");};
-  const apply=()=>{if(!ready)return;if(wantSound&&!userMuted){player.unMute();player.setVolume(MUSIC.startVolume);player.playVideo();setUI(!player.isMuted());}else{player.mute();setUI(false);}};
+  const spk=document.getElementById("spk"),btn=document.getElementById("spkBtn"),pop=document.getElementById("pop"),vol=document.getElementById("volRange"),
+        muteBtn=document.getElementById("muteBtn"),pillImg=document.getElementById("pillImg"),pillTitle=document.getElementById("pillTitle"),pillArtist=document.getElementById("pillArtist");
+  spk.hidden=false;
+  let player=null,ready=false,userMuted=false,volume=MUSIC.startVolume;
+  try{if(localStorage.getItem("sm-music-muted")==="1")userMuted=true;const v=+localStorage.getItem("sm-music-vol");if(v>=0&&v<=100&&localStorage.getItem("sm-music-vol")!==null)volume=v;}catch(e){}
+  vol.value=volume;
+  const playing=()=>ready&&!player.isMuted()&&player.getPlayerState()===1;
+  const save=()=>{try{localStorage.setItem("sm-music-muted",userMuted?"1":"0");localStorage.setItem("sm-music-vol",String(volume));}catch(e){}};
+  function updateUI(){const on=playing();btn.setAttribute("aria-pressed",on?"true":"false");btn.title=on?"Sound: on (click for volume)":"Sound: off (click to play)";muteBtn.textContent=ready&&player.isMuted()?"Unmute":"Mute";
+    if(ready){const d=player.getVideoData&&player.getVideoData();if(d&&d.video_id){pillImg.src=`https://i.ytimg.com/vi/${d.video_id}/mqdefault.jpg`;pillTitle.textContent=d.title||"Sunil's Music Stream";pillArtist.textContent=(d.author||"")+(on?"":" · paused or muted");}}}
+  function soundOn(){if(!ready)return;userMuted=false;save();player.unMute();player.setVolume(volume);player.playVideo();setTimeout(updateUI,300);}
+  function soundOff(){if(!ready)return;userMuted=true;save();player.mute();updateUI();}
   window.onYouTubeIframeAPIReady=()=>{
-    player=new YT.Player("ytplayer",{width:200,height:200,playerVars:{listType:"playlist",list:id,autoplay:1,mute:1,controls:1,playsinline:1,rel:0,modestbranding:1,loop:1},
-      events:{onReady:()=>{ready=true;player.playVideo();player.setShuffle&&player.setShuffle(true);apply();},onStateChange:()=>setUI(ready&&!player.isMuted()&&player.getPlayerState()===1)}});
+    player=new YT.Player("ytplayer",{width:200,height:200,playerVars:{listType:"playlist",list:id,autoplay:1,mute:1,controls:1,playsinline:1,rel:0,loop:1},
+      events:{onReady:()=>{ready=true;try{player.setShuffle(true);}catch(e){}player.playVideo();updateUI();},onStateChange:updateUI}});
   };
-  const s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.onerror=()=>{box.hidden=true;};document.head.append(s);
-  // Browsers allow sound only after the visitor's first tap, click or key press
-  const unlock=()=>{if(!userMuted){wantSound=true;apply();}};
+  const s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.onerror=()=>{spk.hidden=true;};document.head.append(s);
+  // browsers allow sound only after a tap, click or key press
+  const unlock=e=>{if(e&&e.target&&e.target.closest&&e.target.closest("#spk"))return;if(!userMuted)soundOn();};
   ["pointerdown","keydown","touchend"].forEach(ev=>addEventListener(ev,unlock,{once:true,passive:true}));
   btn.addEventListener("click",e=>{e.stopPropagation();
-    userMuted=!!(ready&&!player.isMuted());
-    try{localStorage.setItem("sm-music-muted",userMuted?"1":"0");}catch(e){}wantSound=!userMuted;apply();});
-  document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();}});
+    if(!playing()){soundOn();return;}
+    const open=!spk.classList.contains("open");spk.classList.toggle("open",open);pop.setAttribute("aria-hidden",open?"false":"true");});
+  document.addEventListener("pointerdown",e=>{if(!e.target.closest("#spk")){spk.classList.remove("open");pop.setAttribute("aria-hidden","true");}});
+  vol.addEventListener("input",()=>{volume=+vol.value;save();if(!ready)return;player.setVolume(volume);if(volume===0){player.mute();}else if(player.isMuted()&&!userMuted){player.unMute();}updateUI();});
+  muteBtn.addEventListener("click",()=>{if(!ready)return;player.isMuted()?soundOn():soundOff();});
+  document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();setTimeout(updateUI,600);}});
+  setInterval(()=>{if(ready)updateUI();},4000);
 })();
-
 /* On camera: load the YouTube player only when a card is clicked */
 document.querySelectorAll(".clip .yt").forEach(b=>b.addEventListener("click",()=>{
   const f=document.createElement("iframe");f.src=`https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1&rel=0`;
