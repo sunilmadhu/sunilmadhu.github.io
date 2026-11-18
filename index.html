@@ -109,10 +109,12 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 .ic.small .led{right:2px; top:2px; width:6px; height:6px}
 .ic[aria-pressed="true"] .led{background:#43e07a; box-shadow:0 0 6px 2px rgba(67,224,122,.65), 0 0 14px 4px rgba(67,224,122,.25)}
 .ic[aria-pressed="false"] .wave{opacity:.25}
-.camview{margin:0; background:rgba(10,11,14,.82); border:1px solid var(--line); border-radius:10px; padding:6px; width:190px; order:-1}
-.camview canvas{display:block; width:176px; height:132px; border-radius:6px; background:#000}
-.camview figcaption{font-family:var(--mono); font-size:.6rem; line-height:1.4; color:var(--dim); margin-top:6px}
-.camview.scrolling{border-color:rgba(67,224,122,.6)}
+.thumb{width:56px; height:42px; border-radius:6px; background:#000; border:1px solid var(--line); display:block}
+.thumb.scrolling{border-color:#43e07a; box-shadow:0 0 8px rgba(67,224,122,.45)}
+.camwrap{position:static; display:flex}
+.tip{position:absolute; right:0; bottom:calc(100% + 8px); width:max-content; max-width:260px; background:rgba(10,11,14,.92); border:1px solid var(--line); border-radius:8px; padding:8px 11px; font-family:var(--mono); font-size:.64rem; line-height:1.45; color:var(--text); opacity:0; transform:translateY(6px); pointer-events:none; transition:opacity .18s, transform .18s}
+.camwrap:hover .tip,.camwrap:focus-within .tip{opacity:1; transform:none}
+.dock:has(.toast.show) .tip{opacity:0}
 .spk{position:static; display:flex}
 .pill{position:absolute; right:0; bottom:calc(100% + 8px); display:flex; align-items:center; gap:10px; width:max-content; max-width:280px; background:rgba(10,11,14,.9); border:1px solid var(--line); border-radius:99px; padding:5px 14px 5px 5px; opacity:0; transform:translateY(6px); pointer-events:none; transition:opacity .18s, transform .18s}
 .pill img{width:34px; height:34px; border-radius:50%; object-fit:cover; background:#222}
@@ -122,7 +124,6 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 .spk:hover .pill,.spk:focus-within .pill{opacity:1; transform:none}
 .spk.open .pill{opacity:0}
 .dock:has(.toast.show) .pill{opacity:0}
-@media (max-width:520px){.camview{width:142px}.camview canvas{width:128px; height:96px}.camview figcaption{display:none}}
 .pop{position:absolute; right:0; bottom:calc(100% + 8px); width:216px; background:rgba(10,11,14,.92); border:1px solid var(--line); border-radius:10px; padding:8px; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .18s, transform .18s}
 .spk.open .pop{opacity:1; transform:none; pointer-events:auto}
 .pop .frame{width:200px; height:200px; border-radius:6px; overflow:hidden; background:#000}
@@ -175,15 +176,15 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
   </nav>
 </header>
 <div class="dock" id="dock">
-  <figure class="camview" id="camView" hidden aria-label="What your camera sees">
-    <canvas id="camCanvas" width="176" height="132"></canvas>
-    <figcaption id="camHint">Open hand: push toward the screen to scroll down, pull back to scroll up. Make a fist to pause.</figcaption>
-  </figure>
   <div class="ctl">
-    <button class="ic cam" id="camBtn" type="button" aria-pressed="false" title="Camera tracking: off">
+    <canvas id="camCanvas" class="thumb" width="112" height="84" hidden aria-label="What your camera sees"></canvas>
+    <div class="camwrap">
+    <div class="tip" id="camTip" role="tooltip">Camera off. Click to let the portrait follow your eyes and scroll with your hand.</div>
+    <button class="ic cam" id="camBtn" type="button" aria-pressed="false" aria-describedby="camTip">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h3l1.6-2.2h8.8L18 7.5h3v11H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
       <i class="led" aria-hidden="true"></i><span class="sr">Camera tracking</span>
     </button>
+    </div>
     <div class="spk" id="spk" hidden>
       <div class="pill" id="pill" role="status" aria-live="polite"><img id="pillImg" alt=""><span><b id="pillTitle">Sunil's Music Stream</b><em id="pillArtist">Click the speaker to play</em></span></div>
       <div class="pop" id="pop" aria-hidden="true">
@@ -430,8 +431,9 @@ addEventListener("deviceorientation",e=>{if(look.src==="cursor"&&MOBILE&&e.gamma
 const toastEl=document.getElementById("toast");let toastT=0;
 function toast(msg,ms=3200){toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove("show"),ms);}
 const cam={on:false,stream:null,video:null,raf:0,face:null,hand:null,lastY:null,target:null,starting:false};
-const camBtn=document.getElementById("camBtn"),camView=document.getElementById("camView"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d");
-function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camBtn.title=on?"Camera tracking: on (click to turn off)":"Camera tracking: off";camView.hidden=!on;}
+const camBtn=document.getElementById("camBtn"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d"),camTip=document.getElementById("camTip"),camView=camCanvas;
+function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camCanvas.hidden=!on;
+  camTip.textContent=on?"Camera on. Push an open hand toward the screen to scroll down, pull it back to scroll up. Make a fist to pause. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
 async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
   const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
   let pref=null;try{pref=localStorage.getItem("sm-cam");}catch(e){}
@@ -467,8 +469,9 @@ function loopCamera(){
   const v=cam.video;if(!v||v.readyState<2||v.currentTime===lastVT)return;lastVT=v.currentTime;frameN++;
   const now=performance.now(),W=camCanvas.width,H=camCanvas.height;
   camCtx.save();camCtx.translate(W,0);camCtx.scale(-1,1);camCtx.drawImage(v,0,0,W,H);camCtx.restore();
-  // eyes steer the portrait (every other frame keeps it light)
-  if(frameN%2===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
+  if(frameN%2)return; // run tracking at half the camera frame rate so clicks stay responsive
+  // eyes steer the portrait
+  if(frameN%4===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
     if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);
       camCtx.fillStyle="rgba(232,179,107,.95)";[a,b].forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,2.2,0,6.3);camCtx.fill();});}}
   // an open hand moving up or down scrolls the page, like dragging a mouse wheel in the air
@@ -754,7 +757,7 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   let player=null,ready=false,userMuted=false,volume=MUSIC.startVolume;
   try{if(localStorage.getItem("sm-music-muted")==="1")userMuted=true;const v=+localStorage.getItem("sm-music-vol");if(v>=0&&v<=100&&localStorage.getItem("sm-music-vol")!==null)volume=v;}catch(e){}
   vol.value=volume;
-  const playing=()=>ready&&!player.isMuted()&&player.getPlayerState()===1;
+  const playing=()=>ready&&!userMuted&&!player.isMuted();
   const save=()=>{try{localStorage.setItem("sm-music-muted",userMuted?"1":"0");localStorage.setItem("sm-music-vol",String(volume));}catch(e){}};
   function updateUI(){const on=playing();btn.setAttribute("aria-pressed",on?"true":"false");btn.title=on?"Sound: on (click for volume)":"Sound: off (click to play)";muteBtn.textContent=ready&&player.isMuted()?"Unmute":"Mute";
     if(ready){const d=player.getVideoData&&player.getVideoData();if(d&&d.video_id){pillImg.src=`https://i.ytimg.com/vi/${d.video_id}/mqdefault.jpg`;pillTitle.textContent=d.title||"Sunil's Music Stream";pillArtist.textContent=(d.author||"")+(on?"":" · paused or muted");}}}
@@ -762,13 +765,14 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   function soundOff(){if(!ready)return;userMuted=true;save();player.mute();updateUI();}
   window.onYouTubeIframeAPIReady=()=>{
     player=new YT.Player("ytplayer",{width:200,height:200,playerVars:{listType:"playlist",list:id,autoplay:1,mute:1,controls:1,playsinline:1,rel:0,loop:1},
-      events:{onReady:()=>{ready=true;try{player.setShuffle(true);}catch(e){}player.playVideo();updateUI();},onStateChange:updateUI}});
+      events:{onReady:()=>{ready=true;try{player.setShuffle(true);}catch(e){}player.playVideo();updateUI();},onStateChange:updateUI,onError:e=>{toast("YouTube can\u2019t play this playlist (error "+e.data+"). Check that it is public and the link is complete.",6000);}}});
   };
   const s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.onerror=()=>{spk.hidden=true;};document.head.append(s);
   // browsers allow sound only after a tap, click or key press
   const unlock=e=>{if(e&&e.target&&e.target.closest&&e.target.closest("#spk"))return;if(!userMuted)soundOn();};
   ["pointerdown","keydown","touchend"].forEach(ev=>addEventListener(ev,unlock,{once:true,passive:true}));
   btn.addEventListener("click",e=>{e.stopPropagation();
+    if(!ready){toast("The music player is still loading.");return;}
     if(!playing()){soundOn();return;}
     const open=!spk.classList.contains("open");spk.classList.toggle("open",open);pop.setAttribute("aria-hidden",open?"false":"true");});
   document.addEventListener("pointerdown",e=>{if(!e.target.closest("#spk")){spk.classList.remove("open");pop.setAttribute("aria-hidden","true");}});
