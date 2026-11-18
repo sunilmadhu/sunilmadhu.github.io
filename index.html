@@ -40,7 +40,9 @@ h1,h2,h3{font-family:var(--display); font-weight:400; text-wrap:balance; margin:
 main{position:relative; z-index:3}
 .wrap{max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,48px)}
 .bar{position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px clamp(16px,4vw,48px)}
-.bar .mark{font-family:var(--display); font-style:italic; font-size:clamp(.82rem,1.2vw,1rem); color:var(--text); text-decoration:none; white-space:nowrap}
+.bar .mark{font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-decoration:none; white-space:nowrap}
+.bar .mark:hover{color:var(--text)}
+.bar .mark,.bar nav a{text-shadow:0 1px 10px rgba(0,0,0,.95)}
 .bar nav{display:flex; gap:18px; flex-wrap:wrap}
 .bar nav a{font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-decoration:none}
 .bar nav a:hover{color:var(--text)}
