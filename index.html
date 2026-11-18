@@ -177,7 +177,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 <div class="dock" id="dock">
   <figure class="camview" id="camView" hidden aria-label="What your camera sees">
     <canvas id="camCanvas" width="176" height="132"></canvas>
-    <figcaption id="camHint">Open hand: move up or down to scroll. Make a fist to pause.</figcaption>
+    <figcaption id="camHint">Open hand: push toward the screen to scroll down, pull back to scroll up. Make a fist to pause.</figcaption>
   </figure>
   <div class="ctl">
     <button class="ic cam" id="camBtn" type="button" aria-pressed="false" title="Camera tracking: off">
@@ -454,7 +454,7 @@ async function startCamera(){
     setCamUI(true);toast("Loading hand and face tracking…",8000);
     await loadModels();
     cam.on=true;look.src="camera";cam.lastY=null;
-    toast("Camera on. It stays on your device. Open hand up or down to scroll; fist to pause.",5000);
+    toast("Camera on. It stays on your device. Push an open hand toward the screen to scroll down, pull back to scroll up; fist to pause.",6000);
     loopCamera();
   }catch(err){stopCamera(true);toast("Camera tracking isn't available here, so the portrait follows your cursor.",5000);}
   finally{cam.starting=false;camBtn.disabled=false;}
@@ -475,13 +475,15 @@ function loopCamera(){
   const hr=cam.hand.detectForVideo(v,now);const h=hr.landmarks&&hr.landmarks[0];
   if(h){
     const open=[[8,6],[12,10],[16,14],[20,18]].filter(([t,p])=>extended(h,t,p)).length>=3;
-    const y=(h[8].y+h[12].y+h[0].y)/3;
+    // hand size in the frame stands in for distance: bigger means closer to the screen
+    const span=Math.hypot(h[5].x-h[17].x,h[5].y-h[17].y)+Math.hypot(h[0].x-h[9].x,h[0].y-h[9].y);
+    cam.size=cam.size==null?span:cam.size*.5+span*.5;
     camCtx.fillStyle=open?"#43e07a":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
     if(open){
-      if(cam.lastY!=null){const dy=y-cam.lastY;if(Math.abs(dy)>.003)gestureScroll(dy*innerHeight*3.2);}
-      cam.lastY=y;camView.classList.add("scrolling");
-    }else{cam.lastY=null;camView.classList.remove("scrolling");}
-  }else{cam.lastY=null;camView.classList.remove("scrolling");}
+      if(cam.lastY!=null){const ds=Math.log(cam.size/cam.lastY);if(Math.abs(ds)>.006)gestureScroll(ds*innerHeight*3.5);}
+      cam.lastY=cam.size;camView.classList.add("scrolling");
+    }else{cam.lastY=null;cam.size=null;camView.classList.remove("scrolling");}
+  }else{cam.lastY=null;cam.size=null;camView.classList.remove("scrolling");}
 }
 function gestureScroll(px){
   const max=document.documentElement.scrollHeight-innerHeight;
