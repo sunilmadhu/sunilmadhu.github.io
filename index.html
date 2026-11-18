@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunil Madhu</title>
+<meta name="description" content="Sunil Madhu: founder of Socure, Instnt and Asyml8, maker of Brahma. Thirty years in identity, security and AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600&family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+/* A dark warehouse. Hundreds of prints hang at different depths; from the
+   opening viewpoint they line up into one giant portrait. Scrolling breaks the
+   alignment and the prints fly past as Polaroids, clips and press clippings. */
+:root{
+  --black:#07080A;
+  --card:rgba(10,11,14,.72);
+  --line:rgba(255,255,255,.10);
+  --text:#EDEAE3;
+  --dim:#A7A39A;
+  --accent:#E8B36B;
+  --cool:#9DB0D6;
+  --display:"Fraunces","Iowan Old Style",Georgia,serif;
+  --body:"Source Serif 4",Georgia,serif;
+  --ui:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0; background:var(--black); color:var(--text)}
+body{font-family:var(--body); font-size:1.08rem; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px}
+h1,h2,h3{font-family:var(--display); font-weight:400; text-wrap:balance; margin:0}
+#scene{position:fixed; inset:0; width:100%; height:100%; display:block; z-index:0}
+.grain{position:fixed; inset:-50%; z-index:1; pointer-events:none; opacity:.06; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}100%{transform:translate(0,0)}}
+.vignette{position:fixed; inset:0; z-index:1; pointer-events:none; background:radial-gradient(120% 95% at 50% 45%, transparent 50%, rgba(0,0,0,.7) 100%)}
+@media (prefers-reduced-motion:reduce){.grain{animation:none}}
+main{position:relative; z-index:3}
+.wrap{max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,48px)}
+.bar{position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px clamp(16px,4vw,48px)}
+.bar .mark{font-family:var(--display); font-style:italic; font-size:1.2rem; color:var(--text); text-decoration:none}
+.bar nav{display:flex; gap:18px; flex-wrap:wrap}
+.bar nav a{font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-decoration:none}
+.bar nav a:hover{color:var(--text)}
+.progress{position:fixed; left:0; top:0; height:2px; width:100%; transform-origin:0 50%; transform:scaleX(0); background:var(--accent); z-index:6}
+
+.hero{min-height:100svh; display:flex; flex-direction:column; justify-content:flex-end; padding-bottom:clamp(28px,6vh,64px)}
+.hero h1{font-size:clamp(2.6rem,6vw,5rem); line-height:.92; letter-spacing:-.03em; font-variation-settings:"opsz" 144,"SOFT" 50; text-shadow:0 2px 30px rgba(0,0,0,.8)}
+.hero h1 em{font-style:italic; font-weight:300; color:var(--accent)}
+.hero .lede{max-width:40ch; font-size:clamp(1rem,1.5vw,1.18rem); line-height:1.5; margin:14px 0 0; color:var(--text); text-shadow:0 1px 18px rgba(0,0,0,.9)}
+.hero .row{display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:20px}
+.chip{font-family:var(--mono); font-size:.76rem; letter-spacing:.04em; color:var(--text); background:var(--card); border:1px solid var(--line); padding:9px 14px; border-radius:99px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px)}
+button.chip{cursor:pointer}
+button.chip:hover{border-color:rgba(255,255,255,.35)}
+.chip .dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:8px; vertical-align:1px}
+.cue{font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--dim)}
+.status{font-family:var(--mono); font-size:.72rem; color:var(--dim); min-height:1.2em; margin:10px 0 0}
+
+.chapter{min-height:140vh; display:flex; align-items:center; padding:14vh 0}
+.chapter.right .card{margin-left:auto}
+.card{max-width:520px; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:clamp(22px,3vw,34px); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:0 40px 90px -40px rgba(0,0,0,.9)}
+.era{font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent)}
+.card h2{font-size:clamp(2rem,4.2vw,3.3rem); line-height:1.03; letter-spacing:-.025em; margin:10px 0 16px; font-variation-settings:"opsz" 144}
+.card h2 em{font-style:italic; color:var(--accent)}
+.card p{margin:0 0 .9em}
+.card ul{list-style:none; margin:14px 0 0; padding:0; display:grid; gap:9px}
+.card li{position:relative; padding-left:20px; color:var(--dim); font-size:.97rem}
+.card li::before{content:""; position:absolute; left:0; top:.75em; width:10px; height:1px; background:var(--accent)}
+.role{font-family:var(--ui); font-weight:600; font-size:.94rem; color:var(--cool); margin-top:-6px; margin-bottom:12px}
+.word{display:inline-block; will-change:transform,opacity}
+
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:22px 18px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px)}
+.stat b{display:block; font-family:var(--display); font-weight:400; font-size:clamp(2rem,3.6vw,3rem); letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums}
+.stat span{display:block; margin-top:10px; color:var(--dim); font-size:.92rem; line-height:1.35}
+.panel{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:clamp(20px,3vw,36px); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+.panel h2{font-size:clamp(2rem,4vw,3rem); letter-spacing:-.025em; margin-bottom:20px}
+.ledger{width:100%; border-collapse:collapse; font-size:.95rem}
+.ledger th{font-family:var(--mono); font-weight:400; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-align:left; padding:0 14px 10px 0; border-bottom:1px solid var(--line)}
+.ledger td{padding:12px 14px 12px 0; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top}
+.ledger td:first-child{font-family:var(--mono); font-size:.78rem; color:var(--dim); white-space:nowrap; font-variant-numeric:tabular-nums}
+.ledger td:nth-child(2){font-family:var(--ui); font-weight:600}
+.ledger td:nth-child(3){color:var(--dim)}
+.tag{font-family:var(--mono); font-size:.58rem; letter-spacing:.06em; text-transform:uppercase; color:#17110a; background:var(--accent); padding:2px 6px; border-radius:99px; margin-left:8px; vertical-align:2px}
+.facts{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:28px}
+.facts h3{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
+.facts p{margin:0 0 .5em; font-size:.97rem}
+.contact{min-height:130vh; display:flex; align-items:flex-end; padding-bottom:10vh}
+.contact .panel{max-width:540px}
+.contact h2{font-style:italic; font-size:clamp(2.6rem,6vw,4.4rem)}
+.links{display:grid; gap:10px; margin-top:22px}
+.links a{display:flex; justify-content:space-between; gap:12px; padding:13px 16px; border:1px solid var(--line); border-radius:4px; color:var(--text); text-decoration:none; font-family:var(--mono); font-size:.84rem; transition:background .2s,border-color .2s}
+.links a:hover{background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.3)}
+.links a span:last-child{color:var(--dim)}
+footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:var(--mono); font-size:.7rem; color:var(--dim)}
+.music[hidden],.music .deck[hidden]{display:none !important}
+.music{position:fixed; right:clamp(12px,2vw,24px); bottom:clamp(12px,2vw,24px); z-index:7; display:flex; align-items:flex-end; gap:10px}
+.music .deck{width:216px; background:rgba(10,11,14,.82); border:1px solid var(--line); border-radius:8px; padding:8px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); transition:opacity .3s}
+.music .deck.min{position:absolute; right:0; bottom:54px}
+.music .deck .frame{width:200px; height:200px; border-radius:4px; overflow:hidden; background:#000}
+.music .deck .frame iframe{width:200px; height:200px; border:0; display:block}
+.music .meta{display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px; font-family:var(--mono); font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
+.music .meta button{all:unset; cursor:pointer; color:var(--text)}
+.music .sound{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; color:var(--text); background:rgba(10,11,14,.82); border:1px solid var(--line); border-radius:99px; padding:9px 14px; cursor:pointer; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
+.music .sound:hover{border-color:rgba(255,255,255,.35)}
+.music .bars{display:inline-flex; gap:2px; align-items:flex-end; height:12px}
+.music .bars i{width:2px; background:var(--accent); height:4px}
+.music.playing .bars i{animation:eq 1s ease-in-out infinite}
+.music.playing .bars i:nth-child(2){animation-delay:.2s}.music.playing .bars i:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:3px}50%{height:12px}}
+@media (prefers-reduced-motion:reduce){.music.playing .bars i{animation:none; height:8px}}
+.oncam{padding:12vh 0 4vh}
+.oncam h2{font-size:clamp(2rem,4.2vw,3.2rem); letter-spacing:-.025em; margin:10px 0 24px}
+.reel{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+.clip{position:relative; background:var(--card); border:1px solid var(--line); border-radius:6px; overflow:hidden; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px)}
+.clip .screen{position:relative; aspect-ratio:16/9; background:#000; display:block; width:100%; border:0; padding:0; cursor:pointer}
+.clip .screen img,.clip .screen video,.clip .screen iframe{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0}
+.clip .screen .play{position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%; background:rgba(10,11,14,.7); border:1px solid rgba(255,255,255,.4)}
+.clip .screen .play::after{content:""; position:absolute; left:23px; top:18px; border-left:16px solid var(--text); border-top:11px solid transparent; border-bottom:11px solid transparent}
+.clip .screen:hover .play{background:rgba(232,179,107,.85)}
+.clip .cap{padding:12px 14px 14px}
+.clip .cap b{display:block; font-family:var(--ui); font-weight:600; font-size:.95rem; line-height:1.3}
+.clip .cap span{display:block; margin-top:4px; font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
+.more{margin-top:18px; display:flex; flex-wrap:wrap; gap:10px}
+.more a{font-family:var(--mono); font-size:.76rem; color:var(--text); text-decoration:none; border:1px solid var(--line); background:var(--card); padding:9px 13px; border-radius:99px}
+.more a:hover{border-color:rgba(255,255,255,.35)}
+@media (max-width:900px){.reel{grid-template-columns:1fr}}
+@media (max-width:900px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .facts{grid-template-columns:1fr}
+  .bar nav{display:none}
+  .ledger thead{display:none}
+  .ledger,.ledger tbody,.ledger tr,.ledger td{display:block; width:100%}
+  .ledger tr{padding:12px 0; border-bottom:1px solid rgba(255,255,255,.06)}
+  .ledger td{border:0; padding:2px 0}
+}
+@media (prefers-reduced-motion:reduce){ .word{transform:none !important; opacity:1 !important} }
+</style>
+</head>
+<body>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="progress" id="progress"></div>
+<header class="bar">
+  <a class="mark" href="#top">Sunil Madhu</a>
+  <nav aria-label="Chapters">
+    <a href="#origins">Origins</a><a href="#socure">Socure</a><a href="#patents">Patents</a><a href="#instnt">Instnt</a><a href="#brahma">Brahma</a><a href="#oncamera">Videos</a><a href="#numbers">Record</a><a href="#contact">Contact</a>
+  </nav>
+</header>
+<div class="music" id="music" hidden>
+  <div class="deck min" id="deck" hidden>
+    <div class="frame"><div id="ytplayer"></div></div>
+    <div class="meta"><span>Sunil's playlist</span><button type="button" id="nextBtn" aria-label="Next track">Next ›</button></div>
+  </div>
+  <button class="sound" id="soundBtn" type="button" aria-pressed="false"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="soundLabel">Sound off</span></button>
+</div>
+<main>
+  <section class="hero wrap" id="top">
+    <div class="copy">
+      <h1>Sunil <em>Madhu</em></h1>
+      <p class="lede">Founder of Socure, Instnt and Asyml8. Thirty years teaching machines to tell who is real, insuring them when they get it wrong, and now putting AI on the devices people already own.</p>
+      <div class="row">
+        <button class="chip" id="camBtn" type="button" hidden><span class="dot"></span>Let the portrait follow your eyes</button>
+        <span class="cue">Scroll to step inside</span>
+      </div>
+      <p class="status" id="camStatus" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="origins">
+    <div class="card">
+      <div class="era">1986 – 1999 · Glasgow to the Gulf</div>
+      <h2 class="split">It started with <em>computer science</em> in Scotland</h2>
+      <p>A BSc in Computer Science at the University of Strathclyde, then an MSc in Computer Information Systems at Glasgow Caledonian University.</p>
+      <p>My first real systems job was running IT for Texaco across the Middle East: wide-area networks, an SAP rollout, and a turn as Y2K compliance officer.</p>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="identity">
+    <div class="card">
+      <div class="era">1999 – 2010 · The identity architect</div>
+      <h2 class="split">A decade inside <em>identity and access</em></h2>
+      <p>I architected authentication for Fortune 500 firms at Netegrity, stayed on through its move to CA, and joined Securent, where I helped drive the $100M sale to Cisco.</p>
+      <ul>
+        <li>Chief Architect for Cisco's Policy Management unit, across WebEx, NAC and Call Manager</li>
+        <li>VP of Solutions Engineering at SunGard: 200 engineers and a $20M budget</li>
+        <li>Prototyped the first security agent for Microsoft SharePoint</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="hopskoch">
+    <div class="card">
+      <div class="era">2010 – 2012 · Hopskoch</div>
+      <h2 class="split">The first company <em>of my own</em></h2>
+      <div class="role">Founder, CEO &amp; Chairman</div>
+      <p>Hopskoch was the first end-to-end platform for running campaigns across websites, social networks, mobile apps and ad networks from one place. I bootstrapped it and led product and sales.</p>
+      <ul>
+        <li>Several thousand early users shaped its gamification features</li>
+        <li>Enterprise pilots in the US, Europe and China</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="socure">
+    <div class="card">
+      <div class="era">2011 – 2019 · Socure</div>
+      <h2 class="split">One question for banks: <em>is this person real?</em></h2>
+      <div class="role">Founder, CEO &amp; CTO, later Chief Strategy Officer</div>
+      <p>No ChatGPT, no TensorFlow. I founded Socure and built its first AI: machine learning that read social graphs and the open internet to risk-rate identities in real time, paired with face matching against online profiles. Then I built the business around it.</p>
+      <ul>
+        <li>Zero to double-digit millions in revenue, serving America's top banks</li>
+        <li>Named a top AI company in the US by Forbes and CB Insights</li>
+        <li>Social Biometrics, demoed at Finovate in 2015, and the first digital-to-physical identity verification platform at FinovateFall 2017</li>
+        <li>Hired my co-founder to scale sales on the blueprint I built</li>
+        <li>Today a leader in identity verification, valued at more than $5 billion</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <section class="chapter wrap" id="patents">
+    <div class="card">
+      <div class="era">2015 – 2023 · Patents</div>
+      <h2 class="split">Ten US patents on <em>how AI reads identity</em></h2>
+      <p>The ideas behind Socure's AI are protected by ten issued US patents that name me as an inventor, in two families.</p>
+      <ul>
+        <li><strong>Risk assessment using social networking data</strong>: six patents, 2016 to 2023, on scoring identity risk from social-network signals</li>
+        <li><strong>Analyzing facial recognition data and social network data for user authentication</strong>: four patents, 2015 to 2023, on authenticating people by matching faces with their social profiles</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="instnt">
+    <div class="card">
+      <div class="era">2019 – now · Instnt</div>
+      <h2 class="split">Then the harder question: <em>who pays when the machine is wrong?</em></h2>
+      <div class="role">Founder &amp; CEO</div>
+      <p>Fraud losses were treated as a cost of doing business. I founded Instnt to make identity fraud losses insurable for financial institutions for the first time. Its AI underwriting platform prices the risk, and its agency arm places the coverage with Munich Re and Swiss Re.</p>
+      <p>Banks, credit unions and fintechs get to move fraud losses off their balance sheets instead of holding reserves against them.</p>
+      <ul>
+        <li>A+ rated insurers behind it, with claims settled in under 30 days</li>
+        <li>Underwriting AI developed with Munich Re</li>
+        <li>Plugs into an existing fraud stack with one line of JavaScript</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="ai">
+    <div class="card">
+      <div class="era">2026 · AI-native</div>
+      <h2 class="split">Six people. <em>The work of fifty.</em></h2>
+      <p>Instnt runs on a team of six, with AI agents doing much of the engineering, sales and operations work a larger company would hire for.</p>
+      <p>I gave the opening keynote at TiECon East 2026 on why insurance becomes the governance layer for AI.</p>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="brahma">
+    <div class="card">
+      <div class="era">2026 · Asyml8</div>
+      <h2 class="split">Brahma: <em>run AI on the devices you already have</em></h2>
+      <div class="role">Founder, CEO, CTO and developer #1</div>
+      <p>My new company, Asyml8, builds Brahma, a graph-native AI mesh. It runs open-weight Mixture-of-Experts language models across ordinary Macs, PCs, Raspberry Pis and cloud machines, with no GPU or datacenter required.</p>
+      <ul>
+        <li>Splits a model into a graph of attention heads, KV heads, neuron groups and experts spread across machines, and shows which parts fired for each token</li>
+        <li>Prompts and replies stay on your own node; only vectors travel between machines</li>
+        <li>Open source under AGPL-3.0, now heading into private beta</li>
+      </ul>
+      <p style="margin-top:14px">The goal: AI that is green, accessible, private and free. <a href="https://asyml8.com" rel="noopener">asyml8.com</a> · <a href="https://mybrahma.com" rel="noopener">mybrahma.com</a></p>
+    </div>
+  </section>
+
+  <section class="wrap oncam" id="oncamera">
+    <div class="era">On camera</div>
+    <h2>Interviews, demos and talks</h2>
+    <div class="reel">
+      <div class="clip">
+        <button class="screen yt" type="button" data-id="ChOQ5_LciCM" aria-label="Play: Sunil Madhu, Founder and CEO of Socure"><img src="https://i.ytimg.com/vi/ChOQ5_LciCM/hqdefault.jpg" alt="" loading="lazy"><span class="play"></span></button>
+        <div class="cap"><b>Sunil Madhu, Founder &amp; CEO, Socure</b><span>Socure years · YouTube</span></div>
+      </div>
+      <div class="clip">
+        <button class="screen yt" type="button" data-id="WUMLAS4kzHI" aria-label="Play: Socure demo at BAI Retail Delivery 2014"><img src="https://i.ytimg.com/vi/WUMLAS4kzHI/hqdefault.jpg" alt="" loading="lazy"><span class="play"></span></button>
+        <div class="cap"><b>Social Biometric Analysis in Risk and Compliance</b><span>BAI Retail Delivery 2014 · Socure demo</span></div>
+      </div>
+      <div class="clip">
+        <div class="screen"><video src="media/clips/sunil_on_camera.mp4" controls playsinline preload="metadata" poster="media/portraits/p_2022.jpg"></video></div>
+        <div class="cap"><b>Sunil Madhu on Instnt</b><span>Instnt · 2021</span></div>
+      </div>
+    </div>
+    <div class="more">
+      <a href="https://ffnews.com/videos/sunil-madhu-instnt-fintech-meetup-2023" rel="noopener">FF News · Fintech Meetup 2023</a>
+      <a href="https://instnt.ai/resources/videos/" rel="noopener">Instnt videos &amp; demos</a>
+      <a href="https://finovate.com/videos/finovatefall-2013-socure" rel="noopener">FinovateFall 2013 · Socure</a>
+      <a href="https://ppacc.player.fm/series/insurtechsio/the-founders-journey-ai-fraud-prevention-and-insurance-with-sunil-madhu" rel="noopener">Founders Journey podcast</a>
+      <a href="https://insights.som.yale.edu/insights/can-we-secure-online-identities" rel="noopener">Yale Insights interview</a>
+    </div>
+  </section>
+
+  <section class="wrap" id="numbers" style="padding:14vh clamp(16px,4vw,48px)">
+    <div class="stats">
+      <div class="stat"><b>30+</b><span>years building software and companies</span></div>
+      <div class="stat"><b>4</b><span>companies founded</span></div>
+      <div class="stat"><b>10</b><span>issued US patents</span></div>
+      <div class="stat"><b>$200M+</b><span>raised as a founder</span></div>
+      <div class="stat"><b>$5B+</b><span>Socure's valuation today</span></div>
+      <div class="stat"><b>$100M+</b><span>in exits, plus an IPO, on teams I was part of</span></div>
+    </div>
+  </section>
+
+  <section class="wrap" id="career" style="padding:6vh clamp(16px,4vw,48px) 10vh">
+    <div class="panel">
+      <h2>The record</h2>
+      <table class="ledger">
+        <thead><tr><th>Years</th><th>Company</th><th>Role</th><th>What I did</th></tr></thead>
+        <tbody>
+          <tr><td>2026 – now</td><td>Asyml8<span class="tag">Founder</span></td><td>Founder, CEO &amp; CTO</td><td>Brahma, a graph-native AI mesh that runs on everyday hardware.</td></tr>
+          <tr><td>2019 – now</td><td>Instnt<span class="tag">Founder</span></td><td>Founder &amp; CEO</td><td>AI underwriting platform for identity fraud loss insurance.</td></tr>
+          <tr><td>2011 – 2019</td><td>Socure<span class="tag">Founder</span></td><td>Founder, CEO &amp; CTO; later CSO</td><td>Built the company and its technology from zero to double-digit millions in revenue.</td></tr>
+          <tr><td>2010 – 2012</td><td>Hopskoch<span class="tag">Founder</span></td><td>Founder, CEO &amp; Chairman</td><td>Cross-channel campaign platform; pilots in the US, Europe and China.</td></tr>
+          <tr><td>2010</td><td>SunGard Availability Services</td><td>VP, Solutions Engineering</td><td>Realigned 200 engineers and 7 directors with sales; ran a $20M budget.</td></tr>
+          <tr><td>2007 – 2010</td><td>Cisco</td><td>Chief Architect, Policy Management</td><td>Identity and policy across WebEx, NAC, Call Manager and more.</td></tr>
+          <tr><td>2006 – 2007</td><td>Securent</td><td>Senior Solutions Architect</td><td>Entitlement management; helped drive the $100M sale to Cisco.</td></tr>
+          <tr><td>2004 – 2006</td><td>CA</td><td>VP, Technical Account Manager</td><td>Identity management and security for enterprise customers.</td></tr>
+          <tr><td>1999 – 2004</td><td>Netegrity</td><td>Senior Architect</td><td>Authentication and access security for Fortune 500 firms.</td></tr>
+          <tr><td>1999</td><td>EDS</td><td>Senior Architect</td><td>Data management strategy for the Commonwealth of Massachusetts.</td></tr>
+          <tr><td>1994 – 1999</td><td>Texaco (now Chevron)</td><td>Systems Administrator, then IT Manager</td><td>IT infrastructure for the Middle East.</td></tr>
+        </tbody>
+      </table>
+      <div class="facts">
+        <div><h3>Education</h3><p>MSc, Computer Information Systems, Glasgow Caledonian University, 1992</p><p>BSc, Computer Science, University of Strathclyde, 1990</p></div>
+        <div><h3>Investing &amp; inventions</h3><p>Angel investor through Cohen &amp; Co and Parameter Ventures.</p><p>Named inventor on 10 issued US patents covering identity risk scoring and face-plus-social authentication.</p></div>
+        <div><h3>Speaking</h3><p>Opening keynote, TiECon East 2026: <em>Who pays when the machine is wrong?</em></p><p>Also Finovate, Identity Week America, InsurTech NY and Cisco Live.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact wrap" id="contact">
+    <div class="panel">
+      <div class="era">Now</div>
+      <h2>Let's talk.</h2>
+      <p>Founders, investors, banks and insurers: the fastest way to reach me is LinkedIn.</p>
+      <div class="links">
+        <a href="https://www.linkedin.com/in/sunilmadhu/" rel="noopener"><span>LinkedIn</span><span>linkedin.com/in/sunilmadhu</span></a>
+        <a href="https://mybrahma.com" rel="noopener"><span>Brahma</span><span>mybrahma.com</span></a>
+        <a href="https://asyml8.com" rel="noopener"><span>Asyml8</span><span>asyml8.com</span></a>
+        <a href="https://www.instnt.ai" rel="noopener"><span>Instnt</span><span>instnt.ai</span></a>
+        <a href="mailto:hello@instnt.ai"><span>Instnt email</span><span>hello@instnt.ai</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><span>© 2026 Sunil Madhu</span><span>New York City</span></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/* ================= Media (swap or add files here) ================= */
+const MEDIA={
+  heroWide:"media/hero_wide.jpg", heroTall:"media/hero_tall.jpg",
+  photos:["media/portraits/p_2026.jpg","media/portraits/p_2022.jpg","media/portraits/p_2025.jpg","media/portraits/p_socure.jpg","media/portraits/p_bw.jpg","media/portraits/p_instnt.jpg",
+    "media/stills/keynote_cover.jpg","media/stills/slide_01.jpg","media/stills/slide_02.jpg","media/stills/slide_03.jpg","media/stills/slide_04.jpg","media/stills/slide_05.jpg","media/stills/slide_06.jpg",
+    "media/stills/slide_07.jpg","media/stills/slide_08.jpg","media/stills/slide_09.jpg","media/stills/slide_10.jpg","media/stills/slide_12.jpg","media/stills/slide_14.jpg","media/stills/slide_16.jpg","media/stills/slide_18.jpg"],
+  portraitCount:6,
+  videos:["media/clips/sunil_on_camera.mp4","media/clips/tiecon_clip_a.mp4"],
+  articles:[
+    {src:"Yale Insights",date:"October 2017",head:"Can we secure online identities?",dek:"An interview with Sunil Madhu at Yale SOM's Fintech Transformation Conference."},
+    {src:"United States Patent 9,147,117",date:"September 2015",head:"Analyzing facial recognition data and social network data for user authentication",dek:"Inventors: Sunil Madhu, Xinyu Li, Justin Kamerman"},
+    {src:"United States Patent 9,300,676",date:"March 2016",head:"Risk assessment using social networking data",dek:"Inventors: Sunil Madhu, Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"},
+    {src:"FinovateFall 2017",date:"September 2017",head:"Socure unveils digital-to-physical identity verification",dek:"Live demo on the Finovate stage."},
+    {src:"TiECon East 2026",date:"Opening keynote",head:"Who pays when the machine is wrong?",dek:"Sunil Madhu, Founder & CEO, Instnt"},
+    {src:"Instnt",date:"2019 to now",head:"Turning identity fraud losses into an insurable asset",dek:"Coverage backed by Munich Re and Swiss Re."},
+    {src:"Asyml8",date:"2026",head:"Brahma: run AI on the devices you already have",dek:"A graph-native AI mesh. Open source."},
+    {src:"InsurTech NY",date:"Match Education Day",head:"Getting to Series B/C",dek:"Panelist: Sunil Madhu"}
+  ]
+};
+const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MOBILE=matchMedia("(max-width: 760px)").matches;
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)), lerp=(a,b,t)=>a+(b-a)*t;
+const smooth=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0),0,1);return t*t*(3-2*t);};
+function rng(seed){let s=seed>>>0;return()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+const rand=rng(20260918);
+
+/* ================= Looking: cursor, tilt or camera ================= */
+const look={tx:0,ty:0,x:0,y:0,src:"cursor"};
+addEventListener("pointermove",e=>{if(look.src!=="camera"){look.tx=(e.clientX/innerWidth-.5)*2;look.ty=-(e.clientY/innerHeight-.5)*2;}},{passive:true});
+addEventListener("deviceorientation",e=>{if(look.src==="cursor"&&MOBILE&&e.gamma!=null){look.tx=clamp(e.gamma/30,-1,1);look.ty=clamp((45-(e.beta||45))/30,-1,1);}});
+const camBtn=document.getElementById("camBtn"),camStatus=document.getElementById("camStatus");
+async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices)return;const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput"))return;camBtn.hidden=false;
+  let g=false;try{g=(await navigator.permissions.query({name:"camera"})).state==="granted";}catch(e){}if(g)startCamera();}catch(e){}}
+camBtn&&camBtn.addEventListener("click",startCamera);
+async function startCamera(){camBtn.disabled=true;camStatus.textContent="Starting camera…";
+  try{const stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:"user"},audio:false});
+    const v=document.createElement("video");v.muted=true;v.playsInline=true;v.srcObject=stream;await v.play();
+    camStatus.textContent="Loading face tracking…";
+    const vision=await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
+    const files=await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+    const lm=await vision.FaceLandmarker.createFromOptions(files,{baseOptions:{modelAssetPath:"https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",delegate:"GPU"},runningMode:"VIDEO",numFaces:1});
+    look.src="camera";camBtn.hidden=true;camStatus.textContent="Following your eyes. The video stays on your device.";
+    let last=-1;const tick=()=>{if(v.currentTime!==last){last=v.currentTime;const r=lm.detectForVideo(v,performance.now());const f=r.faceLandmarks&&r.faceLandmarks[0];
+      if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);}}requestAnimationFrame(tick);};tick();
+  }catch(err){look.src="cursor";camBtn.hidden=true;camStatus.textContent="Camera tracking isn't available in this viewer, so the portrait follows your cursor.";}}
+detectCamera();
+
+/* ================= Renderer and warehouse ================= */
+const canvas=document.getElementById("scene");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:"high-performance"});
+let pixelRatio=Math.min(devicePixelRatio||1,MOBILE?1.5:2);const maxPR=pixelRatio;
+renderer.setPixelRatio(pixelRatio);renderer.setSize(innerWidth,innerHeight,false);renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.setClearColor(0x07080a,1);
+const scene=new THREE.Scene();
+const FOG=new THREE.Color(0x090a0d);
+scene.fog=new THREE.Fog(FOG.clone().convertSRGBToLinear(),12,95);
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.05,400);
+const BAY=16; // distance between skylight bays
+
+function canvasTex(w,h,draw,rep){const c=document.createElement("canvas");c.width=w;c.height=h;draw(c.getContext("2d"),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;}t.anisotropy=8;return t;}
+// concrete floor with pools of light under each skylight
+const floorTex=canvasTex(512,1024,(g,w,h)=>{g.fillStyle="#0c0d10";g.fillRect(0,0,w,h);
+  const r=rng(7);for(let i=0;i<9000;i++){const v=10+r()*14|0;g.fillStyle=`rgba(${v},${v+1},${v+3},.5)`;g.fillRect(r()*w,r()*h,1+r()*2,1+r()*2);}
+  for(let k=0;k<2;k++){const gr=g.createRadialGradient(w/2,h*(.25+k*.5),10,w/2,h*(.25+k*.5),w*.5);gr.addColorStop(0,"rgba(196,184,160,.20)");gr.addColorStop(1,"rgba(196,184,160,0)");g.fillStyle=gr;g.fillRect(0,0,w,h);}
+  g.strokeStyle="rgba(0,0,0,.5)";g.lineWidth=2;for(let y=0;y<h;y+=h/4){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke();}g.beginPath();g.moveTo(w/2,0);g.lineTo(w/2,h);g.stroke();},true);
+floorTex.repeat.set(2,180/(BAY*2));
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(32,180),new THREE.MeshBasicMaterial({map:floorTex,fog:true}));
+floor.rotation.x=-Math.PI/2;floor.position.set(0,-3.4,-70);scene.add(floor);
+// pillars and ceiling beams
+const pillarTex=canvasTex(64,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"#2a2a2c");gr.addColorStop(.35,"#1a1b1e");gr.addColorStop(1,"#0e0f12");g.fillStyle=gr;g.fillRect(0,0,w,h);
+  const r=rng(3);for(let i=0;i<500;i++){g.fillStyle=`rgba(255,255,255,${r()*.03})`;g.fillRect(r()*w,r()*h,1,2);}g.fillStyle="rgba(255,255,255,.05)";g.fillRect(0,0,3,h);});
+const pillarMat=new THREE.MeshBasicMaterial({map:pillarTex,fog:true});
+const beamMat=new THREE.MeshBasicMaterial({color:0x111216,fog:true});
+const lightMat=new THREE.MeshBasicMaterial({color:0x6d675c,fog:true});
+for(let z=8;z>-170;z-=BAY){
+  [-1,1].forEach(s=>{const p=new THREE.Mesh(new THREE.BoxGeometry(.9,13,.9),pillarMat);p.position.set(s*10.5,3.1,z);scene.add(p);});
+  const beam=new THREE.Mesh(new THREE.BoxGeometry(22,.6,.5),beamMat);beam.position.set(0,9.4,z);scene.add(beam);
+  const strip=new THREE.Mesh(new THREE.BoxGeometry(2.6,.05,6),lightMat);strip.position.set(0,9.6,z-BAY/2);scene.add(strip);
+}
+// soft light shafts from the skylights (very faint haze)
+const shaftTex=canvasTex(128,512,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"rgba(255,240,215,.55)");gr.addColorStop(1,"rgba(255,240,215,0)");g.fillStyle=gr;g.fillRect(0,0,w,h);
+  const m=g.createLinearGradient(0,0,w,0);m.addColorStop(0,"rgba(0,0,0,1)");m.addColorStop(.5,"rgba(0,0,0,0)");m.addColorStop(1,"rgba(0,0,0,1)");g.globalCompositeOperation="destination-out";g.fillStyle=m;g.fillRect(0,0,w,h);});
+const shaftMat=new THREE.MeshBasicMaterial({map:shaftTex,transparent:true,opacity:.07,depthWrite:false,blending:THREE.AdditiveBlending,fog:true,side:THREE.DoubleSide});
+for(let z=8-BAY/2;z>-170;z-=BAY){const m=new THREE.Mesh(new THREE.PlaneGeometry(4.5,13),shaftMat);m.position.set(0,3,z);m.rotation.y=.5;m.rotation.z=.12;scene.add(m);
+  const m2=m.clone();m2.rotation.y=-.6;scene.add(m2);}
+
+/* ================= Textures for the prints ================= */
+const loader=new THREE.TextureLoader();
+const tall=innerWidth/innerHeight<.9;
+const heroTex=loader.load(tall?MEDIA.heroTall:MEDIA.heroWide);heroTex.encoding=THREE.sRGBEncoding;heroTex.anisotropy=8;
+const GX=8,GY=4,CS=256;
+const photoCanvas=document.createElement("canvas");photoCanvas.width=GX*CS;photoCanvas.height=GY*CS;const pctx=photoCanvas.getContext("2d");pctx.fillStyle="#222";pctx.fillRect(0,0,photoCanvas.width,photoCanvas.height);
+const photoTex=new THREE.CanvasTexture(photoCanvas);photoTex.encoding=THREE.sRGBEncoding;photoTex.anisotropy=8;
+MEDIA.photos.forEach((src,i)=>{const im=new Image();im.onload=()=>{const cx=(i%GX)*CS,cy=Math.floor(i/GX)*CS;const s=Math.max(CS/im.width,CS/im.height);const w=im.width*s,h=im.height*s;
+  pctx.save();pctx.beginPath();pctx.rect(cx,cy,CS,CS);pctx.clip();pctx.drawImage(im,cx+(CS-w)/2,cy+(CS-h)/2,w,h);pctx.restore();photoTex.needsUpdate=true;};im.src=src;});
+// press clippings
+const AX=4,AY=2,AS=512;
+const artCanvas=document.createElement("canvas");artCanvas.width=AX*AS;artCanvas.height=AY*AS;const actx=artCanvas.getContext("2d");
+const artTex=new THREE.CanvasTexture(artCanvas);artTex.encoding=THREE.sRGBEncoding;artTex.anisotropy=8;
+function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(" ");let line="",n=0;for(const w of words){const t=line?line+" "+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(line,x,y+n*lh);n++;line=w;if(n>=maxLines)return n;}else line=t;}if(line){g.fillText(line,x,y+n*lh);n++;}return n;}
+function drawArticles(){MEDIA.articles.forEach((a,i)=>{const x=(i%AX)*AS,y=Math.floor(i/AX)*AS,g=actx;const r=rng(100+i);
+  g.save();g.translate(x,y);g.fillStyle="#efe9dc";g.fillRect(0,0,AS,AS);
+  for(let k=0;k<1800;k++){g.fillStyle=`rgba(80,70,50,${r()*.05})`;g.fillRect(r()*AS,r()*AS,1+r()*2,1);}
+  g.fillStyle="#1b1a17";g.font="500 22px 'IBM Plex Mono', monospace";g.fillText(a.src.toUpperCase(),36,62);
+  g.fillStyle="#6a6457";g.font="400 18px 'IBM Plex Mono', monospace";g.fillText(a.date,36,92);
+  g.fillStyle="#1b1a17";g.fillRect(36,112,AS-72,3);
+  g.font="italic 500 46px Fraunces, Georgia, serif";const n=wrapText(g,a.head,36,176,AS-72,52,5);
+  g.font="400 22px 'Source Serif 4', Georgia, serif";g.fillStyle="#3b3730";wrapText(g,a.dek,36,176+n*52+26,AS-72,30,3);
+  g.fillStyle="rgba(27,26,23,.18)";for(let l=0;l<4;l++)g.fillRect(36,AS-120+l*22,(AS-72)*(.6+r()*.4),8);
+  g.restore();});artTex.needsUpdate=true;}
+document.fonts.ready.then(drawArticles);drawArticles();
+function videoTex(src){const v=document.createElement("video");v.src=src;v.muted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.play().catch(()=>{});const t=new THREE.VideoTexture(v);t.encoding=THREE.sRGBEncoding;t.minFilter=THREE.LinearFilter;return{v,t};}
+const vids=MEDIA.videos.map(videoTex);
+addEventListener("pointerdown",()=>vids.forEach(x=>x.v.play().catch(()=>{})),{once:true});
+
+/* ================= The suspended portrait ================= */
+// The portrait is laid out on a virtual picture plane 10 units in front of the camera.
+// Each print hangs at its own depth along the line of sight, scaled so that from the
+// opening viewpoint it covers exactly its cell of the picture.
+const D=10, aspectImg=tall?820/1138:1600/1138;
+const viewH=2*D*Math.tan(THREE.MathUtils.degToRad(20));
+const viewW=viewH*innerWidth/innerHeight;
+let picH=viewH*.94, picW=picH*aspectImg; if(picW>viewW*.98){picW=viewW*.98;picH=picW/aspectImg;}
+const COLS=tall?26:(MOBILE?34:58), ROWS=Math.round(COLS/aspectImg);
+const cellW=picW/COLS, cellH=picH/ROWS;
+const lumCanvas=document.createElement("canvas");lumCanvas.width=COLS;lumCanvas.height=ROWS;
+const prints=[];
+const START=new THREE.Vector3(0,0,10), END_Z=-118;
+let N=0, mesh=null, aHero, aKind, aCell, aSeed;
+const geo=new THREE.PlaneGeometry(1,1);
+const U={uHero:{value:heroTex},uPhoto:{value:photoTex},uArt:{value:artTex},uVidA:{value:vids[0].t},uVidB:{value:vids[1].t},
+  uFog:{value:FOG.clone().convertSRGBToLinear()},uFocus:{value:7},uDof:{value:0},uMosaic:{value:1},uTime:{value:0},uCamZ:{value:10}};
+const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
+  vertexShader:`attribute vec4 aHero;attribute float aKind;attribute float aCell;attribute float aSeed;
+    varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;
+    void main(){vUv=uv;vHero=aHero;vKind=aKind;vCell=aCell;vSeed=aSeed;vec4 w=modelMatrix*instanceMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vDepth=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform sampler2D uHero,uPhoto,uArt,uVidA,uVidB;uniform vec3 uFog;uniform float uFocus,uDof,uMosaic,uTime,uCamZ;
+    varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;
+    vec3 lin(vec3 c){return pow(c,vec3(2.2));}
+    vec4 blurTex(sampler2D t,vec2 uv,float b){return texture2D(t,uv,b);}
+    void main(){
+      float coc=clamp(abs(vDepth-uFocus)/(uFocus*.9),0.,1.)*uDof; float bias=coc*5.5;
+      vec3 col; vec2 uv=vUv;
+      if(gl_FrontFacing){
+        col=lin(blurTex(uHero,vHero.xy+(uv-.5)*vHero.zw,bias*.6).rgb);
+        float e=min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y));col=mix(col*1.08+.008,col,smoothstep(.0,.03,e)); // thin paper edge
+      } else {
+        uv.x=1.-uv.x;
+        if(vKind>1.5){ // press clipping, full bleed
+          float c=mod(vCell,4.),r=floor(vCell/4.);col=lin(blurTex(uArt,(vec2(c,1.-r)+uv)/vec2(4.,2.),bias).rgb);
+        } else { // polaroid: photo or video
+          vec2 iuv=vec2((uv.x-.06)/.88,(uv.y-.22)/.74);bool inside=iuv.x>0.&&iuv.x<1.&&iuv.y>0.&&iuv.y<1.;
+          vec3 ph;
+          if(vKind>.5){ph=lin((vCell<.5?texture2D(uVidA,clamp(iuv,0.,1.)):texture2D(uVidB,clamp(iuv,0.,1.))).rgb);}
+          else{float c=mod(vCell,8.),r=floor(vCell/8.);ph=lin(blurTex(uPhoto,(vec2(c,3.-r)+clamp(iuv,0.,1.))/vec2(8.,4.),bias).rgb);}
+          col=inside?ph:lin(vec3(.93,.91,.86));
+        }
+      }
+      // warehouse light: brighter under each skylight bay, a soft key light near the camera
+      float bay=.55+.45*cos((vW.z-${(8-BAY/2).toFixed(1)})*6.2832/${BAY.toFixed(1)});
+      float key=exp(-pow(vDepth/14.,2.));
+      float light=mix(.38+.5*bay*exp(-abs(vW.x)/9.)+.35*key,1.,uMosaic);
+      col*=light;
+      col=mix(col,col*vec3(.75,.78,.85),coc*.6); // distant prints go cooler and softer
+      float f=smoothstep(12.,95.,vDepth);col=mix(col,uFog,f);
+      gl_FragColor=vec4(col,1.);
+      #include <encodings_fragment>
+    }`});
+
+function buildPrints(){
+  const img=new Image();img.onload=()=>{
+    const g=lumCanvas.getContext("2d");g.drawImage(img,0,0,COLS,ROWS);const d=g.getImageData(0,0,COLS,ROWS).data;
+    const list=[];
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const k=(r*COLS+c)*4;const lum=(.2126*d[k]+.7152*d[k+1]+.0722*d[k+2])/255;if(lum<.035)continue;list.push({c,r,lum});}
+    N=list.length;aHero=new Float32Array(N*4);aKind=new Float32Array(N);aCell=new Float32Array(N);aSeed=new Float32Array(N);
+    const nArt=MEDIA.articles.length;
+    list.forEach((L,i)=>{
+      const px=-picW/2+(L.c+.5)*cellW, py=picH/2-(L.r+.5)*cellH;
+      const depth=D*(.72+rand()*.56); // distance from the camera along the ray
+      const s=depth/D;
+      const p={rel:new THREE.Vector3(px*s,py*s,-depth),sx:cellW*s*1.004,sy:cellH*s*1.004,seed:rand()};
+      aHero.set([(L.c+.5)/COLS,1-(L.r+.5)/ROWS,1/COLS,1/ROWS],i*4);
+      const r=rand();
+      aKind[i]=r<.12?2:(r<.2?1:0);
+      aCell[i]=aKind[i]===2?Math.floor(rand()*nArt):aKind[i]===1?(rand()<.75?0:1):(rand()<.45?Math.floor(rand()*MEDIA.portraitCount):Math.floor(rand()*MEDIA.photos.length));
+      aSeed[i]=p.seed;
+      // flight: spread through the warehouse, some close and sharp, many far and soft
+      const near=rand()<.35;
+      p.fx=(rand()<.5?-1:1)*(near?1.3+rand()*3.2:1+rand()*8.5);
+      p.fy=-2.2+rand()*(near?4.6:9);
+      p.fz=8-rand()*160;
+      p.fs=(aKind[i]===2?1.2:1)*(near?.6+rand()*.6:.8+rand()*1.2);
+      p.stored=rand()<.45; // these stay up in the rafters during the walk, so the aisle breathes
+      { // hang clear of the walking path
+        const tr=clamp((p.fz-5.5)/(END_Z-5.5),0,1), cx=Math.sin(tr*Math.PI*3)*1.1*tr, cy=.3*Math.sin(tr*Math.PI*2);
+        const dx=p.fx-cx, dy=p.fy-cy, rr=Math.hypot(dx,dy), minR=1.7+p.fs*.8;
+        if(rr<minR){const k=minR/Math.max(rr,.01);p.fx=cx+dx*k;p.fy=cy+dy*k;} }
+      p.baseYaw=(rand()-.5)*.9; p.th=0; p.om=0; p.sw=0; p.swv=0; // twirl and swing state
+      p.side=p.fx>0?1:-1;
+      p.pos=new THREE.Vector3().copy(p.rel).add(START);p.q=new THREE.Quaternion();p.scl=new THREE.Vector3(p.sx,p.sy,1);
+      prints.push(p);
+    });
+    geo.setAttribute("aHero",new THREE.InstancedBufferAttribute(aHero,4));
+    geo.setAttribute("aKind",new THREE.InstancedBufferAttribute(aKind,1));
+    geo.setAttribute("aCell",new THREE.InstancedBufferAttribute(aCell,1));
+    geo.setAttribute("aSeed",new THREE.InstancedBufferAttribute(aSeed,1));
+    mesh=new THREE.InstancedMesh(geo,mat,N);mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;scene.add(mesh);
+    // barely-there hanging wires, dark against the dark
+    wirePos=new Float32Array(N*6);wireGeo.setAttribute("position",new THREE.BufferAttribute(wirePos,3).setUsage(THREE.DynamicDrawUsage));
+    wires=new THREE.LineSegments(wireGeo,new THREE.LineBasicMaterial({color:0x3a3833,transparent:true,opacity:.35,fog:true}));wires.frustumCulled=false;scene.add(wires);
+  };img.src=tall?MEDIA.heroTall:MEDIA.heroWide;
+}
+let wires=null,wirePos=null;const wireGeo=new THREE.BufferGeometry();
+buildPrints();
+
+/* ================= Story progress ================= */
+let P=0;
+function camAt(p){ // camera rig along the warehouse
+  const a=smooth(.06,.17,p); // the reveal: step in and to the side
+  const travel=smooth(.17,.9,p);
+  const x=lerp(0,2.2,a)*(1-travel)+Math.sin(travel*Math.PI*3)*1.1*travel*(1-smooth(.85,.95,p));
+  const y=lerp(0,.6,a)*(1-travel)+.3*Math.sin(travel*Math.PI*2);
+  const z=lerp(10,5.5,a)+(END_Z-5.5)*travel;
+  return new THREE.Vector3(x,y,z);
+}
+const qA=new THREE.Quaternion(),qB=new THREE.Quaternion(),qFlip=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI),eul=new THREE.Euler(),M=new THREE.Matrix4(),vT=new THREE.Vector3(),sT=new THREE.Vector3();
+let last=performance.now(),ema=16,adaptT=0,lastScroll=scrollY,scrollVel=0;
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;U.uTime.value=t;
+  ema=lerp(ema,dt*1000,.05);adaptT+=dt;
+  if(adaptT>1.2){adaptT=0;if(ema>21&&pixelRatio>.7){pixelRatio=Math.max(.7,pixelRatio-.15);renderer.setPixelRatio(pixelRatio);renderer.setSize(innerWidth,innerHeight,false);}
+    else if(ema<14&&pixelRatio<maxPR){pixelRatio=Math.min(maxPR,pixelRatio+.1);renderer.setPixelRatio(pixelRatio);renderer.setSize(innerWidth,innerHeight,false);}}
+  look.x=lerp(look.x,look.tx,1-Math.exp(-dt*4));look.y=lerp(look.y,look.ty,1-Math.exp(-dt*4));
+  const sv=(scrollY-lastScroll)/Math.max(dt,1e-3);lastScroll=scrollY;scrollVel=lerp(scrollVel,sv,.12);
+  const airPush=REDUCED?0:clamp(scrollVel/1400,-1.6,1.6);
+  const cam=camAt(P);
+  const assembledStart=1-smooth(.1,.22,P), assembledEnd=smooth(.88,.97,P);
+  const mosaic=Math.max(assembledStart,assembledEnd);
+  // looking around: a small orbit near the portrait, a wider sway in flight
+  const sway=lerp(.9,.16,mosaic);
+  camera.position.set(cam.x+look.x*sway,cam.y+look.y*sway*.6,cam.z);
+  camera.lookAt(cam.x*.6,cam.y*.6,cam.z-D);
+  U.uMosaic.value=smooth(.2,1,mosaic);U.uDof.value=1-smooth(.3,.9,mosaic);U.uFocus.value=6.5;U.uCamZ.value=cam.z;
+  if(mesh){
+    const base=assembledEnd>assembledStart?new THREE.Vector3(0,0,END_Z):START;
+    for(let i=0;i<N;i++){const p=prints[i];
+      const a=smooth(p.seed*.4,p.seed*.4+.6,mosaic);
+      // hanging prints: walking past pushes air, so nearby prints twirl on their wire and swing
+      if(a<.9){
+        const dz=p.fz-cam.z, near=Math.exp(-(dz*dz)/90-((p.fx-cam.x)**2)/40);
+        const push=airPush*near;
+        p.om+=(push*p.side*2.4-1.1*p.th-.32*p.om)*dt; p.th+=p.om*dt;
+        p.swv+=(push*1.3-2.6*p.sw-.55*p.swv)*dt; p.sw+=p.swv*dt;
+      }
+      const fh0=p.fs*1.04, fx=p.fx, fy=(p.stored?15+p.seed*4:p.fy)+Math.sin(t*.5+p.seed*11)*.03, fz=p.fz-Math.sin(p.sw)*fh0*.5;
+      vT.set(lerp(fx,base.x+p.rel.x,a),lerp(fy,base.y+p.rel.y,a),lerp(fz,base.z+p.rel.z,a));
+      if(a>.995){vT.x+=Math.sin(t*.7+p.seed*40)*.003;vT.y+=Math.cos(t*.6+p.seed*30)*.003;}
+      if(p.pos.distanceToSquared(vT)>900)p.pos.copy(vT);else p.pos.lerp(vT,1-Math.exp(-dt*(a>.5?3.2:1.6+p.seed*1.6)));
+      // orientation: square to the camera in the portrait; turned around and slowly spinning in flight
+      const idle=REDUCED?0:1;
+      eul.set(p.sw+.04*idle*Math.sin(t*.6+p.seed*9),p.baseYaw+p.th+.22*idle*Math.sin(t*.23+p.seed*6),.03*idle*Math.sin(t*.5+p.seed*7),"YXZ");
+      qB.setFromEuler(eul).multiply(qFlip);qA.identity().slerp(qB,1-a);p.q.slerp(qA,1-Math.exp(-dt*4));
+      const kind=aKind[i];const fw=p.fs*(kind===2?1:.88), fh=p.fs*(kind===2?1:1.04);
+      sT.set(lerp(fw,p.sx,a),lerp(fh,p.sy,a),1);p.scl.lerp(sT,1-Math.exp(-dt*4));
+      M.compose(p.pos,p.q,p.scl);mesh.setMatrixAt(i,M);
+      const j=i*6,top=p.pos.y+p.scl.y*.5;wirePos[j]=p.pos.x;wirePos[j+1]=top;wirePos[j+2]=p.pos.z;wirePos[j+3]=p.pos.x;wirePos[j+4]=(a<.6||i%4===0)?9.4:top;wirePos[j+5]=p.pos.z;
+    }
+    mesh.instanceMatrix.needsUpdate=true;wireGeo.attributes.position.needsUpdate=true;
+    wires.material.opacity=.3*(1-.6*mosaic);
+  }
+  renderer.render(scene,camera);
+  requestAnimationFrame(frame);
+}
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);});
+
+/* ================= Scroll story ================= */
+gsap.registerPlugin(ScrollTrigger);
+let lenis=null;
+if(!REDUCED&&window.Lenis){lenis=new Lenis({lerp:.08,smoothWheel:true});lenis.on("scroll",ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);}
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{const el=document.querySelector(a.getAttribute("href"));if(el){e.preventDefault();lenis?lenis.scrollTo(el,{offset:-20}):el.scrollIntoView({behavior:REDUCED?"auto":"smooth"});}}));
+ScrollTrigger.create({start:0,end:"max",onUpdate:s=>{P=s.progress;document.getElementById("progress").style.transform=`scaleX(${s.progress})`;}});
+document.querySelectorAll(".split").forEach(h=>{const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(w=>{if(!w)return;if(/^\s+$/.test(w))f.append(w);else{const s=document.createElement("span");s.className="word";s.textContent=w;f.append(s);}});c.replaceWith(f);}else walk(c);});};walk(h);});
+if(!REDUCED){
+  document.querySelectorAll(".chapter .card").forEach(card=>{
+    gsap.fromTo(card,{y:140},{y:-80,ease:"none",scrollTrigger:{trigger:card,start:"top bottom",end:"bottom top",scrub:true}});
+    gsap.fromTo(card.querySelectorAll(".word"),{y:"0.6em",opacity:.12},{y:0,opacity:1,stagger:.04,ease:"power2.out",scrollTrigger:{trigger:card,start:"top 85%",end:"top 35%",scrub:true}});
+    if(card.querySelector("li"))gsap.fromTo(card.querySelectorAll("li"),{x:-18,opacity:.3},{x:0,opacity:1,stagger:.06,scrollTrigger:{trigger:card,start:"top 70%",end:"top 30%",scrub:true}});
+  });
+  gsap.fromTo(".stat",{y:80,opacity:.3},{y:0,opacity:1,stagger:.08,scrollTrigger:{trigger:"#numbers",start:"top 90%",end:"top 40%",scrub:true}});
+  gsap.to(".hero .copy",{y:-60,opacity:0,ease:"none",scrollTrigger:{trigger:".hero",start:"top top",end:"60% top",scrub:true}});
+}
+
+/* ================= Music: a YouTube Music playlist that starts with the visit ================= */
+// Paste the playlist link or its id (the part after list=) from music.youtube.com.
+const MUSIC={playlist:"", startVolume:45};
+(function(){
+  const id=(MUSIC.playlist.match(/list=([\w-]+)/)||[])[1]||MUSIC.playlist.trim();
+  if(!id)return;
+  const box=document.getElementById("music"),deck=document.getElementById("deck"),btn=document.getElementById("soundBtn"),label=document.getElementById("soundLabel");
+  box.hidden=false;deck.hidden=false;
+  let player=null,ready=false,wantSound=true,userMuted=false;
+  try{if(localStorage.getItem("sm-music-muted")==="1"){userMuted=true;wantSound=false;}}catch(e){}
+  const setUI=on=>{box.classList.toggle("playing",on);btn.setAttribute("aria-pressed",on?"true":"false");label.textContent=on?"Sound on":(ready&&!userMuted?"Tap for sound":"Sound off");};
+  const apply=()=>{if(!ready)return;if(wantSound&&!userMuted){player.unMute();player.setVolume(MUSIC.startVolume);player.playVideo();setUI(!player.isMuted());}else{player.mute();setUI(false);}};
+  window.onYouTubeIframeAPIReady=()=>{
+    player=new YT.Player("ytplayer",{width:200,height:200,playerVars:{listType:"playlist",list:id,autoplay:1,mute:1,controls:1,playsinline:1,rel:0,modestbranding:1,loop:1},
+      events:{onReady:()=>{ready=true;player.playVideo();player.setShuffle&&player.setShuffle(true);apply();},onStateChange:()=>setUI(ready&&!player.isMuted()&&player.getPlayerState()===1)}});
+  };
+  const s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.onerror=()=>{box.hidden=true;};document.head.append(s);
+  // Browsers allow sound only after the visitor's first tap, click or key press
+  const unlock=()=>{if(!userMuted){wantSound=true;apply();}};
+  ["pointerdown","keydown","touchend"].forEach(ev=>addEventListener(ev,unlock,{once:true,passive:true}));
+  btn.addEventListener("click",e=>{e.stopPropagation();
+    userMuted=!!(ready&&!player.isMuted());
+    try{localStorage.setItem("sm-music-muted",userMuted?"1":"0");}catch(e){}wantSound=!userMuted;apply();});
+  document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();}});
+})();
+
+/* On camera: load the YouTube player only when a card is clicked */
+document.querySelectorAll(".clip .yt").forEach(b=>b.addEventListener("click",()=>{
+  const f=document.createElement("iframe");f.src=`https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1&rel=0`;
+  f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";f.allowFullscreen=true;f.title=b.getAttribute("aria-label");b.replaceChildren(f);b.style.cursor="default";}));
+requestAnimationFrame(t=>{last=t;frame(t);});
+</script>
+</body>
+</html>
