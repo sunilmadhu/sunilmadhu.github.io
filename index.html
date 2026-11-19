@@ -89,9 +89,31 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .facts{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:28px}
 .facts h3{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
 .facts p{margin:0 0 .5em; font-size:.97rem}
-.contact{min-height:130vh; display:flex; align-items:flex-end; padding-bottom:10vh}
-.contact .panel{max-width:540px}
-.contact h2{font-style:italic; font-size:clamp(2.6rem,6vw,4.4rem)}
+.contact{min-height:auto; display:block; padding-top:24vh; padding-bottom:14vh}
+.contact-head{max-width:620px}
+.contact-head p{color:var(--dim); font-size:1.05rem; margin-top:4px}
+.contact h2{font-style:italic; font-size:clamp(2.6rem,6vw,4.4rem); margin:6px 0 10px; text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px}
+.chips a{font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; color:var(--text); text-decoration:none; padding:7px 12px; border:1px solid var(--line); border-radius:999px; background:rgba(10,11,14,.55); transition:border-color .2s,background .2s}
+.chips a:hover{border-color:rgba(232,179,107,.6); background:rgba(232,179,107,.08)}
+/* the calendar hangs like one of the prints: a wire from the dark, a clip, a paper frame */
+.booking{position:relative; padding-top:140px; margin-top:2vh; display:flex; justify-content:center}
+.wire{position:absolute; top:0; left:50%; width:1px; height:150px; background:linear-gradient(rgba(237,234,227,0),rgba(237,234,227,.55)); transform-origin:top; transform:scaleY(0)}
+.print{position:relative; width:100%; margin:0; padding:14px 14px 0; background:#f3efe6; border-radius:2px; transform-origin:50% -140px;
+  box-shadow:0 40px 90px rgba(0,0,0,.65),0 6px 18px rgba(0,0,0,.4); opacity:0}
+.print::after{content:""; position:absolute; inset:14px 14px 52px; pointer-events:none; background:linear-gradient(105deg,transparent 35%,rgba(255,236,200,.55) 50%,transparent 65%); background-size:250% 100%; background-position:120% 0; opacity:0}
+.print.developed::after{animation:sweep 1.8s ease-out .2s 1}
+@keyframes sweep{0%{opacity:1;background-position:120% 0}100%{opacity:0;background-position:-30% 0}}
+.clip{position:absolute; top:-16px; left:50%; width:54px; height:26px; margin-left:-27px; border-radius:3px; background:linear-gradient(#4a4c52,#24262a); box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.clip::before{content:""; position:absolute; left:50%; top:-10px; width:16px; height:12px; margin-left:-8px; border:2px solid #6a6d74; border-bottom:0; border-radius:8px 8px 0 0}
+.cal{position:relative; height:min(720px,82vh); background:#fff; overflow:hidden; filter:brightness(.12) sepia(.7) blur(6px); transition:filter 1.8s cubic-bezier(.2,.7,.2,1)}
+.print.developed .cal{filter:none}
+.cal iframe{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; border:0}
+.cal-wait{position:absolute; inset:0; display:grid; place-items:center; font-family:var(--mono); font-size:.8rem; color:#6b665c}
+.print figcaption{display:flex; justify-content:space-between; gap:12px; align-items:center; height:52px; font-family:var(--mono); font-size:.7rem; letter-spacing:.05em; color:#6b665c}
+.print figcaption a{color:#8a5a1c; text-decoration:none; cursor:pointer}
+.print figcaption a:hover{text-decoration:underline}
+@media (max-width:640px){.booking{padding-top:90px}.wire{height:100px}.print{padding:8px 8px 0;transform-origin:50% -90px}.print::after{inset:8px 8px 52px}.cal{height:78vh}.print figcaption span{display:none}}
 .links{display:grid; gap:10px; margin-top:22px}
 .links a{display:flex; justify-content:space-between; gap:12px; padding:13px 16px; border:1px solid var(--line); border-radius:4px; color:var(--text); text-decoration:none; font-family:var(--mono); font-size:.84rem; transition:background .2s,border-color .2s}
 .links a:hover{background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.3)}
@@ -378,17 +400,25 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
   </section>
 
   <section class="contact wrap" id="contact">
-    <div class="panel">
+    <div class="contact-head">
       <div class="era">Now</div>
       <h2>Let's talk.</h2>
-      <p>Founders, investors, banks and insurers: the fastest way to reach me is LinkedIn.</p>
-      <div class="links">
-        <a href="https://www.linkedin.com/in/sunilmadhu/" rel="noopener"><span>LinkedIn</span><span>linkedin.com/in/sunilmadhu</span></a>
-        <a href="https://mybrahma.com" rel="noopener"><span>Brahma</span><span>mybrahma.com</span></a>
-        <a href="https://asyml8.com" rel="noopener"><span>Asyml8</span><span>asyml8.com</span></a>
-        <a href="https://www.instnt.ai" rel="noopener"><span>Instnt</span><span>instnt.ai</span></a>
-        <a href="mailto:hello@instnt.ai"><span>Instnt email</span><span>hello@instnt.ai</span></a>
-      </div>
+      <p>Founders, investors, banks and insurers: pick a time on my calendar.</p>
+      <nav class="chips" aria-label="Elsewhere">
+        <a href="https://www.linkedin.com/in/sunilmadhu/" rel="noopener">LinkedIn</a>
+        <a href="https://mybrahma.com" rel="noopener">Brahma</a>
+        <a href="https://asyml8.com" rel="noopener">Asyml8</a>
+        <a href="https://www.instnt.ai" rel="noopener">Instnt</a>
+        <a href="mailto:hello@instnt.ai">hello@instnt.ai</a>
+      </nav>
+    </div>
+    <div class="booking" id="booking">
+      <i class="wire" aria-hidden="true"></i>
+      <figure class="print" id="print">
+        <i class="clip" aria-hidden="true"></i>
+        <div class="cal" id="cal"><p class="cal-wait">Opening my calendar…</p></div>
+        <figcaption><span>Times show in your own time zone</span><a id="calLink" rel="noopener" target="_blank">Open in Calendly ↗</a></figcaption>
+      </figure>
     </div>
   </section>
 </main>
@@ -788,6 +818,41 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   muteBtn.addEventListener("click",()=>{if(!ready)return;player.isMuted()?soundOn():soundOff();});
   document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();setTimeout(updateUI,600);}});
   setInterval(()=>{if(ready)updateUI();},4000);
+})();
+/* ================= Let's talk: Calendly hung like a print ================= */
+const BOOKING={url:"https://calendly.com/sunilmadhu/external-meeting"};
+(function(){
+  const print=document.getElementById("print"),cal=document.getElementById("cal"),wire=document.querySelector(".booking .wire");
+  const q=new URLSearchParams({embed_domain:location.hostname||"sunilmadhu.me",embed_type:"Inline",hide_gdpr_banner:"1",
+    background_color:"ffffff",text_color:"1b1a17",primary_color:"a86d24"});
+  document.getElementById("calLink").href=BOOKING.url;
+  let loaded=false,hung=false;
+  function develop(){print.classList.add("developed");}
+  function load(){if(loaded)return;loaded=true;
+    const f=document.createElement("iframe");f.title="Book a time with Sunil Madhu";f.loading="eager";f.allow="payment";
+    f.src=BOOKING.url+"?"+q.toString();
+    f.addEventListener("load",()=>{cal.querySelector(".cal-wait")?.remove();setTimeout(develop,hung?250:900);},{once:true});
+    cal.append(f);
+    setTimeout(develop,8000); // if the load event never comes, show what is there
+  }
+  // fetch the calendar a little before it scrolls into view
+  new IntersectionObserver((es,o)=>{if(es.some(e=>e.isIntersecting)){load();o.disconnect();}},{rootMargin:"120% 0px"}).observe(print);
+  function hang(){if(hung)return;hung=true;
+    if(REDUCED||!window.gsap){gsap?.set?.(wire,{scaleY:1});print.style.opacity=1;wire.style.transform="none";return;}
+    const tl=gsap.timeline();
+    tl.to(wire,{scaleY:1,duration:.9,ease:"power2.inOut"})
+      .fromTo(print,{opacity:0,y:-90,rotation:-5},{opacity:1,y:0,rotation:3.2,duration:1,ease:"power3.out"},"-=.35")
+      .to(print,{rotation:0,duration:3.2,ease:"elastic.out(1,0.22)"})
+      .add(sway);
+  }
+  // a slow idle sway that stops while the visitor is using the calendar
+  let swayTw=null;
+  function sway(){swayTw=gsap.fromTo(print,{rotation:-.35},{rotation:.35,duration:3.6,ease:"sine.inOut",yoyo:true,repeat:-1});}
+  let resume=null;
+  print.addEventListener("pointerenter",()=>{resume?.kill();if(swayTw){swayTw.pause();gsap.to(print,{rotation:0,duration:.6,ease:"power2.out"});}});
+  print.addEventListener("pointerleave",()=>{if(swayTw)resume=gsap.delayedCall(1.5,()=>swayTw.resume());});
+  if(window.ScrollTrigger)ScrollTrigger.create({trigger:"#booking",start:"top 78%",once:true,onEnter:hang});
+  else hang();
 })();
 /* On camera: load the YouTube player only when a card is clicked */
 document.querySelectorAll(".clip .yt").forEach(b=>b.addEventListener("click",()=>{
