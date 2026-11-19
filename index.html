@@ -117,6 +117,12 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .firsts b{font-weight:600; color:var(--text)}
 .builds{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr)); gap:16px; margin-bottom:28px}
 .build{border:1px solid var(--line); border-top:2px solid rgba(232,179,107,.55); border-radius:6px; padding:20px 22px 18px; background:rgba(255,255,255,.02)}
+.build{overflow:hidden}
+.b-shot{display:block; position:relative; margin:-20px -22px 16px; border-bottom:1px solid var(--line); background:#0c0c0c}
+.b-shot img{display:block; width:100%; height:auto; aspect-ratio:960/420; object-fit:cover; filter:saturate(.85) brightness(.9); transition:filter .3s}
+a.b-shot:hover img,a.b-shot:focus-visible img{filter:none}
+.b-shot span{position:absolute; left:10px; bottom:8px; font-family:var(--mono); font-size:.62rem; letter-spacing:.06em; color:var(--text); background:rgba(10,10,10,.74); padding:3px 7px; border-radius:3px}
+a.b-shot span::after{content:" ↗"}
 .build .b-meta{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; font-family:var(--mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
 .build .b-meta span:nth-child(2){color:var(--text)}
 .build h3{font-size:clamp(1.35rem,2vw,1.7rem); line-height:1.15; letter-spacing:-.015em; margin:10px 0 10px}
@@ -452,6 +458,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
       </ol>
       <div class="builds">
         <article class="build">
+          <a class="b-shot" href="https://mybrahma.com" target="_blank" rel="noopener"><img src="media/builds/brahma.webp" width="960" height="420" loading="lazy" decoding="async" alt="The mybrahma.com home page"><span>mybrahma.com</span></a>
           <div class="b-meta"><span>2026 – now</span><span>Asyml8</span><span class="tag">Founder</span></div>
           <h3>Brahma</h3>
           <p>A graph-native AI mesh. It breaks an open-weight language model into small graph vertices (attention heads, neuron groups and experts) and spreads them across ordinary Macs, PCs, Raspberry Pis and cloud machines, which find each other and answer prompts together. No GPU or datacenter. Prompts and replies stay on your own node; only vectors travel between machines.</p>
@@ -459,6 +466,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
           <p><b class="b-k">My part</b>I built it on my own, with AI as my engineering team: the Python mesh, native Rust expert kernels and a one-command installer. On a single Apple M4 Max it runs IBM Granite at 57.8 tokens a second with the Rust kernels, against 29.8 with standard PyTorch kernels. On a MacBook CPU it answers at 28 to 34 tokens a second <a class="src" href="https://mybrahma.com" target="_blank" rel="noopener">mybrahma.com</a>.</p>
         </article>
         <article class="build">
+          <a class="b-shot" href="https://instnt.ai" target="_blank" rel="noopener"><img src="media/builds/instnt.webp" width="960" height="420" loading="lazy" decoding="async" alt="The instnt.ai home page"><span>instnt.ai</span></a>
           <div class="b-meta"><span>2019 – now</span><span>Instnt</span><span class="tag">Founder</span></div>
           <h3>Fraud Loss Insurance</h3>
           <p>Insurance that moves identity fraud losses off a lender's balance sheet. An AI underwriting platform prices the fraud risk, and Instnt Insurance Agency places the coverage with A-rated insurers. It plugs into an existing fraud stack with one line of JavaScript.</p>
@@ -466,6 +474,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
           <p><b class="b-k">My part</b>Founded the company, built the underwriting platform with Munich Re and set up the agency that places the policies. The platform includes Beema, the engine that prices fraud loss insurance, and the Instnt Agent, a 25 KB script tag that reads device, behavior and journey signals and returns an insurance decision. It runs on a small team, with AI agents doing much of the work.</p>
         </article>
         <article class="build">
+          <a class="b-shot" href="https://www.socure.com" target="_blank" rel="noopener"><img src="media/builds/socure.webp" width="960" height="420" loading="lazy" decoding="async" alt="The socure.com home page"><span>socure.com</span></a>
           <div class="b-meta"><span>2011 – 2019</span><span>Socure</span><span class="tag">Founder</span></div>
           <h3>Identity verification from the open internet</h3>
           <p>Socure answers one question for banks: is this person real? Before ChatGPT or TensorFlow, I built the first semantic graph AI and ML platform on social and online data, with an auto-ML fabric that trained and tuned its own models, years before AutoML had a name. On top of it sat the first real-time API for identity verification and KYC, scoring people from semantic models of their online behavior and network connections, plus computer vision to match faces against online profiles.</p>
@@ -473,6 +482,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
           <p><b class="b-k">My part</b>Founder, CEO and CTO, later Chief Strategy Officer. I wrote the first models and product, and the engine I built in Scala is still the core of the platform; later products came in through acquisitions. I took revenue from zero to double-digit millions, and hired my co-founder to scale sales on the blueprint I built.</p>
         </article>
         <article class="build">
+          <figure class="b-shot"><img src="media/builds/hopskoch.webp" width="960" height="420" loading="lazy" decoding="async" alt="Hopskoch's 360° seamless storytelling across websites, social, mobile and ad networks"><span>Hopskoch, 2013</span></figure>
           <div class="b-meta"><span>2010 – 2012</span><span>Hopskoch</span><span class="tag">Founder</span></div>
           <h3>Transmedia marketing on social data</h3>
           <p>The first transmedia marketing platform built on social data: one campaign, run end to end across websites, social networks, mobile apps and ad networks, using rules engines, statistical models and the semantic web.</p>
@@ -480,6 +490,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
           <p><b class="b-k">My part</b>Founder, CEO and Chairman. I bootstrapped it and led product and sales.</p>
         </article>
         <article class="build">
+          <a class="b-shot" href="https://www.cisco.com" target="_blank" rel="noopener"><img src="media/builds/cisco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The cisco.com home page"><span>cisco.com</span></a>
           <div class="b-meta"><span>2006 – 2010</span><span>Securent, then Cisco</span><span class="tag">Architect</span></div>
           <h3>Entitlement management</h3>
           <p>Securent's Entitlement Management Solution used the XACML standard to decide, enforce and audit who can do what inside any application, from one place.</p>
@@ -487,6 +498,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
           <p><b class="b-k">My part</b>Senior Solutions Architect at Securent, where I worked on XACML-based policy and helped drive the sale. At Cisco I was Chief Architect for Policy Management across WebEx, NAC and Call Manager.</p>
         </article>
         <article class="build">
+          <a class="b-shot" href="https://www.ca.com" target="_blank" rel="noopener"><img src="media/builds/ca.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ca.com home page, now Broadcom"><span>ca.com, now Broadcom</span></a>
           <div class="b-meta"><span>1999 – 2006</span><span>Netegrity, then CA</span><span class="tag">Architect</span></div>
           <h3>SiteMinder single sign-on</h3>
           <p>One login across every web application in an enterprise, with access policy managed in one place and federation over SAML.</p>
@@ -494,6 +506,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
           <p><b class="b-k">My part</b>Senior Architect. I helped build single sign-on for Fortune 500 companies and most of the US federal government, worked with Oracle and Sun on identity at scale, and stayed on through the move to CA.</p>
         </article>
         <article class="build">
+          <figure class="b-shot"><img src="media/builds/ibm_texaco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ibm.com and texaco.com home pages"><span>ibm.com · texaco.com</span></figure>
           <div class="b-meta"><span>The 1990s</span><span>IBM and Texaco</span><span class="tag">Engineer</span></div>
           <h3>Where it started</h3>
           <p>Decision processing systems and early AI at IBM, then machine learning at scale. At Texaco (now Chevron) I ran IT across the Middle East on Wang VS 6000 mainframes: wide-area networks, an SAP rollout and Y2K compliance.</p>
