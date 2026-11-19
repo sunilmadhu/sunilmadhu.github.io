@@ -109,6 +109,15 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 html.pick body{cursor:pointer}
 main{transition:opacity .5s}
 body.holding main{opacity:0; pointer-events:none}
+.selbox{position:fixed; left:0; top:0; z-index:30; pointer-events:none; opacity:0; transition:opacity .2s, width .18s ease-out, height .18s ease-out, transform .18s ease-out; filter:drop-shadow(0 0 6px rgba(232,179,107,.75))}
+.selbox.on{opacity:1}
+.selbox i{position:absolute; width:18px; height:18px; border:2px solid var(--accent)}
+.selbox i:nth-child(1){left:0; top:0; border-right:0; border-bottom:0}
+.selbox i:nth-child(2){right:0; top:0; border-left:0; border-bottom:0}
+.selbox i:nth-child(3){left:0; bottom:0; border-right:0; border-top:0}
+.selbox i:nth-child(4){right:0; bottom:0; border-left:0; border-top:0}
+.fdot{position:fixed; left:-5px; top:-5px; z-index:31; width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 10px 3px rgba(232,179,107,.6); pointer-events:none; opacity:0; transition:opacity .2s}
+.fdot.on{opacity:.9}
 .vlayer{position:fixed; inset:0; z-index:40; pointer-events:none}
 .vwin{position:absolute; pointer-events:auto; opacity:0; transition:opacity .35s; overflow:hidden}
 .vwin:has(iframe){background:#000}
@@ -446,6 +455,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 </main>
+<div class="selbox" id="selbox" aria-hidden="true"><i></i><i></i><i></i><i></i></div><span class="fdot" id="fdot" aria-hidden="true"></span>
 <div class="vlayer" id="vlayer" hidden><div class="vwin" id="vwin"></div><button class="vx" id="vx" type="button" aria-label="Close the video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <article class="m-card" data-lenis-prevent>
@@ -574,6 +584,144 @@ const ITEMS=[
   {type:"photo",thumb:"media/stills/keynote_cover.jpg",cap:"TiECon East '26",title:"Opening keynote, TiECon East 2026"},
   ...["02","04","06","07","09","10","14","16","18"].map(n=>({type:"photo",thumb:`media/stills/slide_${n}.jpg`,cap:"TiECon East '26",title:"From the TiECon East 2026 keynote"}))
 ];
+// ---- news from each company, during Sunil's time there (shown on that chapter's Polaroids)
+const NEWS=[
+  // Asyml8 / Brahma, 2026
+  {era:"brahma",type:"article",y:2026,source:"Asyml8",date:"2026",cap:"Brahma",title:"Brahma runs AI on the devices you already have",url:"https://mybrahma.com",linkText:"Visit mybrahma.com",
+   text:["Asyml8's Brahma is a graph-native AI mesh that runs open-weight Mixture-of-Experts language models across ordinary Macs, PCs, Raspberry Pis and cloud machines, with no GPU or datacenter required."]},
+  {era:"brahma",type:"article",y:2026,source:"Asyml8",date:"2026",cap:"Open source",title:"Brahma is open source under AGPL-3.0",url:"https://asyml8.com",linkText:"Visit asyml8.com",
+   text:["Prompts and replies stay on your own node; only vectors travel between machines. The goal: AI that is green, accessible, private and free."]},
+  {era:"brahma",type:"article",y:2026,source:"Asyml8",date:"2026",cap:"Private beta",title:"Brahma heads into private beta",url:"https://mybrahma.com",linkText:"Visit mybrahma.com",
+   text:["Brahma splits a model into a graph of attention heads, KV heads, neuron groups and experts spread across machines, and shows which parts fired for each token."]},
+
+  // Instnt, 2019 – now
+  {era:"instnt",type:"article",y:2021,source:"Instnt · Funding",date:"January 2021",cap:"Seed, 2021",title:"Instnt closes a $7M seed round",url:"https://www.cbinsights.com/company/instnt/financials",linkText:"See the funding history",
+   text:["The round brought Instnt's total funding to about $10 million."]},
+  {era:"instnt",type:"article",y:2021,source:"EIN Presswire",date:"September 8, 2021",cap:"Instnt Accept",title:"Instnt launches Instnt Accept at FinovateFall 2021",url:"https://www.einpresswire.com/article/550318228/instnt-to-launch-instnt-accepttm-showcasing-a-new-approach-to-digital-customer-onboarding",linkText:"Read the announcement",
+   text:["Instnt Accept was billed as the first fully managed customer onboarding solution, backed by up to $100 million a year in fraud loss warranty."]},
+  {era:"instnt",type:"article",y:2021,source:"Accesswire",date:"December 13, 2021",cap:"Meet Instnt",title:"Meet Instnt: insured customer acceptance for millennial and Gen Z customers",url:"https://www.accessnewswire.com/newsroom/en/business-and-professional-services/meet-instnt-the-startup-built-by-a-serial-entrepreneur-thats-disr-676781",linkText:"Read the story",
+   text:["A profile of Instnt as the first fully managed, insured customer acceptance platform, which absorbs fraud loss liability so businesses can accept more genuine customers."]},
+  {era:"instnt",type:"article",y:2022,source:"Newswire",date:"May 2022",cap:"FinovateSpring '22",title:"Sunil Madhu speaks at FinovateSpring 2022",url:"https://www.newswire.com/view/content/sunil-madhu-ceo-founder-of-instnt-to-speak-at-finovatespring-2022-to-21709823",linkText:"Read the announcement",
+   text:["A fireside chat in San Francisco on why businesses still reject good customers at sign-up, and how managed customer acceptance fixes it."]},
+  {era:"instnt",type:"article",y:2022,source:"Finovate",date:"September 2022",cap:"FinovateFall '22",title:"Instnt demos at FinovateFall 2022",url:"https://finovate.com/category/instnt",linkText:"See it on Finovate",
+   text:["Instnt returned to the Finovate stage in New York to demo its insured onboarding platform."]},
+  {era:"instnt",type:"article",y:2022,source:"Newswire",date:"October 27, 2022",cap:"Instnt Access",title:"Instnt Access brings single-click customer onboarding",url:"https://www.newswire.com/news/instnt-launches-instnt-access-to-help-businesses-onboard-customers-21860155",linkText:"Read the announcement",
+   text:["Instnt Access let businesses onboard customers in one click while shifting up to $100 million of fraud loss liability off their balance sheets."]},
+  {era:"instnt",type:"article",y:2023,source:"Accesswire",date:"",cap:"Multipass",title:"Instnt unveils Multipass, an insured, decentralized consumer identity",url:"https://www.accessnewswire.com/newsroom/en/computers-technology-and-internet/instnt-launches-multipass-an-insured-decentralized-consumer-identi-795363",linkText:"Read the announcement",
+   text:["Multipass extended Instnt's insured approach to a reusable consumer identity."]},
+  {era:"instnt",type:"article",y:2024,source:"The Fintech Magazine",date:"March 5, 2024",cap:"Fintech Magazine",title:"A new way to KYC",url:"https://ffnews.com/thought-leadership/exclusive-a-new-way-to-kyc-sunil-madhu-instnt-in-the-fintech-magazine",linkText:"Read on FF News",
+   text:["An interview on easing the burden of fraud loss while helping financial institutions onboard more customers."]},
+  {era:"instnt",type:"article",y:2025,source:"Business Wire",date:"March 18, 2025",cap:"Fraud Loss Insurance",title:"Instnt launches Fraud Loss Insurance with A-rated insurers",url:"https://www.businesswire.com/news/home/20250318535682/en",linkText:"Read the announcement",
+   text:["Backed by AM Best A-rated insurers including Accredited and Howden, the product pairs AI-powered verification with insurance protection against fraud losses."]},
+  {era:"instnt",type:"article",y:2025,source:"Business Wire",date:"June 24, 2025",cap:"Munich Re",title:"Instnt partners with Munich Re on fraud loss insurance",url:"https://www.businesswire.com/news/home/20250624234889/en",linkText:"Read the announcement",
+   text:["Munich Re acts as reinsurer behind Instnt's Fraud Loss Insurance, drawing on its aiSure AI insurance experience."]},
+  {era:"instnt",type:"article",y:2025,source:"Insurtech Insights",date:"July 2025",cap:"California",title:"Instnt brings fraud loss insurance to California",url:"https://www.insurtechinsights.com/?p=56713",linkText:"Read the story",
+   text:["The expansion followed the Munich Re partnership announced the month before."]},
+  {era:"instnt",type:"article",y:2025,source:"Business Wire",date:"September 8, 2025",cap:"Webinar",title:"Munich Re, Howden, Accredited and Instnt host a fraud loss insurance webinar",url:"https://www.businesswire.com/news/home/20250908869925/en",linkText:"Read the announcement",
+   text:["Industry partners explained how fraud loss insurance removes fraud loss liability from the balance sheet."]},
+  {era:"instnt",type:"article",y:2025,source:"Business Wire",date:"November 4, 2025",cap:"Margin protection",title:"Margin protection through identity fraud insurance",url:"https://www.businesswire.com/news/home/20251104954472/en",linkText:"Read the announcement",
+   text:["A second webinar with Munich Re, Howden and Accredited on capital efficiency, growth and carrier-backed claims for financial institutions."]},
+  {era:"instnt",type:"article",y:2026,source:"Reinsurance News",date:"February 26, 2026",cap:"Double-Indemnity",title:"Munich Re and Swiss Re back Instnt and MKIII's double-indemnity lending",url:"https://www.reinsurancene.ws/munich-re-and-swiss-re-back-instnt-and-mkiiis-new-fully-indemnified-lending-solution/",linkText:"Read the story",
+   text:["Instnt's identity fraud policies are insured by Accredited and reinsured by Munich Re and Swiss Re, with claims processed by Sedgwick under a 30-day denial-free guarantee."]},
+
+  // Patents, 2015 – 2023
+  ...[["9,147,117","September 2015","Analyzing facial recognition data and social network data for user authentication","Xinyu Li, Justin Kamerman"],
+      ["9,300,676","March 2016","Risk assessment using social networking data","Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"],
+      ["9,942,259","April 10, 2018","Risk assessment using social networking data","Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"],
+      ["10,154,030","December 11, 2018","Analyzing facial recognition data and social network data for user authentication","Xinyu Li, Justin Kamerman"],
+      ["10,313,388","June 4, 2019","Risk assessment using social networking data","Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"],
+      ["10,542,032","January 21, 2020","Risk assessment using social networking data","Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"],
+      ["10,868,809","December 15, 2020","Analyzing facial recognition data and social network data for user authentication","Xinyu Li, Justin Kamerman"],
+      ["11,570,195","January 31, 2023","Risk assessment using social networking data","Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"],
+      ["11,799,853","October 24, 2023","Analyzing facial recognition data and social network data for user authentication","Xinyu Li, Justin Kamerman"]]
+    .map(([n,d,t,co])=>({era:"patents",type:"patent",y:+(/\d{4}/.exec(d)[0]),source:"US Patent "+n,date:d,cap:"US "+n,title:t,
+      url:"https://patents.google.com/patent/US"+n.replace(/,/g,""),linkText:"See the patent",
+      text:["Inventors: Sunil Madhu, "+co+". Assigned to Socure."]})),
+
+  // Socure, 2011 – 2019
+  {era:"socure",type:"article",y:2013,source:"Finovate",date:"FinovateFall 2013",cap:"Finovate '13",title:"Socure demos Social Biometrics on the FinovateFall stage",url:"https://finovate.com/?p=46554",linkText:"Read on Finovate",
+   text:["Sunil and the team showed Social Biometrics, which checks that an online identity belongs to a real person by reading their social and digital footprint."]},
+  {era:"socure",type:"article",y:2014,source:"Biometric Update",date:"October 2014",cap:"Series A",title:"Socure closes a $2.5M Series A led by ff Venture Capital",url:"https://www.biometricupdate.com/201410/socure-completes-2-5-million-financing-round-lead-by-ff-venture-capital",linkText:"Read the story",
+   text:["Founder Collective and Two Sigma Ventures joined the round."]},
+  {era:"socure",type:"article",y:2015,source:"Finovate",date:"August 2015",cap:"2015",title:"Socure adds $2.5M in debt financing",url:"https://finovate.com/?p=46554",linkText:"Read on Finovate",
+   text:["The financing followed the 2014 Series A, ahead of Socure's return to the Finovate stage."]},
+  {era:"socure",type:"article",y:2015,source:"Finovate",date:"FinovateFall 2015",cap:"Perceive",title:"Socure unveils Perceive, remote facial biometrics",url:"https://finovate.com/?p=60183",linkText:"Read on Finovate",
+   text:["Sunil demonstrated Perceive, which matched faces against online profiles, at FinovateFall 2015."]},
+  {era:"socure",type:"article",y:2016,source:"Global Venturing",date:"December 2016",cap:"Santander",title:"Socure raises $13M with Santander InnoVentures",url:"https://globalventuring.com/blog/2016/12/14/socure-identifies-santander-to-raise-13m/",linkText:"Read the story",
+   text:["Santander's fintech investment arm joined the round as banks looked for better identity verification."]},
+  {era:"socure",type:"article",y:2017,source:"PR Newswire",date:"August 9, 2017",cap:"Series B",title:"Socure raises a $13.9M Series B led by Commerce Ventures",url:"https://prnewswire.com/news-releases/socure-raises-139m-funding-to-fuel-its-beyond-human-digital-identity-verification-business-300501825.html",linkText:"Read the announcement",
+   text:["Flint Capital, Work-Bench, Santander InnoVentures and Two Sigma Ventures took part, bringing total funding to $27.5 million."]},
+  {era:"socure",type:"article",y:2017,source:"CB Insights",date:"December 2017",cap:"AI 100",title:"Socure named to the CB Insights AI 100",url:"https://prnewswire.com/news-releases/cb-insights-unveils-second-annual-ai-100-companies-at-a-ha-663646923.html",linkText:"See the list",
+   text:["Socure was named among the 100 most promising private artificial intelligence companies."]},
+  {era:"socure",type:"article",y:2018,source:"Forbes",date:"2018",cap:"Cloud 100",title:"Socure named a Forbes Cloud 100 Rising Star",url:"https://coverager.com/socure-raises-30m/",linkText:"Read more",
+   text:["In the same year Socure was named a Red Herring 100 North America winner and an IDC Innovator for identity proofing."]},
+  {era:"socure",type:"article",y:2019,source:"Business Wire",date:"February 28, 2019",cap:"Series C",title:"Socure raises a $30M Series C led by Scale Venture Partners",url:"https://businesswire.com/news/home/20190228005538/en/Socure-Raises-30M-Additional-Financing-Identify-Human",linkText:"Read the announcement",
+   text:["The round followed a year in which annual revenue grew more than threefold, taking total funding to $57.5 million."]},
+
+  // Hopskoch, 2010 – 2012
+  {era:"hopskoch",type:"article",y:2010,source:"Hopskoch",date:"2010",cap:"Hopskoch",title:"One platform for campaigns across web, social, mobile and ad networks",
+   text:["Hopskoch was the first end-to-end platform for running campaigns across websites, social networks, mobile apps and ad networks from one place."]},
+  {era:"hopskoch",type:"article",y:2011,source:"Hopskoch",date:"2011",cap:"Pilots",title:"Enterprise pilots in the US, Europe and China",
+   text:["Sunil bootstrapped the company and led product and sales."]},
+  {era:"hopskoch",type:"article",y:2011,source:"Hopskoch",date:"2011",cap:"Gamification",title:"Thousands of early users shape Hopskoch's gamification",
+   text:["Several thousand early users shaped the platform's gamification features."]},
+  {era:"hopskoch",type:"article",y:2009,source:"Hopskoch",date:"2009",cap:"Social, 2009",title:"The semantic web meets social media",
+   text:["In 2009 Sunil took the rules engines, statistical models and semantic web from Securent to social media, and that became Hopskoch."]},
+
+  // The identity years, 1999 – 2010
+  {era:"identity",type:"article",y:2001,source:"Tech Monitor",date:"2001",cap:"Netegrity '01",title:"Netegrity's SiteMinder passes 430 enterprise customers",url:"https://techmonitor.ai/?p=60383",linkText:"Read the story",
+   text:["SiteMinder license revenue more than doubled year on year as Netegrity signed 52 new customers in a quarter."]},
+  {era:"identity",type:"article",y:2001,source:"eWeek",date:"October 25, 2001",cap:"Netegrity '01",title:"Netegrity combines access control and portals",url:"https://www.eweek.com/it-management/netegrity-to-acquire-integrate-portal-software/",linkText:"Read on eWeek",
+   text:["Netegrity moved to merge web access management and portal services into one platform."]},
+  {era:"identity",type:"article",y:2002,source:"Netegrity",date:"September 23, 2002",cap:"SiteMinder 5.5",title:"SiteMinder 5.5 ships with SAML, Passport and Kerberos",url:"https://xml.coverpages.org/NetegritySiteMinderv55.html",linkText:"Read the announcement",
+   text:["Federated identity arrived in the product: one sign-on across applications hosted inside and outside the company."]},
+  {era:"identity",type:"article",y:2004,source:"eWeek",date:"October 6, 2004",cap:"CA + Netegrity",title:"CA to acquire Netegrity for about $430 million",url:"https://www.eweek.com/security/ca-to-acquire-netegrity-for-430-million/",linkText:"Read on eWeek",
+   text:["Computer Associates bought Netegrity, best known for SiteMinder web single sign-on, to strengthen its identity and access management suite."]},
+  {era:"identity",type:"article",y:2007,source:"Cisco",date:"November 1, 2007",cap:"Cisco + Securent",title:"Cisco to acquire Securent for about $100 million",url:"https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2007/m11/cisco-announces-definitive-agreement-to-acquire-securent.html",linkText:"Read the announcement",
+   text:["Cisco bought Securent's policy management platform and moved the team into its Collaboration Software Group."]},
+  {era:"identity",type:"article",y:2008,source:"Cisco",date:"2008",cap:"Policy, Cisco",title:"Policy from the network, across WebEx, NAC and Call Manager",
+   text:["As Chief Architect for Cisco's Policy Management unit, Sunil carried identity and policy across Cisco's collaboration products."]},
+  {era:"identity",type:"article",y:2010,source:"SunGard",date:"2010",cap:"SunGard '10",title:"200 engineers realigned with sales",
+   text:["As VP of Solutions Engineering at SunGard Availability Services, Sunil realigned 200 engineers and 7 directors with sales and ran a $20 million budget."]},
+
+  // IBM and the Gulf, the 1990s
+  {era:"gulf",type:"article",y:1993,source:"IBM",date:"",cap:"IBM",title:"Decision processing systems and early AI",
+   text:["Sunil started on decision processing systems and early AI at IBM, then worked with machine learning at scale through the 90s."]},
+  {era:"gulf",type:"article",y:1995,source:"Texaco",date:"",cap:"Texaco",title:"IT across the Middle East on Wang VS 6000 mainframes",
+   text:["At Texaco, now Chevron, Sunil ran IT across the Middle East: wide-area networks on Wang VS 6000 mainframes."]},
+  {era:"gulf",type:"article",y:1998,source:"Texaco",date:"January 1998",cap:"Equilon '98",title:"Texaco and Shell form Equilon",url:"https://www.sec.gov/Archives/edgar/data/0000097349/000009734999000013/0000097349-99-000013.txt",linkText:"Read Texaco's 1998 report",
+   text:["The joint venture combined Texaco's and Shell's western and midwestern US refining and marketing businesses."]},
+  {era:"gulf",type:"article",y:1998,source:"Texaco",date:"July 1, 1998",cap:"Motiva '98",title:"Texaco, Shell and Saudi Aramco launch Motiva",url:"https://www.sec.gov/Archives/edgar/data/0000097349/000009734998000028/0000097349-98-000028.txt",linkText:"Read the announcement",
+   text:["A second joint venture combined the three companies' eastern and Gulf Coast US refining and marketing businesses."]},
+  {era:"gulf",type:"article",y:1999,source:"Texaco",date:"1999",cap:"Y2K",title:"An SAP rollout and Y2K compliance",
+   text:["Sunil led an SAP rollout and served as Y2K compliance officer."]},
+
+  // Education, 1986 – 1992
+  {era:"origins",type:"article",y:1990,source:"University of Strathclyde",date:"1990",cap:"Strathclyde '90",title:"BSc, Computer Science",
+   text:["A BSc in Computer Science at the University of Strathclyde in Glasgow."]},
+  {era:"origins",type:"article",y:1992,source:"Glasgow Caledonian University",date:"1992",cap:"GCU '92",title:"MSc, Computer Information Systems",
+   text:["An MSc in Computer Information Systems at Glasgow Caledonian University."]},
+];
+ITEMS.push(...NEWS);
+
+// which chapter each earlier item belongs to
+function eraOf(it){
+  if(it.era)return it.era;
+  const t=[it.source,it.title,it.thumb,it.cap].join(" ");
+  if(it.type==="post")return /Fintech Meetup/.test(t)?"instnt":"ai";
+  if(/slide_|keynote|TiECon/.test(t))return "ai";
+  if(/American Banker|Yale|PYMNTS|Socure|BAI|Finovate|p_socure/.test(t))return "socure";
+  if(/p_2026|fb_car|ig_on/.test(t))return "brahma";
+  if(/p_2025/.test(t))return "ai";
+  if(/p_bw/.test(t))return "hopskoch";
+  return "instnt";
+}
+ITEMS.forEach(it=>it.era=eraOf(it));
+const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>(SETS[it.era]=SETS[it.era]||[]).push(k));
+const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"patents",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
+function pickFor(i,era){const set=SETS[era]||SETS.all;let h=2166136261;for(const c of era)h=Math.imul(h^c.charCodeAt(0),16777619);return set[((Math.imul(i+1,2654435761)^h)>>>0)%set.length];}
+function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}return ERA_OF_SECTION[id]||"all";}
+
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const MOBILE=matchMedia("(max-width: 760px)").matches;
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)), lerp=(a,b,t)=>a+(b-a)*t;
@@ -590,7 +738,7 @@ function toast(msg,ms=3200){toastEl.textContent=msg;toastEl.classList.add("show"
 const cam={on:false,stream:null,video:null,raf:0,face:null,hand:null,lastY:null,target:null,starting:false};
 const camBtn=document.getElementById("camBtn"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d"),camTip=document.getElementById("camTip"),camView=camCanvas;
 function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camCanvas.hidden=!on;foldState();
-  camTip.textContent=on?"Camera on. Hold up an open palm and the page scrolls down on its own. Make a fist to stop; pull the fist down to scroll back up. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
+  camTip.textContent=on?"Camera on. Open palm scrolls down; a fist stops; pull the fist down to scroll up. Point with one finger to select a Polaroid, and twirl it to cycle to the next. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
 async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
   const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
   let pref=null;try{pref=localStorage.getItem("sm-cam");}catch(e){}
@@ -635,13 +783,56 @@ function loopCamera(){
   const hr=cam.hand.detectForVideo(v,now);const h=hr.landmarks&&hr.landmarks[0];
   if(h){
     const n=[[8,6],[12,10],[16,14],[20,18]].filter(([t,p])=>extended(h,t,p)).length;
-    camCtx.fillStyle=n>=3?"#43e07a":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
-    cam.palm=n>=3?(cam.palm||0)+1:0; cam.fist=n<=1?(cam.fist||0)+1:0;
+    const pointing=n===1&&extended(h,8,6); // only the index finger out
+    camCtx.fillStyle=n>=3?"#43e07a":pointing?"#e8b36b":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
+    cam.palm=n>=3?(cam.palm||0)+1:0; cam.fist=n===0?(cam.fist||0)+1:0;
+    if(pointing)pointAt(h[8],now);
     if(cam.palm>=3)setAutoScroll(1);   // about a quarter second of open palm: scroll down
     if(cam.fist===2){setAutoScroll(0);cam.fistY=h[9].y;}  // making a fist stops
     // pulling the closed fist down (about a tenth of the frame) scrolls back up
     if(cam.fist>2&&cam.fistY!=null&&h[9].y-cam.fistY>.1){setAutoScroll(-1);cam.fistY=null;}
   }else{cam.palm=0;cam.fist=0;cam.fistY=null;}
+}
+
+/* point with your index finger: a selection box locks onto the nearest Polaroid under your fingertip and follows it;
+   twirl the finger in a small circle to cycle to the next print nearby, like casting a spell */
+const POINT={hist:[],last:0,acc:0,prev:null,sel:-1,order:[],k:0,lastCycle:0,sx:-1,sy:-1};
+function pointAt(tip,now){
+  POINT.last=now;POINT.hist.push({x:1-tip.x,y:tip.y});if(POINT.hist.length>14)POINT.hist.shift();
+  const H=POINT.hist;if(H.length<6)return;
+  let cx=0,cy=0;H.forEach(q=>{cx+=q.x;cy+=q.y;});cx/=H.length;cy/=H.length;
+  const q=H[H.length-1],dx=q.x-cx,dy=q.y-cy;
+  if(Math.hypot(dx,dy)>.012){const a=Math.atan2(dy,dx);
+    if(POINT.prev!=null){let d=a-POINT.prev;d=(d+Math.PI*3)%(Math.PI*2)-Math.PI;POINT.acc+=d;}
+    POINT.prev=a;
+    if(Math.abs(POINT.acc)>Math.PI*.7){cyclePoint(Math.sign(POINT.acc));POINT.acc=0;}
+  }else{POINT.prev=null;POINT.acc*=.8;}
+}
+function cyclePoint(dir){if(!POINT.order.length)return;POINT.k=(POINT.k+dir+POINT.order.length)%POINT.order.length;POINT.sel=POINT.order[POINT.k];POINT.lastCycle=performance.now();}
+const selbox=document.getElementById("selbox"),fdot=document.getElementById("fdot"),M2=new THREE.Matrix4();
+function updatePoint(now){
+  const live=cam.on&&now-POINT.last<450&&POINT.hist.length>=4&&mesh&&U.uMosaic.value<.35&&!modalOpen&&HOLD.i<0;
+  if(!live){if(POINT.sel>=0){POINT.sel=-1;U.uHover.value=-1;}selbox.classList.remove("on");fdot.classList.remove("on");if(now-POINT.last>450){POINT.hist.length=0;POINT.acc=0;}return;}
+  // the anchor is the average of recent fingertip positions, so a twirl doesn't drag the box around
+  const H=POINT.hist.slice(-8);let ax=0,ay=0;H.forEach(q=>{ax+=q.x;ay+=q.y;});ax/=H.length;ay/=H.length;
+  const tx=clamp(.5+(ax-.5)*1.7,0,1)*innerWidth,ty=clamp(.5+(ay-.5)*1.7,0,1)*innerHeight;
+  if(POINT.sx<0){POINT.sx=tx;POINT.sy=ty;}POINT.sx+=(tx-POINT.sx)*.3;POINT.sy+=(ty-POINT.sy)*.3;
+  fdot.style.transform=`translate(${POINT.sx}px,${POINT.sy}px)`;fdot.classList.add("on");
+  // prints in the region you are pointing at, nearest first
+  const R=Math.max(160,innerWidth*.14),cand=[];
+  for(let i=0;i<N;i++){const p=prints[i];if(p.stored>.5)continue;prj.copy(p.pos).project(camera);if(prj.z>1||prj.z<-1)continue;
+    if(p.pos.distanceTo(camera.position)>48)continue;
+    const sx=(prj.x+1)/2*innerWidth,sy=(1-prj.y)/2*innerHeight,d=Math.hypot(sx-POINT.sx,sy-POINT.sy);if(d<R)cand.push([d,i]);}
+  cand.sort((a,b)=>a[0]-b[0]);POINT.order=cand.slice(0,7).map(c=>c[1]);
+  // greedy: the nearest print, unless you have just twirled to another one that is still in range
+  const keep=now-POINT.lastCycle<1600&&POINT.order.includes(POINT.sel);
+  if(!keep){POINT.sel=POINT.order.length?POINT.order[0]:-1;POINT.k=0;}else POINT.k=POINT.order.indexOf(POINT.sel);
+  U.uHover.value=POINT.sel;
+  if(POINT.sel<0){selbox.classList.remove("on");return;}
+  mesh.getMatrixAt(POINT.sel,M2);const xs=[],ys=[];
+  [[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5]].forEach(([x,y])=>{prj.set(x,y,0).applyMatrix4(M2).project(camera);xs.push((prj.x+1)/2*innerWidth);ys.push((1-prj.y)/2*innerHeight);});
+  const L=Math.min(...xs)-8,T=Math.min(...ys)-8,Wd=Math.max(...xs)-L+8,Ht=Math.max(...ys)-T+8;
+  selbox.style.transform=`translate(${L}px,${T}px)`;selbox.style.width=Wd+"px";selbox.style.height=Ht+"px";selbox.classList.add("on");
 }
 // auto-scroll runs on its own animation loop so it stays smooth whatever the camera frame rate is
 const auto={dir:0,v:0,raf:0,t:0};
@@ -711,7 +902,7 @@ const tall=innerWidth/innerHeight<.9;
 const heroTex=loader.load(tall?MEDIA.heroTall:MEDIA.heroWide);heroTex.encoding=THREE.sRGBEncoding;heroTex.anisotropy=8;
 // One 2048px atlas, 8 x 6 cells; each cell is a whole Polaroid back: paper, photo window, handwritten caption.
 const AT=2048, CX=8, CW=256, CH=341, PW=244, PH=288, PG=6;
-const atlas=document.createElement("canvas");atlas.width=AT;atlas.height=AT;const at=atlas.getContext("2d");
+const ATH=4096;const atlas=document.createElement("canvas");atlas.width=AT;atlas.height=ATH;const at=atlas.getContext("2d");
 const itemTex=new THREE.CanvasTexture(atlas);itemTex.encoding=THREE.sRGBEncoding;itemTex.anisotropy=8;
 const WIN={x:.06,y:.04,w:.88,h:.74}; // the photo window, from the print's top-left corner
 const imgCache={};
@@ -727,6 +918,19 @@ function drawClipping(g,it,x,y,w,h){ // an article, set in type like a press cli
   g.font=`italic 500 ${17*k}px Fraunces, Georgia, serif`;const n=wrapText(g,it.title,10*k,58*k,w-20*k,19*k,5);
   g.fillStyle="rgba(27,26,23,.2)";for(let l=0;l<6;l++){const ly=58*k+n*19*k+2*k+l*9*k;if(ly>h-8*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3.5*k);}
   g.restore();}
+function drawPatent(g,it,x,y,w,h){ // a US patent front page
+  const k=w/220;g.save();g.translate(x,y);g.fillStyle="#f7f5ef";g.fillRect(0,0,w,h);
+  g.fillStyle="#1b1a17";g.font=`600 ${9*k}px 'Source Serif 4', Georgia, serif`;g.fillText("United States Patent",10*k,17*k);
+  g.font=`500 ${8*k}px 'IBM Plex Mono', monospace`;g.textAlign="right";g.fillText(it.source.replace("US Patent ","US "),w-10*k,17*k);g.textAlign="left";
+  g.fillStyle="#6a6457";g.font=`400 ${7*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date,10*k,28*k);
+  g.fillStyle="#1b1a17";g.fillRect(10*k,33*k,w-20*k,1*k);
+  g.font=`600 ${11*k}px 'Source Serif 4', Georgia, serif`;const n=wrapText(g,it.title,10*k,48*k,w-20*k,13*k,4);
+  // a figure: boxes and connectors, like FIG. 1
+  const fy=48*k+n*13*k+8*k,fh=h-fy-10*k;if(fh>40*k){g.strokeStyle="#2b2722";g.lineWidth=1.1*k;
+    const bx=[[14,0],[86,0],[50,.55]];bx.forEach(([bx0,by0])=>{g.strokeRect(bx0*k,fy+by0*fh,62*k,fh*.32);});
+    g.beginPath();g.moveTo(45*k,fy+fh*.32);g.lineTo(75*k,fy+fh*.55);g.moveTo(117*k,fy+fh*.32);g.lineTo(90*k,fy+fh*.55);g.stroke();
+    g.font=`italic 400 ${7*k}px 'Source Serif 4', Georgia, serif`;g.fillStyle="#2b2722";g.fillText("FIG. 1",w-38*k,h-8*k);}
+  g.restore();}
 function drawPostCard(g,it,x,y,w,h,im){ // a LinkedIn post: its still above the opening line
   const k=w/220;g.save();g.translate(x,y);g.fillStyle="#fff";g.fillRect(0,0,w,h);
   if(im)cover(g,im,0,0,w,h*.5);const t=h*.5;
@@ -738,7 +942,8 @@ function drawPlay(g,x,y,w,h){const cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.15;g.fillS
   g.fillStyle="#fff";g.beginPath();g.moveTo(cx-r*.3,cy-r*.45);g.lineTo(cx+r*.52,cy);g.lineTo(cx-r*.3,cy+r*.45);g.closePath();g.fill();}
 function drawThumb(g,it,x,y,w,h,im){ // the picture inside the window; also used large in the reader
   g.fillStyle="#1a1a1a";g.fillRect(x,y,w,h);
-  if(it.type==="article"||it.type==="link")drawClipping(g,it,x,y,w,h);
+  if(it.type==="patent")drawPatent(g,it,x,y,w,h);
+  else if(it.type==="article"||it.type==="link")drawClipping(g,it,x,y,w,h);
   else if(it.type==="post")drawPostCard(g,it,x,y,w,h,im);
   else if(im)cover(g,im,x,y,w,h);
   if(it.type==="video")drawPlay(g,x,y,w,h);}
@@ -792,7 +997,7 @@ const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
         uv.x=1.-uv.x;
         // the whole Polaroid back comes from the atlas cell for this print's item
         float c=mod(vCell,8.),r=floor(vCell/8.);
-        vec2 auv=vec2((c*256.+6.+uv.x*244.)/2048.,1.-(r*341.+6.+(1.-uv.y)*288.)/2048.);
+        vec2 auv=vec2((c*256.+6.+uv.x*244.)/2048.,1.-(r*341.+6.+(1.-uv.y)*288.)/4096.);
         col=lin(blurTex(uItems,auv,bias).rgb);
         vec2 iuv=vec2((uv.x-.06)/.88,(uv.y-.22)/.74);
         if(act>.5&&uLiveOn>.5&&iuv.x>0.&&iuv.x<1.&&iuv.y>0.&&iuv.y<1.)col=lin(texture2D(uLive,iuv).rgb); // the video plays inside the print
@@ -845,10 +1050,8 @@ function buildPrints(){
       p.pos=new THREE.Vector3().copy(p.rel).add(START);p.q=new THREE.Quaternion();p.scl=new THREE.Vector3(p.sx,p.sy,1);
       prints.push(p);
     });
-    // newest at the front of the warehouse, oldest at the back: deal items by year along the walk
-    const byYear=ITEMS.map((it,k)=>({k,y:itemYear(it),r:rand()})).sort((a,b)=>b.y-a.y||a.r-b.r).map(o=>o.k);
-    const walk=prints.map((_,i)=>i).sort((a,b)=>prints[b].fz-prints[a].fz);
-    walk.forEach((i,rank)=>{const f=rank/walk.length*byYear.length;aCell[i]=byYear[clamp(Math.floor(f+(rand()-.5)*3),0,byYear.length-1)];});
+    // every print shows something from the chapter in view; they change as the story moves on
+    const era0=sectionEra();for(let i=0;i<N;i++)aCell[i]=pickFor(i,era0);ERA.cur=era0;
     geo.setAttribute("aHero",new THREE.InstancedBufferAttribute(aHero,4));
     geo.setAttribute("aKind",new THREE.InstancedBufferAttribute(aKind,1));
     geo.setAttribute("aCell",new THREE.InstancedBufferAttribute(aCell,1));
@@ -870,6 +1073,16 @@ const HOLD={i:-1,k:0,e:0,target:0,pos:new THREE.Vector3(),q:new THREE.Quaternion
 const HOLD_D=3.2,tV=new THREE.Vector3(),tQ=new THREE.Quaternion(),tS=new THREE.Vector3(),fwdV=new THREE.Vector3(),upV=new THREE.Vector3(),prj=new THREE.Vector3();
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ptr={x:-1,y:-1,in:false};let hoverN=0,modalOpen=false;
 const NOPICK="a,button,input,textarea,select,iframe,video,label,.card,.panel,.contact-head,.booking,.dock,.bar,.stats,.modal,.vlayer,#career";
+/* when the story moves to another company, every print spins once on its wire and comes back
+   showing that company's news; the nearest ones turn first */
+const ERA={cur:null,ms:1100,dirty:false},Y_AXIS=new THREE.Vector3(0,1,0),spinQ=new THREE.Quaternion(),swQ=new THREE.Quaternion();
+function eraCheck(){
+  if(!mesh)return;const era=sectionEra();if(era===ERA.cur)return;ERA.cur=era;
+  const t0=performance.now();
+  for(let i=0;i<N;i++){if(i===HOLD.i)continue;const to=pickFor(i,era),p=prints[i];if(to===aCell[i]&&!p.swap)continue;
+    const d=Math.min(p.pos.distanceTo(camera.position),70);p.swap={to,t0:t0+d/70*900+Math.random()*260,done:false};}
+}
+addEventListener("scroll",()=>{clearTimeout(eraCheck.t);eraCheck.t=setTimeout(eraCheck,120);},{passive:true});
 function updateHold(dt){
   HOLD.k+=(HOLD.target-HOLD.k)*(1-Math.exp(-dt*(HOLD.target?4.5:6)));HOLD.e=HOLD.k*HOLD.k*(3-2*HOLD.k);
   if(HOLD.i<0)return;
@@ -886,7 +1099,7 @@ function pickAt(x,y){
   ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
   for(const h of ray.intersectObject(mesh)){if(h.distance>70)break;if(h.instanceId!==HOLD.i)return h.instanceId;}
   return -1;}
-function hoverPick(){const i=(ptr.in&&HOLD.i<0&&!modalOpen)?pickAt(ptr.x,ptr.y):-1;U.uHover.value=i;document.documentElement.classList.toggle("pick",i>=0);}
+function hoverPick(){if(POINT.sel>=0)return;const i=(ptr.in&&HOLD.i<0&&!modalOpen)?pickAt(ptr.x,ptr.y):-1;U.uHover.value=i;document.documentElement.classList.toggle("pick",i>=0);}
 addEventListener("pointermove",e=>{ptr.x=e.clientX;ptr.y=e.clientY;ptr.in=e.pointerType==="mouse";},{passive:true});
 document.addEventListener("mouseleave",()=>{ptr.in=false;});
 const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
@@ -942,7 +1155,7 @@ function openModal(it){
   modalOpen=true;lastFocus=document.activeElement;
   mCard.classList.toggle("photo",it.type==="photo");
   mMedia.innerHTML="";mMedia.classList.remove("paper");
-  if(it.type==="article"||it.type==="link"){const c=document.createElement("canvas");c.width=720;c.height=820;mMedia.append(c);drawThumb(c.getContext("2d"),it,0,0,720,820,null);mMedia.classList.add("paper");}
+  if(it.type==="article"||it.type==="link"||it.type==="patent"){const c=document.createElement("canvas");c.width=720;c.height=820;mMedia.append(c);drawThumb(c.getContext("2d"),it,0,0,720,820,null);mMedia.classList.add("paper");}
   else if(it.thumb){const im=new Image();im.src=it.thumb;im.alt=it.title;mMedia.append(im);}
   mSrc.textContent=[it.source,it.date].filter(Boolean).join(" · ");
   mTitle.textContent=it.title;
@@ -1010,15 +1223,20 @@ function frame(now){
       qB.setFromEuler(eul).multiply(qFlip);qA.identity().slerp(qB,1-a);p.q.slerp(qA,1-Math.exp(-dt*4));
       const kind=aKind[i];const fw=p.fs*(kind===2?1:.88), fh=p.fs*(kind===2?1:1.04);
       sT.set(lerp(fw,p.sx,a),lerp(fh,p.sy,a),1);p.scl.lerp(sT,1-Math.exp(-dt*4));
+      let q=p.q;
+      if(p.swap){const st=(now-p.swap.t0)/ERA.ms;if(st>0){const e=st>=1?1:st*st*(3-2*st);spinQ.setFromAxisAngle(Y_AXIS,e*Math.PI*2);swQ.copy(p.q).multiply(spinQ);q=swQ;
+        if(st>=.5&&!p.swap.done){aCell[i]=p.swap.to;ERA.dirty=true;p.swap.done=true;}if(st>=1)p.swap=null;}}
       if(i===HOLD.i&&HOLD.k>.001){const e=HOLD.e;tV.lerpVectors(p.pos,HOLD.pos,e);tQ.copy(p.q).slerp(HOLD.q,e);tS.lerpVectors(p.scl,HOLD.scl,e);M.compose(tV,tQ,tS);HOLD.M.copy(M);}
-      else M.compose(p.pos,p.q,p.scl);
+      else M.compose(p.pos,q,p.scl);
       mesh.setMatrixAt(i,M);
       const j=i*6,top=p.pos.y+p.scl.y*.5;wirePos[j]=p.pos.x;wirePos[j+1]=top;wirePos[j+2]=p.pos.z;wirePos[j+3]=p.pos.x;wirePos[j+4]=(i===HOLD.i&&HOLD.k>.05)?top:((a<.6||i%4===0)?9.4:top);wirePos[j+5]=p.pos.z;
     }
     mesh.instanceMatrix.needsUpdate=true;wireGeo.attributes.position.needsUpdate=true;
     wires.material.opacity=.3*(1-.6*mosaic);
   }
+  if(ERA.dirty&&mesh){mesh.geometry.attributes.aCell.needsUpdate=true;ERA.dirty=false;}
   renderer.render(scene,camera);
+  updatePoint(now);
   placeHoldUI();
   if(++hoverN%3===0)hoverPick();
   requestAnimationFrame(frame);
