@@ -38,6 +38,21 @@ h1,h2,h3{font-family:var(--display); font-weight:400; text-wrap:balance; margin:
 .vignette{position:fixed; inset:0; z-index:1; pointer-events:none; background:radial-gradient(120% 95% at 50% 45%, transparent 50%, rgba(0,0,0,.7) 100%)}
 @media (prefers-reduced-motion:reduce){.grain{animation:none}}
 main{position:relative; z-index:3}
+/* the year of each period: huge, hollow numerals that roll, focus in, catch a light streak, and dissolve */
+.yearfx{position:fixed; inset:0; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 7vw; pointer-events:none; opacity:0; overflow:hidden}
+.yearfx.l{align-items:flex-start}
+.yearfx.r{align-items:flex-end}
+@media (max-width:760px){.yearfx,.yearfx.l,.yearfx.r{align-items:center; justify-content:flex-start; padding-top:13vh}.yearfx .yf-label,.yearfx.r .yf-label{align-self:center}.yf-num{font-size:30vw}}
+.yf-num{display:flex; font-family:var(--display); font-weight:300; font-size:clamp(6.5rem,min(16.5vw,34vh),17rem); line-height:1; letter-spacing:-.03em; color:rgba(237,234,227,.07);
+  -webkit-text-stroke:1.2px rgba(232,179,107,.6); text-shadow:0 0 40px rgba(232,179,107,.25), 0 0 120px rgba(232,179,107,.12); will-change:transform,filter,opacity}
+.yf-col{display:block; height:1em; overflow:hidden}
+.yf-strip{display:flex; flex-direction:column; will-change:transform}
+.yf-strip span,.yf-ch{display:block; height:1em; line-height:1}
+.yearfx.r .yf-label{align-self:flex-end}
+.yf-label{margin-top:-.2em; font-family:var(--mono); font-size:clamp(.7rem,1.1vw,.9rem); letter-spacing:.42em; text-transform:uppercase; color:rgba(237,234,227,.75); text-shadow:0 1px 14px rgba(0,0,0,.9)}
+.yf-flare{position:absolute; left:50%; top:50%; width:70vw; height:2px; margin:-1px 0 0 -35vw; opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(255,226,180,.0) 10%,rgba(255,226,180,.9) 50%,rgba(255,226,180,0) 90%,transparent);
+  box-shadow:0 0 18px 4px rgba(255,200,130,.35); filter:blur(.4px)}
 .wrap{max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,48px)}
 .bar{position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px clamp(16px,4vw,48px)}
 .bar .mark{font-family:var(--mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-decoration:none; white-space:nowrap}
@@ -105,7 +120,7 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .facts{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:28px}
 .facts h3{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
 .facts p{margin:0 0 .5em; font-size:.97rem}
-.modal[hidden],.vlayer[hidden]{display:none !important}
+[hidden]{display:none !important} /* anything marked hidden stays hidden, whatever its own display rule */
 html.pick body{cursor:pointer}
 main{transition:opacity .5s}
 body.holding main{opacity:0; pointer-events:none}
@@ -271,6 +286,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
   <span class="cue">Scroll back through time</span>
   <button class="gest" id="foldCam" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h3l1.6-2.2h8.8L18 7.5h3v11H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="long">or turn on the camera and scroll with your hand</span><span class="short">or turn on the camera to scroll by hand</span></button>
 </div>
+<div class="yearfx" id="yearfx" aria-hidden="true"><i class="yf-flare"></i><div class="yf-num" id="yfNum"></div><div class="yf-label" id="yfLabel"></div></div>
 <main>
   <section class="hero wrap" id="top">
     <div class="copy">
@@ -720,9 +736,9 @@ function eraOf(it){
 }
 ITEMS.forEach(it=>it.era=eraOf(it));
 const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
-const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"patents",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
+const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
 function pickFor(i,era){const set=SETS[era]||SETS.all;let h=2166136261;for(const c of era)h=Math.imul(h^c.charCodeAt(0),16777619);return set[((Math.imul(i+1,2654435761)^h)>>>0)%set.length];}
-function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}return ERA_OF_SECTION[id]||"all";}
+function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}const e=ERA_OF_SECTION[id];return e==="keep"?(ERA.cur||"instnt"):(e||"all");}
 
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const MOBILE=matchMedia("(max-width: 760px)").matches;
@@ -1090,6 +1106,48 @@ function buildPrints(){
 let wires=null,wirePos=null;const wireGeo=new THREE.BufferGeometry();
 buildPrints();
 
+
+/* ================= The year of each period =================
+   Entering a period, its year rolls into focus behind the story, catches a streak of light, holds, and dissolves
+   before the next period arrives. */
+const YEARS={brahma:["2026","Asyml8"],instnt:["2019","Instnt · 2019 – now"],patents:["2015","Patents · 2015 – 2023"],socure:["2011","Socure · 2011 – 2019"],
+  hopskoch:["2010","Hopskoch · 2010 – 2012"],identity:["1999","The identity years · 1999 – 2010"],gulf:["1990s","IBM and the Gulf"],origins:["1986","Education · 1986 – 1992"]};
+const yearfx=document.getElementById("yearfx"),yfNum=document.getElementById("yfNum"),yfLabel=document.getElementById("yfLabel"),yfFlare=yearfx.querySelector(".yf-flare");
+let yearShown=null,yearTL=null,yearSec=null;
+function currentSection(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}return id;}
+function showYear(year,label){
+  const prev=yearShown||year;yearShown=year;
+  yfNum.innerHTML="";const strips=[];
+  [...year].forEach((ch,k)=>{
+    if(/\d/.test(ch)){const col=document.createElement("span");col.className="yf-col";const st=document.createElement("span");st.className="yf-strip";
+      for(let d=0;d<10;d++){const e=document.createElement("span");e.textContent=d;st.append(e);}col.append(st);yfNum.append(col);
+      const from=/\d/.test(prev[k]||"")?+prev[k]:0;strips.push([st,from,+ch]);}
+    else{const e=document.createElement("span");e.className="yf-ch";e.textContent=ch;yfNum.append(e);}
+  });
+  yfLabel.textContent=label;
+  if(yearTL)yearTL.kill();
+  if(REDUCED||!window.gsap){strips.forEach(([st,,to])=>st.style.transform=`translateY(${-to}em)`);yearfx.style.opacity=1;clearTimeout(showYear.t);showYear.t=setTimeout(()=>yearfx.style.opacity=0,2600);return;}
+  strips.forEach(([st,from])=>gsap.set(st,{y:-from+"em"}));
+  yearTL=gsap.timeline()
+    .set(yearfx,{opacity:1})
+    .fromTo(yfNum,{opacity:0,scale:1.16,filter:"blur(26px)",letterSpacing:".18em",y:20},{opacity:1,scale:1,filter:"blur(0px)",letterSpacing:"-.03em",y:0,duration:1.5,ease:"expo.out"},0)
+    .to(yfNum,{keyframes:[{opacity:.55,duration:.06},{opacity:1,duration:.08},{opacity:.75,duration:.05},{opacity:1,duration:.1}]},.12)   // a projector flicker
+    .add(strips.map(([st,,to],k)=>gsap.to(st,{y:-to+"em",duration:1.7,ease:"power4.out",delay:k*.11})),.05)
+    .fromTo(yfFlare,{opacity:0,x:"-45vw",scaleX:.4},{keyframes:[{opacity:1,x:"0vw",scaleX:1,duration:.7,ease:"power2.out"},{opacity:0,x:"45vw",scaleX:.5,duration:.8,ease:"power2.in"}]},.25)
+    .fromTo(yfLabel,{opacity:0,y:18,letterSpacing:".8em"},{opacity:1,y:0,letterSpacing:".42em",duration:1.1,ease:"power3.out"},.55)
+    .to(yfNum,{opacity:0,scale:.93,y:-36,filter:"blur(18px)",duration:1.6,ease:"power2.in"},"+=1.5")
+    .to(yfLabel,{opacity:0,y:-12,duration:1.1,ease:"power2.in"},"<.15")
+    .set(yearfx,{opacity:0});
+}
+function yearCheck(){
+  const id=currentSection();if(id===yearSec)return;yearSec=id;
+  const y=YEARS[id];const sec=document.getElementById(id);yearfx.classList.toggle("l",!!sec&&sec.classList.contains("right"));yearfx.classList.toggle("r",!!sec&&!sec.classList.contains("right"));
+  if(!y){if(yearTL){yearTL.kill();gsap.to(yearfx,{opacity:0,duration:.6});}return;}
+  if(y[0]===yearShown&&yearTL&&yearTL.isActive())return;
+  showYear(y[0],y[1]);
+}
+addEventListener("scroll",()=>{clearTimeout(yearCheck.t);yearCheck.t=setTimeout(yearCheck,90);},{passive:true});
+
 /* ================= Picking up a Polaroid =================
    Click a print: it lifts off its wire, turns to face you and comes close. Videos play inside it;
    everything else opens in the reader. Close, Esc or a click elsewhere hangs it back up. */
@@ -1099,12 +1157,13 @@ const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ptr={x:-1,y:-1,in:false}
 const NOPICK="a,button,input,textarea,select,iframe,video,label,.card,.panel,.contact-head,.booking,.dock,.bar,.stats,.modal,.vlayer,#career";
 /* when the story moves to another company, every print spins once on its wire and comes back
    showing that company's news; the nearest ones turn first */
-const ERA={cur:null,ms:1100,dirty:false},Y_AXIS=new THREE.Vector3(0,1,0),spinQ=new THREE.Quaternion(),swQ=new THREE.Quaternion();
+const ERA={cur:null,dirty:false};
 function eraCheck(){
   if(!mesh)return;const era=sectionEra();if(era===ERA.cur)return;ERA.cur=era;
   const t0=performance.now();
   for(let i=0;i<N;i++){if(i===HOLD.i)continue;const to=pickFor(i,era),p=prints[i];if(to===aCell[i]&&!p.swap)continue;
-    const d=Math.min(p.pos.distanceTo(camera.position),70);p.swap={to,t0:t0+d/70*900+Math.random()*260,done:false};}
+    const d=Math.min(p.pos.distanceTo(camera.position),70);
+    p.swap={to,t0:t0+d/70*1400+Math.random()*700,kick:(Math.random()<.5?-1:1)*(1.9+Math.random()*.4)};}
 }
 addEventListener("scroll",()=>{clearTimeout(eraCheck.t);eraCheck.t=setTimeout(eraCheck,120);},{passive:true});
 function updateHold(dt){
@@ -1247,9 +1306,12 @@ function frame(now){
       qB.setFromEuler(eul).multiply(qFlip);qA.identity().slerp(qB,1-a);p.q.slerp(qA,1-Math.exp(-dt*4));
       const kind=aKind[i];const fw=p.fs*(kind===2?1:.88), fh=p.fs*(kind===2?1:1.04);
       sT.set(lerp(fw,p.sx,a),lerp(fh,p.sy,a),1);p.scl.lerp(sT,1-Math.exp(-dt*4));
-      let q=p.q;
-      if(p.swap){const st=(now-p.swap.t0)/ERA.ms;if(st>0){const e=st>=1?1:st*st*(3-2*st);spinQ.setFromAxisAngle(Y_AXIS,e*Math.PI*2);swQ.copy(p.q).multiply(spinQ);q=swQ;
-        if(st>=.5&&!p.swap.done){aCell[i]=p.swap.to;ERA.dirty=true;p.swap.done=true;}if(st>=1)p.swap=null;}}
+      const q=p.q;
+      // a breath of air: the print twirls away on its string, changes while it is edge-on, and swings back to settle
+      if(p.swap&&now>=p.swap.t0){
+        const el=(now-p.swap.t0)/1000,want=p.swap.kick*Math.min(el/.6,1);p.om+=want-(p.swap.given||0);p.swap.given=want; // the push builds over half a second, like a draught, whatever the frame rate
+        if(Math.abs(p.th)>1.1||a>=.9||el>3.4){aCell[i]=p.swap.to;ERA.dirty=true;p.swap=null;}
+      }
       if(i===HOLD.i&&HOLD.k>.001){const e=HOLD.e;tV.lerpVectors(p.pos,HOLD.pos,e);tQ.copy(p.q).slerp(HOLD.q,e);tS.lerpVectors(p.scl,HOLD.scl,e);M.compose(tV,tQ,tS);HOLD.M.copy(M);}
       else M.compose(p.pos,q,p.scl);
       mesh.setMatrixAt(i,M);
