@@ -882,10 +882,19 @@ function setAutoScroll(dir){
   dir=+dir; if(auto.dir===dir)return;auto.dir=dir;camView.classList.toggle("scrolling",dir!==0);
   if(dir&&!auto.raf){auto.t=performance.now();auto.raf=requestAnimationFrame(autoStep);}
 }
+let READ_EL=null;
+function readingShare(){ // how much of the middle of the screen is covered by something to read (0 to 1)
+  READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking,.hero .lede")];
+  const a=innerHeight*.15,b=innerHeight*.85;let best=0;
+  for(const el of READ_EL){const r=el.getBoundingClientRect();const v=Math.max(0,Math.min(r.bottom,b)-Math.max(r.top,a))/(b-a);if(v>best)best=v;}
+  return best;
+}
 function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
-  auto.v+=(auto.dir*innerHeight*.22-auto.v)*Math.min(1,dt*3);  // ease in and out, about a fifth of a screen per second
+  // reading pace while a text card fills the middle of the screen, a brisk glide through the warehouse in between
+  const rd=readingShare(),rate=lerp(.6,.045,smooth(.12,.42,rd));
+  auto.v+=(auto.dir*innerHeight*rate-auto.v)*Math.min(1,dt*1.6);
   const y=window.lenis?lenis.scroll:scrollY;
   if((auto.dir>0&&y>=max-1)||(auto.dir<0&&y<=1))setAutoScroll(0);
   if(Math.abs(auto.v)>1){const ny=clamp(y+auto.v*dt,0,max);window.lenis?lenis.scrollTo(ny,{immediate:true}):window.scrollTo(0,ny);}
