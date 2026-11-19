@@ -807,10 +807,14 @@ function loopCamera(){
     // palm size (wrist to middle knuckle) is the yardstick; 3D distance so a pinch still reads when the hand is turned
     const palm=Math.hypot(h[0].x-h[9].x,h[0].y-h[9].y,(h[0].z-h[9].z))+1e-6,
           pr=Math.hypot(h[4].x-h[8].x,h[4].y-h[8].y,(h[4].z-h[8].z))/palm;
-    cam.handAt=now;cam.pr=pr;
-    if(!cam.pinched&&pr<.42){cam.pinched=true;pinchTap();}else if(cam.pinched&&pr>.62)cam.pinched=false;
+    // a pinch reaches: the index tip stands out past its knuckle to meet the thumb. In a fist the thumb also touches
+    // the index finger, but the index tip is curled back toward the wrist, so a fist never reads as a pinch.
+    const reach=Math.hypot(h[8].x-h[0].x,h[8].y-h[0].y)/(Math.hypot(h[5].x-h[0].x,h[5].y-h[0].y)+1e-6);
+    const pinchPose=pr<.42&&reach>1.12;
+    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;
+    if(!cam.pinched&&pinchPose){cam.pinched=true;pinchTap();}else if(cam.pinched&&(pr>.62||reach<1.0))cam.pinched=false;
     fdot.classList.toggle("pinch",cam.pinched);
-    cam.palm=(n>=3&&pr>.6)?(cam.palm||0)+1:0; cam.fist=(n===0&&pr>.6)?(cam.fist||0)+1:0;
+    cam.palm=(n>=3&&!cam.pinched)?(cam.palm||0)+1:0; cam.fist=(n===0&&!cam.pinched&&reach<1.12)?(cam.fist||0)+1:0;
     if(pointing)pointAt(h[8],now);
     if(cam.palm>=3)setAutoScroll(1);   // about a quarter second of open palm: scroll down
     if(cam.fist===2){setAutoScroll(0);cam.fistY=h[9].y;}  // making a fist stops
