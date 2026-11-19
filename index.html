@@ -43,15 +43,11 @@ main{position:relative; z-index:3}
 .yearfx.l{align-items:flex-start}
 .yearfx.r{align-items:flex-end}
 @media (max-width:760px){.yearfx,.yearfx.l,.yearfx.r{align-items:center; justify-content:flex-start; padding-top:13vh}.yearfx .yf-label,.yearfx.r .yf-label{align-self:center}.yf-num{font-size:30vw}}
-.yearfx{perspective:1400px}
-.yf-num{display:flex; font-family:var(--display); font-weight:700; font-variation-settings:"opsz" 144,"SOFT" 0; font-size:clamp(6.5rem,min(16.5vw,34vh),17rem); line-height:1; letter-spacing:-.03em; color:#f6f3ec;
-  transform-style:preserve-3d; will-change:transform,filter,opacity;
-  text-shadow:.005em .006em 0 #e2ded5,.01em .012em 0 #d6d1c6,.015em .018em 0 #c9c3b7,.02em .024em 0 #bcb5a8,.025em .03em 0 #aea698,.03em .036em 0 #a0978a,
-    .035em .042em 0 #91887b,.04em .048em 0 #82796d,.045em .054em 0 #73695e,.05em .06em 0 #625a50,
-    .06em .08em .04em rgba(0,0,0,.55),.08em .16em .22em rgba(0,0,0,.5),0 0 .6em rgba(255,255,255,.08)}
-.yf-col{display:block; height:1.2em; overflow:hidden; padding-right:.07em; margin-right:-.07em}
+.yf-num{display:flex; font-family:var(--display); font-weight:300; font-size:clamp(6.5rem,min(16.5vw,34vh),17rem); line-height:1; letter-spacing:-.03em; color:rgba(237,234,227,.07);
+  -webkit-text-stroke:1.2px rgba(232,179,107,.6); text-shadow:0 0 40px rgba(232,179,107,.25), 0 0 120px rgba(232,179,107,.12); will-change:transform,filter,opacity}
+.yf-col{display:block; height:1em; overflow:hidden}
 .yf-strip{display:flex; flex-direction:column; will-change:transform}
-.yf-strip span,.yf-ch{display:block; height:1.2em; line-height:1.2em}
+.yf-strip span,.yf-ch{display:block; height:1em; line-height:1}
 .yearfx.r .yf-label{align-self:flex-end}
 .yf-label{margin-top:-.2em; font-family:var(--mono); font-size:clamp(.7rem,1.1vw,.9rem); letter-spacing:.42em; text-transform:uppercase; color:rgba(237,234,227,.75); text-shadow:0 1px 14px rgba(0,0,0,.9)}
 .yf-flare{position:absolute; left:50%; top:50%; width:70vw; height:2px; margin:-1px 0 0 -35vw; opacity:0;
@@ -750,25 +746,34 @@ ITEMS.forEach(it=>it.era=eraOf(it));
 const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
 SETS.brahma=SETS.ai=[...new Set([...SETS.brahma,...SETS.ai])]; // both chapters are 2026
 const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
-// real items go to prints you will actually pass: the camera's path through the section is sampled,
-// and each sample takes turns claiming its nearest visible print, so every item appears once along the way
+// real items go to prints you will actually pass: the camera's path through the section is sampled, the
+// nearest visible prints at each point get real items, and an item is only reused far from where it already hangs
 const _pv=new THREE.Vector3(),_tc=new THREE.PerspectiveCamera();
 function sectionFor(era){for(const [id,e] of Object.entries(ERA_OF_SECTION))if(e===era&&id!=="top")return document.getElementById(id);return null;}
 function assignEra(era){
   const set=(SETS[era]||SETS.all).slice();let h=2166136261;for(const c of era)h=Math.imul(h^c.charCodeAt(0),16777619);
   const r=rng(h>>>0);for(let k=set.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[set[k],set[j]]=[set[j],set[k]];}
-  const REAL=Math.min(set.length,24),out=new Array(N);
-  for(let i=0;i<N;i++)out[i]=PH_BASE+(Math.imul(i+1,2654435761)>>>0)%PH_N;
+  const out=new Array(N);for(let i=0;i<N;i++)out[i]=PH_BASE+(Math.imul(i+1,2654435761)>>>0)%PH_N;
   const max=Math.max(1,document.documentElement.scrollHeight-innerHeight),sec=sectionFor(era);
-  let p0=P,p1=P;if(sec){const top=sec.getBoundingClientRect().top+scrollY;p0=clamp((top-innerHeight*.55)/max,0,1);p1=clamp((top+sec.offsetHeight-innerHeight*.55)/max,0,1);}
-  _tc.copy(camera);const lists=[];
-  for(let sIdx=0;sIdx<5;sIdx++){const ps=lerp(p0,p1,(sIdx+.5)/5),c=camAt(ps),flight=ps>.24&&ps<.86;
+  let p0=P,p1=P;if(sec){const top=sec.getBoundingClientRect().top+scrollY;let end=top+sec.offsetHeight;
+    for(let nx=sec.nextElementSibling;nx&&ERA_OF_SECTION[nx.id]==="keep";nx=nx.nextElementSibling)end=nx.getBoundingClientRect().top+scrollY+nx.offsetHeight; // chapters that keep this wall
+    p0=clamp((top-innerHeight*.7)/max,0,1);p1=clamp(end/max,0,1);}
+  // where a print will hang at scroll progress ps (same rule as the render loop); null while it's up in the rafters
+  const posAt=(p,ps)=>{const mo=Math.max(1-smooth(.1,.22,ps),smooth(.88,.97,ps)),a=smooth(p.seed*.4,p.seed*.4+.6,mo);if(p.stored&&a<.5)return null;
+    const endB=smooth(.88,.97,ps)>1-smooth(.1,.22,ps),bx=endB?0:START.x,by=endB?0:START.y,bz=endB?END_Z:START.z;
+    return _pv.set(lerp(p.fx,bx+p.rel.x,a),lerp(p.stored?15+p.seed*4:p.fy,by+p.rel.y,a),lerp(p.fz,bz+p.rel.z,a));};
+  // where the camera will be: 14 points through the section; which prints each point can see
+  _tc.copy(camera);const SAMPLES=14,VIS=24,Ls=[],seenFrom=new Map();
+  for(let sIdx=0;sIdx<SAMPLES;sIdx++){const ps=lerp(p0,p1,(sIdx+.5)/SAMPLES),c=camAt(ps);
     _tc.position.set(c.x,c.y,c.z);_tc.lookAt(c.x*.6,c.y*.6,c.z-D);_tc.updateMatrixWorld();const L=[];
-    for(let i=0;i<N;i++){const p=prints[i];if(flight){if(p.stored)continue;_pv.set(p.fx,p.fy,p.fz);}else _pv.copy(p.pos);
-      const d=_pv.distanceTo(_tc.position);if(d>26)continue;_pv.project(_tc);if(_pv.z>1||Math.abs(_pv.x)>.95||Math.abs(_pv.y)>.95)continue;L.push([d,i]);}
-    L.sort((x,y)=>x[0]-y[0]);lists.push(L);}
-  const used=new Set();let j=0,round=0;
-  while(j<REAL&&round<400){let any=false;for(const L of lists){while(L.length&&used.has(L[0][1]))L.shift();if(!L.length||j>=REAL)continue;const i=L.shift()[1];used.add(i);out[i]=set[j++];any=true;}round++;if(!any)break;}
+    for(let i=0;i<N;i++){if(!posAt(prints[i],ps))continue;
+      const d=_pv.distanceTo(_tc.position);if(d>VIS)continue;_pv.project(_tc);if(_pv.z>1||Math.abs(_pv.x)>1.1||Math.abs(_pv.y)>1.1)continue;L.push([d,i]);}
+    L.sort((x,y)=>x[0]-y[0]);Ls.push(L.map(e=>e[1]));for(const [,i] of L){if(!seenFrom.has(i))seenFrom.set(i,[]);seenFrom.get(i).push(sIdx);}}
+  // nearest prints first; an item goes up only where no copy of it can be seen from any of the same points
+  const showing=Ls.map(()=>new Set()),uses=new Map(set.map(k=>[k,0]));
+  for(let sIdx=0;sIdx<SAMPLES;sIdx++)for(const i of Ls[sIdx]){if(out[i]<PH_BASE)continue;const from=seenFrom.get(i);
+    let pick=-1;for(const k of set){if(from.some(q=>showing[q].has(k)))continue;if(pick<0||uses.get(k)<uses.get(pick))pick=k;}
+    if(pick<0)continue;out[i]=pick;uses.set(pick,uses.get(pick)+1);from.forEach(q=>showing[q].add(pick));}
   return out;}
 function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}const e=ERA_OF_SECTION[id];return e==="keep"?(ERA.cur||"instnt"):(e||"all");}
 
@@ -829,7 +834,10 @@ function loopCamera(){
   camCtx.save();camCtx.translate(W,0);camCtx.scale(-1,1);camCtx.drawImage(v,0,0,W,H);camCtx.restore();
   if(frameN%2)return; // run tracking at half the camera frame rate so clicks stay responsive
   // eyes steer the portrait
-  if(frameN%4===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
+  if(frameN%(auto.dir?2:4)===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
+    if(!f&&EYES.reading&&now-EYES.quietAt>1400)EYES.reading=false;
+    if(f&&f[473]){eyeSample(f,now);}
+    if(EYES.reading){camCtx.fillStyle="rgba(10,11,14,.72)";camCtx.fillRect(0,H-15,W,15);camCtx.fillStyle="#e8b36b";camCtx.font="600 9px 'IBM Plex Mono', monospace";camCtx.textAlign="center";camCtx.fillText("READING · PAUSED",W/2,H-4);camCtx.textAlign="left";}
     if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);
       camCtx.fillStyle="rgba(232,179,107,.95)";[a,b].forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,2.2,0,6.3);camCtx.fill();});}}
   // hold an open palm to start the page scrolling down on its own; a fist stops it
@@ -918,6 +926,24 @@ function setAutoScroll(dir){
   dir=+dir; if(auto.dir===dir)return;auto.dir=dir;camView.classList.toggle("scrolling",dir!==0);
   if(dir&&!auto.raf){auto.t=performance.now();auto.raf=requestAnimationFrame(autoStep);}
 }
+/* reading detection: while auto-scroll runs and a card is on screen, the camera watches where the irises sit
+   between the eye corners. Reading shows as steady sideways eye movement with return sweeps; when the eyes go
+   quiet (or the face leaves) for a moment, scrolling carries on. */
+const EYES={hist:[],reading:false,quietAt:0,since:0};
+function eyeSample(f,now){
+  const ratio=(iris,o,i)=>(f[iris].x-Math.min(f[o].x,f[i].x))/(Math.abs(f[i].x-f[o].x)||1e-6); // 0 = image-left corner, 1 = image-right, same for both eyes
+  const gx=(ratio(468,33,133)+ratio(473,263,362))/2, gy=((f[468].y+f[473].y)/2-(f[159].y+f[386].y)/2)/(Math.abs(f[145].y-f[159].y)+1e-6);
+  EYES.hist.push({t:now,gx,gy});while(EYES.hist.length&&now-EYES.hist[0].t>2400)EYES.hist.shift();
+  const H=EYES.hist;if(H.length<8)return;
+  let dx=0,dy=0,rev=0,lastS=0,mn=1,mx=0;
+  for(let k=1;k<H.length;k++){const a=H[k].gx-H[k-1].gx;dx+=Math.abs(a);dy+=Math.abs(H[k].gy-H[k-1].gy)*.15;
+    const sg=Math.abs(a)>.004?Math.sign(a):0;if(sg&&lastS&&sg!==lastS)rev++;if(sg)lastS=sg;mn=Math.min(mn,H[k].gx);mx=Math.max(mx,H[k].gx);}
+  const span=(H[H.length-1].t-H[0].t)/1000, energy=dx/span, range=mx-mn;
+  const scanning=energy>.06&&range>.04&&rev>=2&&dx>dy;EYES.energy=energy;EYES.range=range;EYES.rev=rev;
+  const card=readingShare()>.25;
+  if(auto.dir&&card&&scanning){if(!EYES.reading){EYES.reading=true;EYES.since=now;}EYES.quietAt=now;}
+  else if(EYES.reading&&(now-EYES.quietAt>1400||!card))EYES.reading=false;
+}
 let READ_EL=null;
 function readingShare(){ // how much of the middle of the screen is covered by something to read (0 to 1)
   READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking")];
@@ -928,13 +954,14 @@ function readingShare(){ // how much of the middle of the screen is covered by s
 function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
-  // reading pace while a text card fills the middle of the screen, a brisk glide through the warehouse in between
-  const rd=readingShare(),rate=lerp(.6,.06,smooth(.12,.42,rd));
-  auto.v+=(auto.dir*innerHeight*rate-auto.v)*Math.min(1,dt*1.6);
+  // a steady glide, about a fifth of a screen a second; it holds still while your eyes are reading a card
+  const want=EYES.reading?0:auto.dir*innerHeight*.2;
+  auto.v+=(want-auto.v)*Math.min(1,dt*(EYES.reading?4:2));
   const y=window.lenis?lenis.scroll:scrollY;
   if((auto.dir>0&&y>=max-1)||(auto.dir<0&&y<=1))setAutoScroll(0);
   if(Math.abs(auto.v)>1){const ny=clamp(y+auto.v*dt,0,max);window.lenis?lenis.scrollTo(ny,{immediate:true}):window.scrollTo(0,ny);}
   if(auto.dir||Math.abs(auto.v)>1)auto.raf=requestAnimationFrame(autoStep);else{auto.raf=0;auto.v=0;}
+  if(!auto.dir&&EYES.reading)EYES.reading=false;
 }
 // any wheel, touch or key scroll by the visitor takes over from the hand
 ["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(0),{passive:true}));
@@ -996,14 +1023,19 @@ const imgCache={};
 function loadImg(src){return imgCache[src]||(imgCache[src]=new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;}));}
 function cover(g,im,x,y,w,h){const k=Math.max(w/im.width,h/im.height),iw=im.width*k,ih=im.height*k;g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.drawImage(im,x+(w-iw)/2,y+(h-ih)/2,iw,ih);g.restore();}
 function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(/\s+/);let line="",n=0;for(const w of words){const t=line?line+" "+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(n===maxLines-1?line+"…":line,x,y+n*lh);n++;line=w;if(n>=maxLines)return n;}else line=t;}if(line){g.fillText(line,x,y+n*lh);n++;}return n;}
+const ERA_HUE={brahma:32,ai:32,instnt:172,patents:212,socure:215,hopskoch:320,identity:265,gulf:28,origins:140,undated:0};
+function drawArtFor(g,it,x,y,w,h){ // a generated picture for the piece: blurry at a distance, the headline below sharpens up close
+  let sd=7;for(const c of it.title)sd=Math.imul(sd^c.charCodeAt(0),16777619);const R=rng(sd>>>0);
+  drawScene(g,R,x,y,w,h,(sd>>>3)%4,ERA_HUE[it.era]);}
 function drawClipping(g,it,x,y,w,h){ // an article, set in type like a press clipping
   const r=rng(7+it.title.length),k=w/220;g.save();g.translate(x,y);g.fillStyle="#efe8d8";g.fillRect(0,0,w,h);
   for(let n=0;n<Math.round(500*k*k);n++){g.fillStyle=`rgba(80,70,50,${r()*.05})`;g.fillRect(r()*w,r()*h,1+r()*2,1);}
-  g.fillStyle="#1b1a17";g.fillRect(0,0,w,40*k); // masthead
-  g.fillStyle="#efe8d8";g.font=`500 ${9*k}px 'IBM Plex Mono', monospace`;g.fillText(it.source.toUpperCase().slice(0,30),10*k,18*k);
-  g.fillStyle="#e8b36b";g.font=`400 ${8*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date||"",10*k,31*k);
-  g.fillStyle="#1b1a17";g.font=`italic 600 ${20*k}px Fraunces, Georgia, serif`;const n=wrapText(g,it.title,10*k,64*k,w-20*k,22*k,5);
-  g.fillStyle="rgba(27,26,23,.28)";for(let l=0;l<6;l++){const ly=64*k+n*22*k+l*9*k;if(ly>h-8*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3.5*k);}
+  g.fillStyle="#1b1a17";g.fillRect(0,0,w,30*k); // masthead
+  g.fillStyle="#efe8d8";g.font=`500 ${8.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.source.toUpperCase().slice(0,30),10*k,13*k);
+  g.fillStyle="#e8b36b";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date||"",10*k,24*k);
+  const ih=h*.46;g.restore();drawArtFor(g,it,x,y+30*k,w,ih);g.save();g.translate(x,y);
+  g.fillStyle="#1b1a17";g.font=`italic 600 ${16*k}px Fraunces, Georgia, serif`;const ty=30*k+ih+18*k,n=wrapText(g,it.title,10*k,ty,w-20*k,17.5*k,3);
+  g.fillStyle="rgba(27,26,23,.28)";for(let l=0;l<4;l++){const ly=ty+n*17.5*k-6*k+l*8*k;if(ly>h-6*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3*k);}
   g.restore();}
 function drawPatent(g,it,x,y,w,h){ // a US patent front page, number first
   const k=w/220;g.save();g.translate(x,y);g.fillStyle="#f7f5ef";g.fillRect(0,0,w,h);
@@ -1015,10 +1047,13 @@ function drawPatent(g,it,x,y,w,h){ // a US patent front page, number first
   g.fillText(num,10*k,22*k+fs);
   const ry=30*k+fs;g.fillRect(10*k,ry,w-20*k,1.2*k);
   g.font=`600 ${10.5*k}px 'Source Serif 4', Georgia, serif`;const n=wrapText(g,it.title,10*k,ry+15*k,w-20*k,12.5*k,4);
-  const fy=ry+15*k+n*12.5*k+4*k,fh=h-fy-12*k;if(fh>34*k){g.strokeStyle="#2b2722";g.lineWidth=1.1*k;
+  const fy=ry+15*k+n*12.5*k+4*k,fh=h-fy-6*k;if(fh>34*k){g.fillStyle="#1f2b3d";g.fillRect(6*k,fy-3*k,w-12*k,fh+3*k);
+    g.strokeStyle="rgba(160,190,230,.18)";g.lineWidth=.6*k;for(let gx=6*k;gx<w-6*k;gx+=10*k){g.beginPath();g.moveTo(gx,fy-3*k);g.lineTo(gx,fy+fh);g.stroke();}
+    for(let gy=fy;gy<fy+fh;gy+=10*k){g.beginPath();g.moveTo(6*k,gy);g.lineTo(w-6*k,gy);g.stroke();}
+    g.strokeStyle="#dfe9f7";g.lineWidth=1.1*k;
     [[14,0],[86,0],[50,.55]].forEach(([bx0,by0])=>g.strokeRect(bx0*k,fy+by0*fh,62*k,fh*.32));
     g.beginPath();g.moveTo(45*k,fy+fh*.32);g.lineTo(75*k,fy+fh*.55);g.moveTo(117*k,fy+fh*.32);g.lineTo(90*k,fy+fh*.55);g.stroke();
-    g.font=`italic 400 ${7*k}px 'Source Serif 4', Georgia, serif`;g.fillStyle="#2b2722";g.fillText("FIG. 1",w-38*k,h-7*k);}
+    g.font=`italic 400 ${7*k}px 'Source Serif 4', Georgia, serif`;g.fillStyle="#dfe9f7";g.fillText("FIG. 1",w-38*k,h-10*k);}
   g.restore();}
 function drawPostCard(g,it,x,y,w,h,im){ // a LinkedIn post: its still above the opening line
   const k=w/220;g.save();g.translate(x,y);g.fillStyle="#fff";g.fillRect(0,0,w,h);
@@ -1060,9 +1095,9 @@ const PH_N=36, PH_BASE=ITEMS.length; // placeholder cells live after the real it
 const isReal=i=>aCell&&aCell[i]<PH_BASE;
 function softText(g,draw){ // text drawn only as its own blur, so it reads as handwriting you can't quite make out
   g.save();g.shadowColor=g.fillStyle;g.shadowBlur=3.2;g.shadowOffsetX=0;g.shadowOffsetY=0;g.globalAlpha=.55;draw();g.restore();}
-function drawScene(g,r,x,y,w,h,kind){ // a generated photograph: no real people or places
+function drawScene(g,r,x,y,w,h,kind,baseHue){ // a generated photograph: no real people or places
   g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
-  const hue=Math.floor(r()*360),sky=g.createLinearGradient(0,y,0,y+h);
+  const hue=baseHue!=null?Math.floor(baseHue+(r()-.5)*40+360)%360:Math.floor(r()*360),sky=g.createLinearGradient(0,y,0,y+h);
   if(kind===0){ // dusk over hills
     sky.addColorStop(0,`hsl(${hue},45%,22%)`);sky.addColorStop(.6,`hsl(${(hue+30)%360},60%,58%)`);sky.addColorStop(1,`hsl(${(hue+50)%360},70%,72%)`);g.fillStyle=sky;g.fillRect(x,y,w,h);
     g.fillStyle=`hsla(${(hue+40)%360},90%,85%,.9)`;g.beginPath();g.arc(x+w*(.25+r()*.5),y+h*(.45+r()*.15),w*.09,0,6.3);g.fill();
@@ -1222,16 +1257,16 @@ function showYear(year,label){
   });
   yfLabel.textContent=label;
   if(yearTL)yearTL.kill();
-  if(REDUCED||!window.gsap){strips.forEach(([st,,to])=>st.style.transform=`translateY(${-to*1.2}em)`);yearfx.style.opacity=1;clearTimeout(showYear.t);showYear.t=setTimeout(()=>yearfx.style.opacity=0,2600);return;}
-  strips.forEach(([st,from])=>gsap.set(st,{y:-from*1.2+"em"}));const side=yearfx.classList.contains("l")?1:-1;
+  if(REDUCED||!window.gsap){strips.forEach(([st,,to])=>st.style.transform=`translateY(${-to}em)`);yearfx.style.opacity=1;clearTimeout(showYear.t);showYear.t=setTimeout(()=>yearfx.style.opacity=0,2600);return;}
+  strips.forEach(([st,from])=>gsap.set(st,{y:-from+"em"}));
   yearTL=gsap.timeline()
     .set(yearfx,{opacity:1})
-    .fromTo(yfNum,{opacity:0,scale:1.16,filter:"blur(26px)",letterSpacing:".18em",y:20,rotationY:side*34,rotationX:14},{opacity:1,scale:1,filter:"blur(0px)",letterSpacing:"-.03em",y:0,rotationY:side*11,rotationX:5,duration:1.5,ease:"expo.out"},0)
+    .fromTo(yfNum,{opacity:0,scale:1.16,filter:"blur(26px)",letterSpacing:".18em",y:20},{opacity:1,scale:1,filter:"blur(0px)",letterSpacing:"-.03em",y:0,duration:1.5,ease:"expo.out"},0)
     .to(yfNum,{keyframes:[{opacity:.55,duration:.06},{opacity:1,duration:.08},{opacity:.75,duration:.05},{opacity:1,duration:.1}]},.12)   // a projector flicker
-    .add(strips.map(([st,,to],k)=>gsap.to(st,{y:-to*1.2+"em",duration:1.7,ease:"power4.out",delay:k*.11})),.05)
+    .add(strips.map(([st,,to],k)=>gsap.to(st,{y:-to+"em",duration:1.7,ease:"power4.out",delay:k*.11})),.05)
     .fromTo(yfFlare,{opacity:0,x:"-45vw",scaleX:.4},{keyframes:[{opacity:1,x:"0vw",scaleX:1,duration:.7,ease:"power2.out"},{opacity:0,x:"45vw",scaleX:.5,duration:.8,ease:"power2.in"}]},.25)
     .fromTo(yfLabel,{opacity:0,y:18,letterSpacing:".8em"},{opacity:1,y:0,letterSpacing:".42em",duration:1.1,ease:"power3.out"},.55)
-    .to(yfNum,{opacity:0,scale:.93,y:-36,rotationY:side*-6,filter:"blur(18px)",duration:1.6,ease:"power2.in"},"+=1.5")
+    .to(yfNum,{opacity:0,scale:.93,y:-36,filter:"blur(18px)",duration:1.6,ease:"power2.in"},"+=1.5")
     .to(yfLabel,{opacity:0,y:-12,duration:1.1,ease:"power2.in"},"<.15")
     .set(yearfx,{opacity:0});
 }
