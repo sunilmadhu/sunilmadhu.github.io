@@ -119,6 +119,7 @@ body.holding main{opacity:0; pointer-events:none}
 .selbox i:nth-child(4){right:0; bottom:0; border-left:0; border-top:0}
 .fdot{position:fixed; left:-5px; top:-5px; z-index:31; width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 10px 3px rgba(232,179,107,.6); pointer-events:none; opacity:0; transition:opacity .2s}
 .fdot.on{opacity:.9}
+.fdot.pinch{background:#fff; box-shadow:0 0 14px 5px rgba(255,255,255,.75); transform-origin:center}
 .vlayer{position:fixed; inset:0; z-index:40; pointer-events:none}
 .vwin{position:absolute; pointer-events:auto; opacity:0; transition:opacity .35s; overflow:hidden}
 .vwin:has(iframe){background:#000}
@@ -787,15 +788,19 @@ function loopCamera(){
     const pointing=n===1&&extended(h,8,6); // only the index finger out
     camCtx.fillStyle=n>=3?"#43e07a":pointing?"#e8b36b":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
     // pinch: thumb tip meets index tip, measured against the size of the hand so distance from the camera doesn't matter
-    const span=Math.hypot(h[5].x-h[17].x,h[5].y-h[17].y)+1e-6,pr=Math.hypot(h[4].x-h[8].x,h[4].y-h[8].y)/span;
-    if(!cam.pinched&&pr<.32){cam.pinched=true;pinchTap();}else if(cam.pinched&&pr>.55)cam.pinched=false;
-    cam.palm=n>=3?(cam.palm||0)+1:0; cam.fist=(n===0&&!cam.pinched)?(cam.fist||0)+1:0;
+    // palm size (wrist to middle knuckle) is the yardstick; 3D distance so a pinch still reads when the hand is turned
+    const palm=Math.hypot(h[0].x-h[9].x,h[0].y-h[9].y,(h[0].z-h[9].z))+1e-6,
+          pr=Math.hypot(h[4].x-h[8].x,h[4].y-h[8].y,(h[4].z-h[8].z))/palm;
+    cam.handAt=now;cam.pr=pr;
+    if(!cam.pinched&&pr<.42){cam.pinched=true;pinchTap();}else if(cam.pinched&&pr>.62)cam.pinched=false;
+    fdot.classList.toggle("pinch",cam.pinched);
+    cam.palm=(n>=3&&pr>.6)?(cam.palm||0)+1:0; cam.fist=(n===0&&pr>.6)?(cam.fist||0)+1:0;
     if(pointing)pointAt(h[8],now);
     if(cam.palm>=3)setAutoScroll(1);   // about a quarter second of open palm: scroll down
     if(cam.fist===2){setAutoScroll(0);cam.fistY=h[9].y;}  // making a fist stops
     // pulling the closed fist down (about a tenth of the frame) scrolls back up
     if(cam.fist>2&&cam.fistY!=null&&h[9].y-cam.fistY>.1){setAutoScroll(-1);cam.fistY=null;}
-  }else{cam.palm=0;cam.fist=0;cam.fistY=null;cam.pinched=false;}
+  }else{cam.palm=0;cam.fist=0;cam.fistY=null;cam.pinched=false;fdot.classList.remove("pinch");}
 }
 
 /* point with your index finger: a selection box locks onto the nearest Polaroid under your fingertip and follows it;
@@ -817,14 +822,17 @@ function pinchTap(){
   const now=performance.now();
   if(modalOpen){closeModal();return;}
   if(HOLD.i>=0&&HOLD.target===1){release();return;}
-  const sel=POINT.sel>=0?POINT.sel:(now-POINT.selAt<900?POINT.lastSel:-1); // the finger curls as you pinch, so remember the last selection
+  const sel=POINT.sel>=0?POINT.sel:(now-POINT.selAt<1500?POINT.lastSel:-1); // the finger curls as you pinch, so remember the last selection
   if(sel>=0){POINT.hist.length=0;POINT.sel=-1;selbox.classList.add("tap");setTimeout(()=>selbox.classList.remove("tap"),260);pickUp(sel);}
 }
 function cyclePoint(dir){if(!POINT.order.length)return;POINT.k=(POINT.k+dir+POINT.order.length)%POINT.order.length;POINT.sel=POINT.order[POINT.k];POINT.lastCycle=performance.now();}
 const selbox=document.getElementById("selbox"),fdot=document.getElementById("fdot"),M2=new THREE.Matrix4();
 function updatePoint(now){
-  const live=cam.on&&now-POINT.last<450&&POINT.hist.length>=4&&mesh&&U.uMosaic.value<.35&&!modalOpen&&HOLD.i<0;
+  const pointingNow=now-POINT.last<450&&POINT.hist.length>=4;
+  const frozen=!pointingNow&&POINT.sel>=0&&now-(cam.handAt||0)<400&&now-POINT.last<2500; // hand still up, finger curling into a pinch
+  const live=cam.on&&(pointingNow||frozen)&&mesh&&U.uMosaic.value<.35&&!modalOpen&&HOLD.i<0;
   if(!live){if(POINT.sel>=0){POINT.sel=-1;U.uHover.value=-1;}selbox.classList.remove("on");fdot.classList.remove("on");if(now-POINT.last>450){POINT.hist.length=0;POINT.acc=0;}return;}
+  if(frozen){drawSel();return;}
   // the anchor is the average of recent fingertip positions, so a twirl doesn't drag the box around
   const H=POINT.hist.slice(-8);let ax=0,ay=0;H.forEach(q=>{ax+=q.x;ay+=q.y;});ax/=H.length;ay/=H.length;
   const tx=clamp(.5+(ax-.5)*1.7,0,1)*innerWidth,ty=clamp(.5+(ay-.5)*1.7,0,1)*innerHeight;
@@ -841,7 +849,9 @@ function updatePoint(now){
   if(!keep){POINT.sel=POINT.order.length?POINT.order[0]:-1;POINT.k=0;}else POINT.k=POINT.order.indexOf(POINT.sel);
   U.uHover.value=POINT.sel;
   if(POINT.sel<0){selbox.classList.remove("on");return;}
-  POINT.lastSel=POINT.sel;POINT.selAt=now;
+  POINT.lastSel=POINT.sel;POINT.selAt=now;drawSel();
+}
+function drawSel(){
   mesh.getMatrixAt(POINT.sel,M2);const xs=[],ys=[];
   [[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5]].forEach(([x,y])=>{prj.set(x,y,0).applyMatrix4(M2).project(camera);xs.push((prj.x+1)/2*innerWidth);ys.push((1-prj.y)/2*innerHeight);});
   const L=Math.min(...xs)-8,T=Math.min(...ys)-8,Wd=Math.max(...xs)-L+8,Ht=Math.max(...ys)-T+8;
