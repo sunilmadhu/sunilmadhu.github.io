@@ -1334,6 +1334,7 @@ document.addEventListener("mouseleave",()=>{ptr.in=false;});
 const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
 function pickUp(i){
   if(!isReal(i))return;const it=ITEMS[aCell[i]];if(!it)return;
+  if(window.track)track("open",{label:(it.cap||it.title||"").slice(0,80)+" · "+it.type,target:it.era});
   if(HOLD.i>=0&&HOLD.i!==i)release(true);
   HOLD.i=i;HOLD.target=1;HOLD.item=it;U.uActive.value=i;U.uHover.value=-1;document.documentElement.classList.remove("pick");
   document.body.classList.add("holding");
@@ -1564,5 +1565,6 @@ const BOOKING={url:"https://calendly.com/sunilmadhu/external-meeting"};
 })();
 requestAnimationFrame(t=>{last=t;frame(t);});
 </script>
+<script src="/analytics.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>sunilmadhu.me · Visitor report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+.viz-root{color-scheme:dark;--bg:#0e0f12;--surface-1:#15171b;--surface-2:#1c1f24;--line:rgba(240,239,236,.09);--grid:rgba(240,239,236,.07);
+  --text-primary:#f0efec;--text-secondary:#c3c2b7;--text-muted:#8d8c85;--accent:#e8b36b;
+  --series-1:#3987e5;--series-2:#d95926;--series-3:#199e70;--good:#0ca30c;--critical:#e66767}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0e0f12;color:#f0efec}
+body{font:15px/1.5 "Source Serif 4",Georgia,serif}
+.viz-root{min-height:100vh;background:var(--bg);color:var(--text-primary);padding:28px clamp(16px,3vw,40px) 80px}
+h1,h2{font-family:Fraunces,Georgia,serif;font-weight:400;margin:0}
+h1{font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.01em}
+h2{font-size:1.15rem;margin-bottom:12px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.muted{color:var(--text-muted)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;justify-content:space-between;margin-bottom:22px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button,.btn{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.04em;color:var(--text-secondary);background:transparent;border:0;padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--surface-2);color:var(--text-primary)}
+.btn{border:1px solid var(--line);border-radius:999px}
+.btn:hover,.seg button:hover{color:var(--text-primary)}
+.live{display:inline-flex;align-items:center;gap:7px;font:500 12px "IBM Plex Mono",monospace;color:var(--text-secondary)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 rgba(12,163,12,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(12,163,12,0)}100%{box-shadow:0 0 0 0 rgba(12,163,12,0)}}
+.gate{max-width:440px;margin:14vh auto;text-align:center;padding:34px 28px;border:1px solid var(--line);border-radius:18px;background:var(--surface-1)}
+.gate p{color:var(--text-secondary);margin:10px 0 22px}
+.gate .err{color:var(--critical);font:500 13px "IBM Plex Mono",monospace;margin-top:16px}
+#signin{display:flex;justify-content:center}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px}
+.tile{background:var(--surface-1);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tile b{display:block;font:400 1.9rem/1.1 Fraunces,Georgia,serif;font-variant-numeric:tabular-nums;margin-top:6px}
+.tile span{font:500 11px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+.tile small{display:block;color:var(--text-muted);font:400 12px "IBM Plex Mono",monospace;margin-top:4px}
+.card{background:var(--surface-1);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.two{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}
+@media(max-width:520px){.two{grid-template-columns:1fr}}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font:500 12px "IBM Plex Mono",monospace;color:var(--text-secondary);margin:-4px 0 8px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+svg text{font:11px "IBM Plex Mono",monospace;fill:var(--text-muted)}
+.tip{position:fixed;pointer-events:none;z-index:20;background:#0b0c0e;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:12px/1.5 "IBM Plex Mono",monospace;color:var(--text-primary);opacity:0;transition:opacity .12s;max-width:280px}
+.tip .k{color:var(--text-muted)}
+table{width:100%;border-collapse:collapse;font:13px/1.45 "IBM Plex Mono",monospace}
+th{font-weight:500;text-align:left;color:var(--text-muted);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:8px 8px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap;user-select:none}
+th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+td{padding:8px;border-bottom:1px solid var(--line);color:var(--text-secondary);vertical-align:top}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--surface-2);color:var(--text-primary)}
+td.strong{color:var(--text-primary)}
+.scroll{max-height:440px;overflow:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{font:500 11px "IBM Plex Mono",monospace;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--text-secondary);background:transparent;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--surface-2);color:var(--text-primary);border-color:rgba(240,239,236,.25)}
+.kind{font:500 10px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--text-secondary);white-space:nowrap}
+.kind.business{color:var(--text-primary);border-color:rgba(232,179,107,.5)}
+.bar{display:grid;grid-template-columns:120px 1fr 92px;gap:10px;align-items:center;font:12px "IBM Plex Mono",monospace;color:var(--text-secondary);margin:6px 0}
+.bar .track{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--series-1);border-radius:0 4px 4px 0}
+.bar .v{text-align:right;color:var(--text-primary)}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:#111317;border-left:1px solid var(--line);z-index:30;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+.drawer header{padding:18px 20px;margin:0;border-bottom:1px solid var(--line)}
+.drawer .body{overflow:auto;padding:14px 20px 40px}
+.ev{display:grid;grid-template-columns:64px 76px 1fr;gap:10px;font:12px/1.5 "IBM Plex Mono",monospace;padding:6px 0;border-bottom:1px dashed var(--line);color:var(--text-secondary)}
+.ev .t{color:var(--text-muted)}.ev .ty{color:var(--text-primary)}
+.list{margin:0;padding:0;list-style:none;font:12px/1.6 "IBM Plex Mono",monospace;color:var(--text-secondary)}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+.list li b{font-weight:500;color:var(--text-primary);font-variant-numeric:tabular-nums}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{color:var(--text-primary);text-decoration:none;font:500 12px "IBM Plex Mono",monospace;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.links a:hover{border-color:var(--accent)}
+.empty{color:var(--text-muted);font:13px "IBM Plex Mono",monospace;padding:18px 0}
+canvas#heat{width:100%;display:block;border-radius:10px;background:var(--surface-2)}
+section.block{margin-top:16px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="gate" id="gate">
+    <h1>Visitor report</h1>
+    <p>Sign in with the site owner's Google account.</p>
+    <div id="signin"></div>
+    <div class="err" id="gateErr" hidden></div>
+  </div>
+
+  <main id="app" hidden>
+    <header>
+      <div>
+        <h1>sunilmadhu.me · Visitor report</h1>
+        <div class="muted mono" style="font-size:12px;margin-top:4px" id="asof"></div>
+      </div>
+      <div class="controls">
+        <span class="live" id="live"><i></i><span>0 on the site now</span></span>
+        <div class="seg" id="range" role="group" aria-label="Date range">
+          <button data-d="1">24h</button><button data-d="7">7 days</button><button data-d="30" aria-pressed="true">30 days</button><button data-d="90">90 days</button>
+        </div>
+        <button class="btn" id="refresh">Refresh</button>
+        <button class="btn" id="signout">Sign out</button>
+      </div>
+    </header>
+
+    <div class="grid kpis" id="kpis"></div>
+
+    <div class="grid two">
+      <div class="card"><h2>Traffic over time</h2><div class="legend" id="trendLegend"></div><div id="trend"></div></div>
+      <div class="card"><h2>How far visitors get</h2><div class="muted mono" style="font-size:12px;margin:-6px 0 8px">Share of sessions that reached each chapter</div><div id="funnel"></div></div>
+    </div>
+
+    <section class="block card">
+      <h2>Who is visiting</h2>
+      <div class="chips" id="kindChips">
+        <button class="chip" data-k="all" aria-pressed="true">All</button><button class="chip" data-k="business">Business</button>
+        <button class="chip" data-k="personal">Personal</button><button class="chip" data-k="hosting">Cloud / VPN</button><button class="chip" data-k="unknown">Unknown</button>
+      </div>
+      <div class="scroll"><table id="companies"></table></div>
+    </section>
+
+    <section class="block card">
+      <h2 id="sessTitle">Recent sessions</h2>
+      <div class="chips" id="sessFilter" hidden></div>
+      <div class="scroll"><table id="sessions"></table></div>
+    </section>
+
+    <div class="grid two block">
+      <div class="card"><h2>Most common journeys</h2><ul class="list" id="paths"></ul></div>
+      <div class="card"><h2>Chapter to chapter</h2><ul class="list" id="steps"></ul></div>
+    </div>
+
+    <div class="grid two block">
+      <div class="card"><h2>What gets clicked</h2><div class="scroll"><table id="clicks"></table></div></div>
+      <div class="card"><h2>Polaroids opened</h2><div class="scroll"><table id="opens"></table></div></div>
+    </div>
+
+    <div class="grid two block">
+      <div class="card"><h2>Click heatmap</h2><div class="muted mono" style="font-size:12px;margin:-6px 0 10px">Where on the page clicks land, top of the page at the top</div><canvas id="heat" height="560"></canvas></div>
+      <div class="card"><h2>Gestures and camera</h2><ul class="list" id="gestures"></ul>
+        <h2 style="margin-top:22px">Where they come from</h2><ul class="list" id="refs"></ul></div>
+    </div>
+
+    <div class="grid two block">
+      <div class="card"><h2>Countries</h2><ul class="list" id="geo"></ul></div>
+      <div class="card"><h2>Devices</h2><ul class="list" id="devices"></ul></div>
+    </div>
+
+    <section class="block card">
+      <h2>Google Analytics</h2>
+      <div id="gaBody"><button class="btn" id="gaConnect">Load Google Analytics</button></div>
+    </section>
+
+    <section class="block card">
+      <h2>Microsoft Clarity</h2>
+      <div class="links">
+        <a href="https://clarity.microsoft.com/projects/view/zfzzxvowwj/dashboard" target="_blank" rel="noopener">Dashboard ↗</a>
+        <a href="https://clarity.microsoft.com/projects/view/zfzzxvowwj/heatmaps" target="_blank" rel="noopener">Heatmaps ↗</a>
+        <a href="https://clarity.microsoft.com/projects/view/zfzzxvowwj/impressions" target="_blank" rel="noopener">Session recordings ↗</a>
+        <a href="https://analytics.google.com/analytics/web/#/p565131496/reports/intelligenthome" target="_blank" rel="noopener">Google Analytics ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <header><div><h2 id="dTitle" style="margin:0"></h2><div class="muted mono" style="font-size:12px" id="dSub"></div></div><button class="btn" id="dClose">Close</button></header>
+    <div class="body" id="dBody"></div>
+  </aside>
+  <div class="tip" id="tip"></div>
+</div>
+
+<script>
+const API="https://sunilmadhu-analytics.sunilmadhu.workers.dev", CLIENT_ID="460557285549-heibrq7jk2t8i6t2133qvu41d6r4nv9i.apps.googleusercontent.com", GA_PROPERTY="565131496";
+const ORDER=["top","brahma","ai","instnt","patents","socure","hopskoch","identity","gulf","origins","numbers","career","contact"];
+const NAMES={top:"Opening",brahma:"Asyml8 · Brahma",ai:"AI-native",instnt:"Instnt",patents:"Patents",socure:"Socure",hopskoch:"Hopskoch",identity:"Identity years",gulf:"IBM & the Gulf",origins:"Education",numbers:"Record",career:"Career",contact:"Let's talk"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>(n==null?"–":Number(n).toLocaleString("en-US"));
+const pct=x=>(x==null||!isFinite(x)?"–":Math.round(x*100)+"%");
+const dur=s=>{s=Math.round(s||0);if(s<60)return s+"s";const m=Math.floor(s/60);return m<60?m+"m "+(s%60)+"s":Math.floor(m/60)+"h "+(m%60)+"m";};
+const when=ts=>{const d=new Date(ts),now=Date.now(),a=(now-ts)/1000;if(a<90)return "just now";if(a<3600)return Math.round(a/60)+" min ago";if(a<86400)return Math.round(a/3600)+" h ago";return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})+" "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});};
+const S={token:null,days:30,data:null,kind:"all",org:null,timer:0,ga:null};
+
+/* ---------- sign-in ---------- */
+function saveToken(t){S.token=t;try{sessionStorage.setItem("rp_tok",t);}catch(e){}}
+function savedToken(){try{const t=sessionStorage.getItem("rp_tok");if(!t)return null;const p=JSON.parse(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/")));return p.exp*1000>Date.now()+60000?t:null;}catch(e){return null;}}
+function initGoogle(){
+  if(!window.google||!google.accounts){return setTimeout(initGoogle,200);}
+  google.accounts.id.initialize({client_id:CLIENT_ID,callback:r=>{saveToken(r.credential);boot();},auto_select:true,itp_support:true});
+  google.accounts.id.renderButton($("signin"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with"});
+  google.accounts.id.prompt();
+}
+function gateError(msg){$("app").hidden=true;$("gate").hidden=false;const e=$("gateErr");e.textContent=msg;e.hidden=false;}
+$("signout").onclick=()=>{try{sessionStorage.removeItem("rp_tok");}catch(e){}S.token=null;clearInterval(S.timer);if(window.google)google.accounts.id.disableAutoSelect();location.reload();};
+
+/* ---------- data ---------- */
+async function api(path){
+  const r=await fetch(API+path,{headers:{Authorization:"Bearer "+S.token}});
+  if(r.status===401){throw Object.assign(new Error("This Google account isn't allowed to see the report."),{auth:true});}
+  if(!r.ok)throw new Error("The report service answered "+r.status+".");
+  return r.json();
+}
+async function load(){
+  try{S.data=await api("/api/report?days="+S.days);}
+  catch(e){if(e.auth){try{sessionStorage.removeItem("rp_tok");}catch(_){}}gateError(e.message);return;}
+  $("gate").hidden=true;$("app").hidden=false;render();
+}
+function boot(){load();clearInterval(S.timer);S.timer=setInterval(load,60000);}
+$("refresh").onclick=load;
+$("range").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.days=+b.dataset.d;[...$("range").children].forEach(x=>x.setAttribute("aria-pressed",x===b));load();});
+
+/* ---------- render ---------- */
+function render(){
+  const d=S.data,k=d.kpi||{};
+  $("asof").textContent="Updated "+new Date(d.generated).toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"})+" · last "+(S.days===1?"24 hours":S.days+" days");
+  const liveN=(d.sessions||[]).filter(s=>Date.now()-s.end<5*60000).length;$("live").querySelector("span").textContent=liveN+" on the site now";
+  const ret=k.returning||{};
+  const tiles=[["Visitors",fmt(k.visitors),""],["Sessions",fmt(k.sessions),""],["Page views",fmt(k.views),""],["Companies",fmt(k.companies),"business networks"],
+    ["Median engaged",dur(k.medianEngaged),"per session"],["Bounce",pct(k.bounceRate),"left from the opening"],["Returning",ret.visitors?pct((ret.back||0)/ret.visitors):"–",fmt(ret.back||0)+" came back another day"],["Live now",fmt(liveN),"last 5 minutes"]];
+  $("kpis").innerHTML=tiles.map(([a,b,c])=>`<div class="tile"><span>${a}</span><b>${b}</b>${c?`<small>${esc(c)}</small>`:""}</div>`).join("");
+  trend(d.daily||[]);funnel(d.funnel||[],k.sessions||0);companies();sessions();
+  list("paths",(d.journeys.paths||[]).map(p=>[p.k.split(">").map(x=>NAMES[x]||x).join(" → ")||"(opening only)",p.n]),"No journeys yet");
+  list("steps",(d.journeys.steps||[]).map(p=>[p.k.split(" → ").map(x=>NAMES[x]||x).join(" → "),p.n]),"No steps yet");
+  table("clicks",[["label","Clicked"],["section","Chapter"],["n","Clicks","num"],["sessions","Sessions","num"]],(d.clicks||[]).map(c=>({...c,label:c.label||c.target,section:NAMES[c.section]||c.section||""})));
+  table("opens",[["label","Polaroid"],["section","Chapter"],["n","Opens","num"],["sessions","Sessions","num"]],(d.opens||[]).map(c=>({...c,section:NAMES[c.section]||c.section||""})));
+  list("gestures",(d.gestures||[]).map(g=>[g.label,g.n]),"No gestures recorded yet");
+  list("refs",(d.refs||[]).map(r=>[r.ref,r.sessions]),"No visits yet");
+  list("geo",(d.geo||[]).map(g=>[g.country||"Unknown",g.sessions]),"No visits yet");
+  list("devices",(d.devices||[]).map(g=>[[g.device,g.browser,g.os].filter(Boolean).join(" · "),g.sessions]),"No visits yet");
+  heat(d.heat||[]);
+}
+function list(id,rows,empty){$(id).innerHTML=rows.length?rows.map(([a,b])=>`<li><span>${esc(a)}</span><b>${fmt(b)}</b></li>`).join(""):`<li class="empty">${empty}</li>`;}
+
+// sortable table
+function table(id,cols,rows,onRow){
+  const el=$(id);el._rows=rows;el._cols=cols;el._on=onRow;el._sort=el._sort||null;drawTable(el);
+}
+function drawTable(el){
+  const cols=el._cols;let rows=el._rows.slice();
+  if(el._sort){const [k,dir]=el._sort;rows.sort((a,b)=>{const x=a[k],y=b[k];return (typeof x==="number"&&typeof y==="number"?x-y:String(x||"").localeCompare(String(y||"")))*dir;});}
+  if(!rows.length){el.innerHTML=`<tr><td class="empty">Nothing recorded yet</td></tr>`;return;}
+  el.innerHTML="<thead><tr>"+cols.map(([k,h,c])=>`<th data-k="${k}" class="${c||""}">${h}${el._sort&&el._sort[0]===k?(el._sort[1]>0?" ↑":" ↓"):""}</th>`).join("")+"</tr></thead><tbody>"+
+    rows.map((r,i)=>`<tr class="${el._on?"click":""}" data-i="${i}">`+cols.map(([k,,c],j)=>`<td class="${c||""} ${j===0?"strong":""}">${r["_"+k]!=null?r["_"+k]:esc(c==="num"?fmt(r[k]):r[k])}</td>`).join("")+"</tr>").join("")+"</tbody>";
+  el._shown=rows;
+  el.querySelectorAll("th").forEach(th=>th.onclick=()=>{const k=th.dataset.k;el._sort=el._sort&&el._sort[0]===k?[k,-el._sort[1]]:[k,typeof rows[0][k]==="number"?-1:1];drawTable(el);});
+  if(el._on)el.querySelectorAll("tbody tr").forEach(tr=>tr.onclick=()=>el._on(el._shown[+tr.dataset.i]));
+}
+
+function companies(){
+  const rows=(S.data.companies||[]).filter(c=>S.kind==="all"||c.kind===S.kind).map(c=>({...c,_kind:`<span class="kind ${esc(c.kind)}">${esc(c.kind==="hosting"?"cloud / vpn":c.kind)}</span>`,
+    place:[...new Set(String(c.cities||"").split(","))].filter(Boolean).slice(0,2).join(", ")+(c.countries?" · "+c.countries:""),_last:when(c.last)}));
+  table("companies",[["org","Organization"],["kind","Type"],["visitors","Visitors","num"],["sessions","Sessions","num"],["clicks","Clicks","num"],["opens","Opened","num"],["place","Where"],["last","Last seen"]],rows,
+    c=>{S.org=c.org;sessions();document.getElementById("sessions").scrollIntoView({behavior:"smooth",block:"center"});});
+}
+$("kindChips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;S.kind=b.dataset.k;[...$("kindChips").children].forEach(x=>x.setAttribute("aria-pressed",x===b));companies();});
+
+function sessions(){
+  let rows=S.data.sessions||[];
+  const f=$("sessFilter");
+  if(S.org){rows=rows.filter(s=>s.org===S.org);$("sessTitle").textContent="Sessions from "+S.org;f.hidden=false;f.innerHTML=`<button class="chip" aria-pressed="true">${esc(S.org)} ✕</button>`;f.firstChild.onclick=()=>{S.org=null;sessions();};}
+  else{$("sessTitle").textContent="Recent sessions";f.hidden=true;}
+  rows=rows.map(s=>({...s,_start:when(s.start),who:s.org||"Unknown network",place:[s.city,s.country].filter(Boolean).join(", "),dev:[s.device,s.browser].filter(Boolean).join(" · "),
+    src:s.ref||"(direct)",eng:s.engaged||0,_eng:dur(s.engaged||0),len:(s.end-s.start)/1000,_len:dur((s.end-s.start)/1000)}));
+  table("sessions",[["start","Started"],["who","Organization"],["place","Where"],["dev","Device"],["src","Source"],["eng","Engaged","num"],["sections","Chapters","num"],["clicks","Clicks","num"],["opens","Opened","num"]],rows,openSession);
+}
+async function openSession(s){
+  $("dTitle").textContent=s.org||"Unknown network";$("dSub").textContent=[when(s.start),[s.city,s.country].filter(Boolean).join(", "),s.device,s.ref||"direct"].filter(Boolean).join(" · ");
+  $("dBody").innerHTML='<div class="empty">Loading the journey…</div>';$("drawer").classList.add("open");$("drawer").setAttribute("aria-hidden","false");
+  try{const r=await api("/api/session?sid="+encodeURIComponent(s.sid));const t0=r.events.length?r.events[0].ts:0;
+    $("dBody").innerHTML=r.events.map(e=>{const what=e.type==="section"?"reached "+(NAMES[e.section]||e.section):e.type==="click"?"clicked "+(e.label||e.target||""):e.type==="open"?"opened "+(e.label||""):e.type==="gesture"?(e.label||"gesture"):e.type==="hb"||e.type==="leave"?(e.type==="leave"?"left after ":"engaged ")+dur(e.val):e.type==="view"?"opened the site":e.type;
+      return `<div class="ev"><span class="t">+${dur((e.ts-t0)/1000)}</span><span class="ty">${esc(e.type)}</span><span>${esc(what)}${e.section&&e.type!=="section"?` <span class="muted">· ${esc(NAMES[e.section]||e.section)}</span>`:""}</span></div>`;}).join("")||'<div class="empty">No events</div>';}
+  catch(e){$("dBody").innerHTML=`<div class="empty">${esc(e.message)}</div>`;}
+}
+$("dClose").onclick=()=>{$("drawer").classList.remove("open");$("drawer").setAttribute("aria-hidden","true");};
+addEventListener("keydown",e=>{if(e.key==="Escape")$("dClose").click();});
+
+/* ---------- charts ---------- */
+const tip=$("tip");
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity=1;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(innerWidth-w-10,x+14)+"px";tip.style.top=Math.max(10,y-h-12)+"px";}
+function hideTip(){tip.style.opacity=0;}
+
+function trend(daily){
+  const box=$("trend"),W=Math.max(320,box.clientWidth||600),H=240,P={l:40,r:84,t:10,b:26};
+  const S3=[["visitors","Visitors","var(--series-1)"],["sessions","Sessions","var(--series-2)"],["views","Page views","var(--series-3)"]];
+  $("trendLegend").innerHTML=S3.map(([,n,c])=>`<span><i style="background:${c}"></i>${n}</span>`).join("");
+  // fill every day in range so gaps read as zero
+  const days=[],map={};daily.forEach(d=>map[d.day]=d);const n=Math.max(S.days,1);
+  for(let i=n-1;i>=0;i--){const dt=new Date(Date.now()-i*864e5).toISOString().slice(0,10);days.push(map[dt]||{day:dt,visitors:0,sessions:0,views:0});}
+  const max=Math.max(1,...days.flatMap(d=>S3.map(([k])=>d[k]||0))),nice=Math.ceil(max/4)*4||4;
+  const x=i=>P.l+(days.length<2?0:i*(W-P.l-P.r)/(days.length-1)),y=v=>P.t+(H-P.t-P.b)*(1-v/nice);
+  let g="";for(let t=0;t<=4;t++){const v=nice*t/4;g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${P.l-8}" y="${y(v)+4}" text-anchor="end">${fmt(v)}</text>`;}
+  const ticks=Math.min(6,days.length);for(let t=0;t<ticks;t++){const i=Math.round(t*(days.length-1)/Math.max(1,ticks-1));g+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle">${new Date(days[i].day+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"})}</text>`;}
+  const lines=S3.map(([k,nm,c])=>`<path d="${days.map((d,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(d[k]||0).toFixed(1)).join(" ")}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join("");
+  // direct labels at the line ends, nudged apart so they never collide
+  const ends=S3.map(([k,nm,c])=>({nm,c,v:days[days.length-1][k]||0,y:y(days[days.length-1][k]||0)})).sort((a,b)=>a.y-b.y);
+  for(let i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<13)ends[i].y=ends[i-1].y+13;
+  const labels=ends.map(e=>`<text x="${W-P.r+8}" y="${e.y+4}" style="fill:var(--text-secondary)">${e.nm}</text>`).join("");
+  box.innerHTML=`<svg width="100%" viewBox="0 0 ${W} ${H}" role="img" aria-label="Visitors, sessions and page views per day">${g}${lines}${labels}<line id="xh" y1="${P.t}" y2="${H-P.b}" stroke="rgba(240,239,236,.25)" opacity="0"/><rect x="${P.l}" y="${P.t}" width="${W-P.l-P.r}" height="${H-P.t-P.b}" fill="transparent" id="hit"/></svg>`;
+  const svg=box.querySelector("svg"),xh=svg.querySelector("#xh");
+  svg.querySelector("#hit").addEventListener("mousemove",e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width;const i=Math.max(0,Math.min(days.length-1,Math.round((px-P.l)/((W-P.l-P.r)/Math.max(1,days.length-1)))));
+    xh.setAttribute("x1",x(i));xh.setAttribute("x2",x(i));xh.setAttribute("opacity",1);const d=days[i];
+    showTip(`<div>${new Date(d.day+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}</div>`+S3.map(([k,nm,c])=>`<div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c};margin-right:6px"></span><span class="k">${nm}</span> ${fmt(d[k]||0)}</div>`).join(""),e.clientX,e.clientY);});
+  svg.querySelector("#hit").addEventListener("mouseleave",()=>{xh.setAttribute("opacity",0);hideTip();});
+}
+function funnel(rows,total){
+  const m={};rows.forEach(r=>m[r.section]=r.sessions);const base=Math.max(total,m.top||0,1);
+  $("funnel").innerHTML=ORDER.map(s=>{const v=m[s]||0,p=v/base;return `<div class="bar" data-s="${s}"><span>${esc(NAMES[s])}</span><div class="track"><div class="fill" style="width:${(p*100).toFixed(1)}%"></div></div><span class="v">${pct(p)} · ${fmt(v)}</span></div>`;}).join("");
+}
+function heat(pts){
+  const c=$("heat"),dpr=Math.min(2,devicePixelRatio||1),W=c.clientWidth||600,H=560;c.width=W*dpr;c.height=H*dpr;const g=c.getContext("2d");g.scale(dpr,dpr);g.clearRect(0,0,W,H);
+  if(!pts.length){g.fillStyle="#8d8c85";g.font="13px 'IBM Plex Mono', monospace";g.fillText("No clicks recorded yet",16,28);return;}
+  // density on a grid, one hue light to dark
+  const cw=8,ch=8,cols=Math.ceil(W/cw),rows=Math.ceil(H/ch),grid=new Float32Array(cols*rows);
+  pts.forEach(p=>{const cx=Math.floor(Math.min(.9999,p.x)*cols),cy=Math.floor(Math.min(.9999,p.y)*rows);for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const X=cx+dx,Y=cy+dy;if(X<0||Y<0||X>=cols||Y>=rows)continue;grid[Y*cols+X]+=Math.exp(-(dx*dx+dy*dy)/2.2);}});
+  const mx=Math.max(...grid);for(let i=0;i<grid.length;i++){if(!grid[i])continue;const t=Math.pow(grid[i]/mx,.6);g.fillStyle=`rgba(232,179,107,${(.12+t*.88).toFixed(3)})`;g.fillRect((i%cols)*cw,Math.floor(i/cols)*ch,cw,ch);}
+  // chapter labels at the median height of their clicks
+  const by={};pts.forEach(p=>{if(p.section)(by[p.section]=by[p.section]||[]).push(p.y);});
+  g.font="11px 'IBM Plex Mono', monospace";g.fillStyle="rgba(240,239,236,.6)";let lastY=-20;
+  Object.entries(by).map(([s,ys])=>[s,ys.sort((a,b)=>a-b)[ys.length>>1]]).sort((a,b)=>a[1]-b[1]).forEach(([s,yy])=>{let py=yy*H;if(py-lastY<14)py=lastY+14;lastY=py;g.fillText(NAMES[s]||s,8,Math.min(H-6,py+4));});
+  c.onmousemove=e=>{const r=c.getBoundingClientRect(),xx=(e.clientX-r.left)/r.width,yy=(e.clientY-r.top)/r.height;const n=pts.filter(p=>Math.abs(p.x-xx)<.03&&Math.abs(p.y-yy)<.02).length;n?showTip(`<span class="k">clicks here</span> ${n}`,e.clientX,e.clientY):hideTip();};
+  c.onmouseleave=hideTip;
+}
+
+/* ---------- Google Analytics (read with your own Google sign-in) ---------- */
+function connectGA(){
+  const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:"https://www.googleapis.com/auth/analytics.readonly",callback:async r=>{if(r.error){$("gaBody").innerHTML=`<div class="empty">${esc(r.error)}</div>`;return;}S.ga=r.access_token;loadGA();}});
+  tc.requestAccessToken();
+}
+$("gaConnect").onclick=connectGA;
+async function gaRun(body,realtime){
+  const r=await fetch(`https://analyticsdata.googleapis.com/v1beta/properties/${GA_PROPERTY}:${realtime?"runRealtimeReport":"runReport"}`,{method:"POST",headers:{Authorization:"Bearer "+S.ga,"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json();if(!r.ok)throw new Error((j.error&&j.error.message)||("GA answered "+r.status));return j;
+}
+async function loadGA(){
+  $("gaBody").innerHTML='<div class="empty">Loading Google Analytics…</div>';
+  const range=[{startDate:S.days+"daysAgo",endDate:"today"}];
+  try{
+    const [tot,src,pages,rt]=await Promise.all([
+      gaRun({dateRanges:range,metrics:[{name:"activeUsers"},{name:"sessions"},{name:"engagementRate"},{name:"averageSessionDuration"},{name:"screenPageViews"}]}),
+      gaRun({dateRanges:range,dimensions:[{name:"sessionSourceMedium"}],metrics:[{name:"sessions"}],limit:12,orderBys:[{metric:{metricName:"sessions"},desc:true}]}),
+      gaRun({dateRanges:range,dimensions:[{name:"country"}],metrics:[{name:"activeUsers"}],limit:12,orderBys:[{metric:{metricName:"activeUsers"},desc:true}]}),
+      gaRun({metrics:[{name:"activeUsers"}]},true)]);
+    const v=(i)=>tot.rows&&tot.rows[0]?+tot.rows[0].metricValues[i].value:0;
+    const rows=(j)=>(j.rows||[]).map(r=>[r.dimensionValues[0].value,+r.metricValues[0].value]);
+    $("gaBody").innerHTML=`<div class="grid kpis" style="margin-bottom:14px">${[["Users",fmt(v(0))],["Sessions",fmt(v(1))],["Engagement rate",pct(v(2))],["Avg session",dur(v(3))],["Views",fmt(v(4))],["Active now",fmt(rt.rows&&rt.rows[0]?+rt.rows[0].metricValues[0].value:0)]].map(([a,b])=>`<div class="tile"><span>${a}</span><b>${b}</b></div>`).join("")}</div>
+      <div class="grid two"><div><h2>Source / medium</h2><ul class="list" id="gaSrc"></ul></div><div><h2>Countries</h2><ul class="list" id="gaGeo"></ul></div></div>`;
+    list("gaSrc",rows(src),"No sessions yet");list("gaGeo",rows(pages),"No users yet");
+  }catch(e){$("gaBody").innerHTML=`<div class="empty">${esc(e.message)}</div><button class="btn" id="gaConnect2">Try again</button>`;$("gaConnect2").onclick=connectGA;}
+}
+
+addEventListener("resize",()=>{if(S.data){trend(S.data.daily||[]);heat(S.data.heat||[]);}});
+const t=savedToken();if(t){S.token=t;boot();}
+initGoogle();
+</script>
+</body>
+</html>
