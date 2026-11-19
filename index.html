@@ -110,6 +110,16 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .stat span{display:block; margin-top:10px; color:var(--dim); font-size:.92rem; line-height:1.35}
 .panel{background:var(--card); border:1px solid var(--line); border-radius:6px; padding:clamp(20px,3vw,36px); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
 .panel h2{font-size:clamp(2rem,4vw,3rem); letter-spacing:-.025em; margin-bottom:20px}
+.builds-lede{font-family:var(--mono); font-size:.78rem; letter-spacing:.04em; color:var(--dim); margin:-10px 0 24px}
+.builds{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr)); gap:16px; margin-bottom:28px}
+.build{border:1px solid var(--line); border-top:2px solid rgba(232,179,107,.55); border-radius:6px; padding:20px 22px 18px; background:rgba(255,255,255,.02)}
+.build .b-meta{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; font-family:var(--mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
+.build .b-meta span:nth-child(2){color:var(--text)}
+.build h3{font-size:clamp(1.35rem,2vw,1.7rem); line-height:1.15; letter-spacing:-.015em; margin:10px 0 10px}
+.build p{margin:0 0 10px; font-size:.95rem; line-height:1.55}
+.build .b-k{display:block; font-family:var(--mono); font-weight:400; font-size:.64rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:3px}
+.build .src{font-family:var(--mono); font-size:.66rem; letter-spacing:.02em; white-space:nowrap; text-decoration:none; border-bottom:1px dotted rgba(232,179,107,.5)}
+.build .src::after{content:" ↗"}
 .ledger{width:100%; border-collapse:collapse; font-size:.95rem}
 .ledger th{font-family:var(--mono); font-weight:400; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); text-align:left; padding:0 14px 10px 0; border-bottom:1px solid var(--line)}
 .ledger td{padding:12px 14px 12px 0; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top}
@@ -425,23 +435,58 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 
   <section class="wrap" id="career" style="padding:6vh clamp(16px,4vw,48px) 10vh">
     <div class="panel">
-      <h2>The record</h2>
-      <table class="ledger">
-        <thead><tr><th>Years</th><th>Company</th><th>Role</th><th>What I did</th></tr></thead>
-        <tbody>
-          <tr><td>2026 – now</td><td>Asyml8<span class="tag">Founder</span></td><td>Founder, CEO &amp; CTO</td><td>Brahma, a graph-native AI mesh that runs on everyday hardware.</td></tr>
-          <tr><td>2019 – now</td><td>Instnt<span class="tag">Founder</span></td><td>Founder &amp; CEO</td><td>AI underwriting platform for identity fraud loss insurance.</td></tr>
-          <tr><td>2011 – 2019</td><td>Socure<span class="tag">Founder</span></td><td>Founder, CEO &amp; CTO; later CSO</td><td>Built the company and its technology from zero to double-digit millions in revenue.</td></tr>
-          <tr><td>2010 – 2012</td><td>Hopskoch<span class="tag">Founder</span></td><td>Founder, CEO &amp; Chairman</td><td>Cross-channel campaign platform; pilots in the US, Europe and China.</td></tr>
-          <tr><td>2010</td><td>SunGard Availability Services</td><td>VP, Solutions Engineering</td><td>Realigned 200 engineers and 7 directors with sales; ran a $20M budget.</td></tr>
-          <tr><td>2007 – 2010</td><td>Cisco</td><td>Chief Architect, Policy Management</td><td>Identity and policy across WebEx, NAC, Call Manager and more.</td></tr>
-          <tr><td>2006 – 2007</td><td>Securent</td><td>Senior Solutions Architect</td><td>Entitlement management; helped drive the $100M sale to Cisco.</td></tr>
-          <tr><td>2004 – 2006</td><td>CA</td><td>VP, Technical Account Manager</td><td>Identity management and security for enterprise customers.</td></tr>
-          <tr><td>1999 – 2004</td><td>Netegrity</td><td>Senior Architect</td><td>Authentication and access security for Fortune 500 firms.</td></tr>
-          <tr><td>1999</td><td>EDS</td><td>Senior Architect</td><td>Data management strategy for the Commonwealth of Massachusetts.</td></tr>
-          <tr><td>1994 – 1999</td><td>Texaco (now Chevron)</td><td>Systems Administrator, then IT Manager</td><td>IT infrastructure for the Middle East.</td></tr>
-        </tbody>
-      </table>
+      <h2>What I built</h2>
+      <p class="builds-lede">Products I founded or architected, and where they are today.</p>
+      <div class="builds">
+        <article class="build">
+          <div class="b-meta"><span>2026 – now</span><span>Asyml8</span><span class="tag">Founder</span></div>
+          <h3>Brahma</h3>
+          <p>A graph-native AI mesh. It runs open-weight Mixture-of-Experts language models across ordinary Macs, PCs, Raspberry Pis and cloud machines, with no GPU or datacenter. Prompts and replies stay on your own node; only vectors travel between machines.</p>
+          <p><b class="b-k">In the market</b>Open source under AGPL-3.0 and heading into private beta at <a class="src" href="https://mybrahma.com" target="_blank" rel="noopener">mybrahma.com</a>.</p>
+          <p><b class="b-k">My part</b>Founder, CEO, CTO and developer #1. I designed how a model splits into a graph of attention heads, KV heads, neuron groups and experts spread across machines.</p>
+        </article>
+        <article class="build">
+          <div class="b-meta"><span>2019 – now</span><span>Instnt</span><span class="tag">Founder</span></div>
+          <h3>Fraud Loss Insurance</h3>
+          <p>Insurance that moves identity fraud losses off a lender's balance sheet. An AI underwriting platform prices the fraud risk, and Instnt Insurance Agency places the coverage with A-rated insurers. It plugs into an existing fraud stack with one line of JavaScript.</p>
+          <p><b class="b-k">In the market</b>Sold to banks, credit unions, lenders and fintechs, with up to $100 million of fraud-loss exposure moved per business <a class="src" href="https://www.newswire.com/view/content/beyond-credit-defaults-instnt-makes-lenders-fraud-proof-with-no-22148306" target="_blank" rel="noopener">Newswire</a>. Munich Re provides reinsurance capacity, alongside Accredited and Howden <a class="src" href="https://www.finextra.com/pressarticle/106120/instnt-partners-munich-re-to-bolster-id-fraud-loss-insurance-coverage" target="_blank" rel="noopener">Finextra</a>, and the product is now offered in California <a class="src" href="https://www.insurtechinsights.com/instnt-expands-fraud-loss-insurance-offering-to-california/" target="_blank" rel="noopener">Insurtech Insights</a>.</p>
+          <p><b class="b-k">My part</b>Founded the company, built the underwriting platform with Munich Re and set up the agency that places the policies. It runs on a team of six, with AI agents doing much of the work.</p>
+        </article>
+        <article class="build">
+          <div class="b-meta"><span>2011 – 2019</span><span>Socure</span><span class="tag">Founder</span></div>
+          <h3>Identity verification from the open internet</h3>
+          <p>Socure answers one question for banks: is this person real? Before ChatGPT or TensorFlow, I built its first AI: semantic inferencing and machine learning on social and web data to risk-rate identities in real time, and computer vision to match faces against online profiles.</p>
+          <p><b class="b-k">In the market</b>Socure's RiskOS platform runs the Sigma Identity, Synthetic and First-Party Fraud models, Socure Verify and Predictive DocV for more than 3,000 customers. It closed the second quarter of 2026 with $364 million in annual recurring revenue and raised at a $5.2 billion valuation in August 2026 <a class="src" href="https://www.summitpartners.com/news/socure-announces-strategic-growth-investment-from-summit-partners" target="_blank" rel="noopener">Summit Partners</a>.</p>
+          <p><b class="b-k">My part</b>Founder, CEO and CTO, later Chief Strategy Officer. I wrote the first models and product, took revenue from zero to double-digit millions, and hired my co-founder to scale sales on the blueprint I built.</p>
+        </article>
+        <article class="build">
+          <div class="b-meta"><span>2010 – 2012</span><span>Hopskoch</span><span class="tag">Founder</span></div>
+          <h3>One console for campaigns everywhere</h3>
+          <p>The first end-to-end platform for running one campaign across websites, social networks, mobile apps and ad networks, built on rules engines, statistical models and the semantic web.</p>
+          <p><b class="b-k">In the market</b>Several thousand early users shaped its gamification features, and it ran enterprise pilots in the US, Europe and China. Working with social data there showed me it could also tell whether a person is who they claim to be. That idea became Socure <a class="src" href="https://alleywatch.com/2016/12/this-nyc-startup-just-raised-13m-to-ensure-your-identity-is-socure/" target="_blank" rel="noopener">AlleyWatch</a>.</p>
+          <p><b class="b-k">My part</b>Founder, CEO and Chairman. I bootstrapped it and led product and sales.</p>
+        </article>
+        <article class="build">
+          <div class="b-meta"><span>2006 – 2010</span><span>Securent, then Cisco</span><span class="tag">Architect</span></div>
+          <h3>Entitlement management</h3>
+          <p>Securent's Entitlement Management Solution used the XACML standard to decide, enforce and audit who can do what inside any application, from one place.</p>
+          <p><b class="b-k">In the market</b>Cisco bought Securent for about $100 million in 2007 <a class="src" href="https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2007/m11/cisco-announces-definitive-agreement-to-acquire-securent.html" target="_blank" rel="noopener">Cisco</a>, and the product shipped as Cisco Enterprise Policy Manager <a class="src" href="https://www3-realm.cisco.com/en/US/prod/collateral/vpndevc/ps9519/ps9530/data_sheet_c78-453502.html" target="_blank" rel="noopener">Cisco data sheet</a>.</p>
+          <p><b class="b-k">My part</b>Senior Solutions Architect at Securent, where I helped drive the sale. At Cisco I was Chief Architect for Policy Management across WebEx, NAC and Call Manager.</p>
+        </article>
+        <article class="build">
+          <div class="b-meta"><span>1999 – 2006</span><span>Netegrity, then CA</span><span class="tag">Architect</span></div>
+          <h3>SiteMinder single sign-on</h3>
+          <p>One login across every web application in an enterprise, with access policy managed in one place.</p>
+          <p><b class="b-k">In the market</b>CA bought Netegrity for $430 million in 2004 <a class="src" href="https://www.sec.gov/Archives/edgar/data/0000840824/000104746904030593/a2144593zdfan14a.htm" target="_blank" rel="noopener">SEC filing</a>. SiteMinder is still sold as Symantec SiteMinder by Broadcom, now on release 12.9, and still guards applications inside banks and large enterprises <a class="src" href="https://www.broadcom.com/products/identity/siteminder" target="_blank" rel="noopener">Broadcom</a>.</p>
+          <p><b class="b-k">My part</b>Senior Architect. I built authentication for Fortune 500 firms, working with Oracle and Sun on single sign-on at scale, and stayed on through the move to CA.</p>
+        </article>
+        <article class="build">
+          <div class="b-meta"><span>The 1990s</span><span>IBM and Texaco</span><span class="tag">Engineer</span></div>
+          <h3>Where it started</h3>
+          <p>Decision processing systems and early AI at IBM, then machine learning at scale. At Texaco (now Chevron) I ran IT across the Middle East on Wang VS 6000 mainframes: wide-area networks, an SAP rollout and Y2K compliance.</p>
+          <p><b class="b-k">My part</b>Systems Administrator, then IT Manager for the Middle East at Texaco.</p>
+        </article>
+      </div>
       <div class="facts">
         <div><h3>Investing &amp; inventions</h3><p>Angel investor through Cohen &amp; Co and Parameter Ventures.</p><p>Named inventor on 10 issued US patents covering identity risk scoring and face-plus-social authentication.</p></div>
         <div><h3>Speaking</h3><p>Opening keynote, TiECon East 2026: <em>Who pays when the machine is wrong?</em></p><p>Also Finovate, Identity Week America, InsurTech NY and Cisco Live.</p></div>
