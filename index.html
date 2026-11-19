@@ -635,7 +635,7 @@ const NEWS=[
       ["10,868,809","December 15, 2020","Analyzing facial recognition data and social network data for user authentication","Xinyu Li, Justin Kamerman"],
       ["11,570,195","January 31, 2023","Risk assessment using social networking data","Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"],
       ["11,799,853","October 24, 2023","Analyzing facial recognition data and social network data for user authentication","Xinyu Li, Justin Kamerman"]]
-    .map(([n,d,t,co])=>({era:"patents",type:"patent",y:+(/\d{4}/.exec(d)[0]),source:"US Patent "+n,date:d,cap:"US "+n,title:t,
+    .map(([n,d,t,co])=>({era:"patents",also:[+(/\d{4}/.exec(d)[0])<=2019?"socure":"instnt"],type:"patent",y:+(/\d{4}/.exec(d)[0]),source:"US Patent "+n,date:d,cap:"US "+n,title:t,
       url:"https://patents.google.com/patent/US"+n.replace(/,/g,""),linkText:"See the patent",
       text:["Inventors: Sunil Madhu, "+co+". Assigned to Socure."]})),
 
@@ -718,7 +718,7 @@ function eraOf(it){
   return "instnt";
 }
 ITEMS.forEach(it=>it.era=eraOf(it));
-const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>(SETS[it.era]=SETS[it.era]||[]).push(k));
+const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
 const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"patents",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
 function pickFor(i,era){const set=SETS[era]||SETS.all;let h=2166136261;for(const c of era)h=Math.imul(h^c.charCodeAt(0),16777619);return set[((Math.imul(i+1,2654435761)^h)>>>0)%set.length];}
 function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}return ERA_OF_SECTION[id]||"all";}
@@ -931,18 +931,19 @@ function drawClipping(g,it,x,y,w,h){ // an article, set in type like a press cli
   g.font=`italic 500 ${17*k}px Fraunces, Georgia, serif`;const n=wrapText(g,it.title,10*k,58*k,w-20*k,19*k,5);
   g.fillStyle="rgba(27,26,23,.2)";for(let l=0;l<6;l++){const ly=58*k+n*19*k+2*k+l*9*k;if(ly>h-8*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3.5*k);}
   g.restore();}
-function drawPatent(g,it,x,y,w,h){ // a US patent front page
+function drawPatent(g,it,x,y,w,h){ // a US patent front page, number first
   const k=w/220;g.save();g.translate(x,y);g.fillStyle="#f7f5ef";g.fillRect(0,0,w,h);
-  g.fillStyle="#1b1a17";g.font=`600 ${9*k}px 'Source Serif 4', Georgia, serif`;g.fillText("United States Patent",10*k,17*k);
-  g.font=`500 ${8*k}px 'IBM Plex Mono', monospace`;g.textAlign="right";g.fillText(it.source.replace("US Patent ","US "),w-10*k,17*k);g.textAlign="left";
-  g.fillStyle="#6a6457";g.font=`400 ${7*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date,10*k,28*k);
-  g.fillStyle="#1b1a17";g.fillRect(10*k,33*k,w-20*k,1*k);
-  g.font=`600 ${11*k}px 'Source Serif 4', Georgia, serif`;const n=wrapText(g,it.title,10*k,48*k,w-20*k,13*k,4);
-  // a figure: boxes and connectors, like FIG. 1
-  const fy=48*k+n*13*k+8*k,fh=h-fy-10*k;if(fh>40*k){g.strokeStyle="#2b2722";g.lineWidth=1.1*k;
-    const bx=[[14,0],[86,0],[50,.55]];bx.forEach(([bx0,by0])=>{g.strokeRect(bx0*k,fy+by0*fh,62*k,fh*.32);});
+  g.fillStyle="#6a6457";g.font=`600 ${8*k}px 'Source Serif 4', Georgia, serif`;g.fillText("United States Patent",10*k,16*k);
+  g.textAlign="right";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date,w-10*k,16*k);g.textAlign="left";
+  g.fillStyle="#1b1a17";let fs=24*k;g.font=`700 ${fs}px 'IBM Plex Mono', monospace`;const num="US "+it.source.replace("US Patent ","");
+  while(g.measureText(num).width>w-20*k&&fs>12*k){fs-=1*k;g.font=`700 ${fs}px 'IBM Plex Mono', monospace`;}
+  g.fillText(num,10*k,22*k+fs);
+  const ry=30*k+fs;g.fillRect(10*k,ry,w-20*k,1.2*k);
+  g.font=`600 ${10.5*k}px 'Source Serif 4', Georgia, serif`;const n=wrapText(g,it.title,10*k,ry+15*k,w-20*k,12.5*k,4);
+  const fy=ry+15*k+n*12.5*k+4*k,fh=h-fy-12*k;if(fh>34*k){g.strokeStyle="#2b2722";g.lineWidth=1.1*k;
+    [[14,0],[86,0],[50,.55]].forEach(([bx0,by0])=>g.strokeRect(bx0*k,fy+by0*fh,62*k,fh*.32));
     g.beginPath();g.moveTo(45*k,fy+fh*.32);g.lineTo(75*k,fy+fh*.55);g.moveTo(117*k,fy+fh*.32);g.lineTo(90*k,fy+fh*.55);g.stroke();
-    g.font=`italic 400 ${7*k}px 'Source Serif 4', Georgia, serif`;g.fillStyle="#2b2722";g.fillText("FIG. 1",w-38*k,h-8*k);}
+    g.font=`italic 400 ${7*k}px 'Source Serif 4', Georgia, serif`;g.fillStyle="#2b2722";g.fillText("FIG. 1",w-38*k,h-7*k);}
   g.restore();}
 function drawPostCard(g,it,x,y,w,h,im){ // a LinkedIn post: its still above the opening line
   const k=w/220;g.save();g.translate(x,y);g.fillStyle="#fff";g.fillRect(0,0,w,h);
