@@ -835,9 +835,8 @@ function loopCamera(){
   if(frameN%2)return; // run tracking at half the camera frame rate so clicks stay responsive
   // eyes steer the portrait
   if(frameN%(auto.dir?2:4)===0){const r=cam.face.detectForVideo(v,now);const f=r.faceLandmarks&&r.faceLandmarks[0];
-    if(!f&&EYES.reading&&now-EYES.quietAt>1400)EYES.reading=false;
     if(f&&f[473]){eyeSample(f,now);}
-    if(EYES.reading){camCtx.fillStyle="rgba(10,11,14,.72)";camCtx.fillRect(0,H-15,W,15);camCtx.fillStyle="#e8b36b";camCtx.font="600 9px 'IBM Plex Mono', monospace";camCtx.textAlign="center";camCtx.fillText("READING · PAUSED",W/2,H-4);camCtx.textAlign="left";}
+    if(paused()){camCtx.fillStyle="rgba(10,11,14,.72)";camCtx.fillRect(0,H-15,W,15);camCtx.fillStyle="#e8b36b";camCtx.font="600 9px 'IBM Plex Mono', monospace";camCtx.textAlign="center";camCtx.fillText("READING · "+Math.ceil((EYES.pauseUntil-now)/1000)+"s",W/2,H-4);camCtx.textAlign="left";}
     if(f){const a=f[468]||f[33],b=f[473]||f[263];look.tx=clamp(-((a.x+b.x)/2-.5)*2.6,-1,1);look.ty=clamp(-((a.y+b.y)/2-.45)*2.4,-1,1);
       camCtx.fillStyle="rgba(232,179,107,.95)";[a,b].forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,2.2,0,6.3);camCtx.fill();});}}
   // hold an open palm to start the page scrolling down on its own; a fist stops it
@@ -853,16 +852,18 @@ function loopCamera(){
     // a pinch reaches: the index tip stands out past its knuckle to meet the thumb. In a fist the thumb also touches
     // the index finger, but the index tip is curled back toward the wrist, so a fist never reads as a pinch.
     const reach=Math.hypot(h[8].x-h[0].x,h[8].y-h[0].y)/(Math.hypot(h[5].x-h[0].x,h[5].y-h[0].y)+1e-6);
-    const pinchPose=pr<.42&&reach>1.12;
-    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;
-    if(!cam.pinched&&pinchPose){cam.pinched=true;pinchTap();}else if(cam.pinched&&(pr>.62||reach<1.0))cam.pinched=false;
+    const pinchPose=pr<.3&&reach>1.15;
+    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;cam.pinchN=pinchPose?(cam.pinchN||0)+1:0;
+    const armed=modalOpen||HOLD.i>=0||POINT.sel>=0||now-(POINT.selAt||0)<1500; // a pinch only means something when a print is selected, held or open
+    if(!cam.pinched&&cam.pinchN>=2&&armed&&now-(cam.tapAt||0)>900){cam.pinched=true;cam.tapAt=now;pinchTap();}
+    else if(cam.pinched&&(pr>.55||reach<1.0))cam.pinched=false;
     fdot.classList.toggle("pinch",cam.pinched);
     cam.palm=(n>=3&&!cam.pinched)?(cam.palm||0)+1:0; cam.fist=(n===0&&!cam.pinched&&reach<1.12)?(cam.fist||0)+1:0;
     if(pointing)pointAt(h[8],now);
-    if(cam.palm>=3){setAutoScroll(1);EYES.reading=false;EYES.palmAt=now;}   // about a quarter second of open palm: scroll down, whatever the eyes are doing
-    if(cam.fist===2){setAutoScroll(0);cam.fistY=h[9].y;}  // making a fist stops
+    if(cam.palm>=2)handScroll(1);   // open palm: scroll down now, whatever the eyes are doing
+    if(cam.fist===1){handScroll(0);cam.fistY=h[9].y;}  // a fist stops at once
     // pulling the closed fist down (about a tenth of the frame) scrolls back up
-    if(cam.fist>2&&cam.fistY!=null&&h[9].y-cam.fistY>.1){setAutoScroll(-1);cam.fistY=null;}
+    if(cam.fist>1&&cam.fistY!=null&&h[9].y-cam.fistY>.1){handScroll(-1);cam.fistY=null;}
   }else{cam.palm=0;cam.fist=0;cam.fistY=null;cam.pinched=false;fdot.classList.remove("pinch");}
 }
 
@@ -929,7 +930,14 @@ function setAutoScroll(dir){
 /* reading detection: while auto-scroll runs and a card is on screen, the camera watches where the irises sit
    between the eye corners. Reading shows as steady sideways eye movement with return sweeps; when the eyes go
    quiet (or the face leaves) for a moment, scrolling carries on. */
-const EYES={hist:[],reading:false,quietAt:0,since:0};
+const EYES={hist:[],reading:false,pauseUntil:0,handAt:0,lastCard:null};
+const paused=()=>performance.now()<EYES.pauseUntil;
+function handScroll(dir){ // hand gestures overrule the eyes
+  const now=performance.now();EYES.pauseUntil=0;EYES.reading=false;EYES.handAt=now;EYES.lastCard=READ_BEST;
+  if(dir===0){setAutoScroll(0);auto.v=0;if(window.lenis)lenis.scrollTo(lenis.scroll,{immediate:true});}
+  else{const was=auto.dir;setAutoScroll(dir);if(was!==dir||Math.abs(auto.v)<innerHeight*.15)auto.v=dir*innerHeight*.2;}
+  if(window.track&&was0(dir))track("gesture",{label:dir>0?"palm: scroll":dir<0?"fist pull: reverse":"fist: stop"});}
+let _lastHand=null;function was0(d){const ch=d!==_lastHand;_lastHand=d;return ch;}
 function eyeSample(f,now){
   const ratio=(iris,o,i)=>(f[iris].x-Math.min(f[o].x,f[i].x))/(Math.abs(f[i].x-f[o].x)||1e-6); // 0 = image-left corner, 1 = image-right, same for both eyes
   const gx=(ratio(468,33,133)+ratio(473,263,362))/2, gy=((f[468].y+f[473].y)/2-(f[159].y+f[386].y)/2)/(Math.abs(f[145].y-f[159].y)+1e-6);
@@ -943,30 +951,31 @@ function eyeSample(f,now){
     if(dir>0&&g>ext)ext=g;else if(dir<0&&g<ext)ext=g;
     if(Math.abs(g-ext)>.03){const nd=Math.sign(g-ext);if(dir&&nd!==dir)rev++;dir=nd;ext=g;}}
   const span=(H[H.length-1].t-H[0].t)/1000, energy=dx/span, range=mx-mn;
-  const palmUp=now-(EYES.palmAt||-1e9)<2000; // a hand held up to scroll means you aren't reading
-  const scanning=!palmUp&&energy>.05&&range>.06&&rev>=2&&dx>dy;EYES.energy=energy;EYES.range=range;EYES.rev=rev;
-  const card=readingShare()>.25;
-  if(auto.dir&&card&&scanning){if(!EYES.reading){EYES.reading=true;EYES.since=now;}EYES.quietAt=now;}
-  else if(EYES.reading&&(now-EYES.quietAt>1400||!card))EYES.reading=false;
+  const scanning=energy>.05&&range>.06&&rev>=2&&dx>dy;EYES.energy=energy;EYES.range=range;EYES.rev=rev;
+  const card=readingShare()>.25?READ_BEST:null;
+  // reading a card: hold for about six seconds, once per card, and not right after you used your hand
+  if(auto.dir>0&&card&&scanning&&card!==EYES.lastCard&&now-EYES.handAt>4000){EYES.pauseUntil=now+6000;EYES.lastCard=card;
+    if(window.track)track("gesture",{label:"eyes: reading pause",section:card.closest("section[id]")?.id});}
+  EYES.reading=paused();
 }
-let READ_EL=null;
+let READ_EL=null,READ_BEST=null;
 function readingShare(){ // how much of the middle of the screen is covered by something to read (0 to 1)
   READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking")];
   const a=innerHeight*.15,b=innerHeight*.85;let best=0;
-  for(const el of READ_EL){const r=el.getBoundingClientRect();const v=Math.max(0,Math.min(r.bottom,b)-Math.max(r.top,a))/(b-a);if(v>best)best=v;}
+  READ_BEST=null;for(const el of READ_EL){const r=el.getBoundingClientRect();const v=Math.max(0,Math.min(r.bottom,b)-Math.max(r.top,a))/(b-a);if(v>best){best=v;READ_BEST=el;}}
   return best;
 }
 function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
   // a steady glide, about a fifth of a screen a second; it holds still while your eyes are reading a card
-  const want=EYES.reading?0:auto.dir*innerHeight*.2;
-  auto.v+=(want-auto.v)*Math.min(1,dt*(EYES.reading?4:2));
+  const hold=paused(),want=hold?0:auto.dir*innerHeight*.2;
+  auto.v+=(want-auto.v)*Math.min(1,dt*(hold?4:2));
   const y=window.lenis?lenis.scroll:scrollY;
   if((auto.dir>0&&y>=max-1)||(auto.dir<0&&y<=1))setAutoScroll(0);
   if(Math.abs(auto.v)>1){const ny=clamp(y+auto.v*dt,0,max);window.lenis?lenis.scrollTo(ny,{immediate:true}):window.scrollTo(0,ny);}
   if(auto.dir||Math.abs(auto.v)>1)auto.raf=requestAnimationFrame(autoStep);else{auto.raf=0;auto.v=0;}
-  if(!auto.dir&&EYES.reading)EYES.reading=false;
+  if(!auto.dir&&EYES.pauseUntil)EYES.pauseUntil=0;
 }
 // any wheel, touch or key scroll by the visitor takes over from the hand
 ["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(0),{passive:true}));
