@@ -859,7 +859,7 @@ function loopCamera(){
     fdot.classList.toggle("pinch",cam.pinched);
     cam.palm=(n>=3&&!cam.pinched)?(cam.palm||0)+1:0; cam.fist=(n===0&&!cam.pinched&&reach<1.12)?(cam.fist||0)+1:0;
     if(pointing)pointAt(h[8],now);
-    if(cam.palm>=3)setAutoScroll(1);   // about a quarter second of open palm: scroll down
+    if(cam.palm>=3){setAutoScroll(1);EYES.reading=false;EYES.palmAt=now;}   // about a quarter second of open palm: scroll down, whatever the eyes are doing
     if(cam.fist===2){setAutoScroll(0);cam.fistY=h[9].y;}  // making a fist stops
     // pulling the closed fist down (about a tenth of the frame) scrolls back up
     if(cam.fist>2&&cam.fistY!=null&&h[9].y-cam.fistY>.1){setAutoScroll(-1);cam.fistY=null;}
@@ -933,13 +933,18 @@ const EYES={hist:[],reading:false,quietAt:0,since:0};
 function eyeSample(f,now){
   const ratio=(iris,o,i)=>(f[iris].x-Math.min(f[o].x,f[i].x))/(Math.abs(f[i].x-f[o].x)||1e-6); // 0 = image-left corner, 1 = image-right, same for both eyes
   const gx=(ratio(468,33,133)+ratio(473,263,362))/2, gy=((f[468].y+f[473].y)/2-(f[159].y+f[386].y)/2)/(Math.abs(f[145].y-f[159].y)+1e-6);
-  EYES.hist.push({t:now,gx,gy});while(EYES.hist.length&&now-EYES.hist[0].t>2400)EYES.hist.shift();
+  // iris landmarks jitter by a few hundredths of the eye's width from frame to frame, so smooth the signal first
+  // and count a change of direction only once the gaze has really swung back (a return sweep), not on jitter
+  EYES.sx=EYES.sx==null?gx:EYES.sx+(gx-EYES.sx)*.35; EYES.sy=EYES.sy==null?gy:EYES.sy+(gy-EYES.sy)*.35;
+  EYES.hist.push({t:now,gx:EYES.sx,gy:EYES.sy});while(EYES.hist.length&&now-EYES.hist[0].t>2400)EYES.hist.shift();
   const H=EYES.hist;if(H.length<8)return;
-  let dx=0,dy=0,rev=0,lastS=0,mn=1,mx=0;
-  for(let k=1;k<H.length;k++){const a=H[k].gx-H[k-1].gx;dx+=Math.abs(a);dy+=Math.abs(H[k].gy-H[k-1].gy)*.15;
-    const sg=Math.abs(a)>.004?Math.sign(a):0;if(sg&&lastS&&sg!==lastS)rev++;if(sg)lastS=sg;mn=Math.min(mn,H[k].gx);mx=Math.max(mx,H[k].gx);}
+  let dx=0,dy=0,rev=0,dir=0,ext=H[0].gx,mn=1,mx=0;
+  for(let k=1;k<H.length;k++){const g=H[k].gx;dx+=Math.abs(g-H[k-1].gx);dy+=Math.abs(H[k].gy-H[k-1].gy)*.15;mn=Math.min(mn,g);mx=Math.max(mx,g);
+    if(dir>0&&g>ext)ext=g;else if(dir<0&&g<ext)ext=g;
+    if(Math.abs(g-ext)>.03){const nd=Math.sign(g-ext);if(dir&&nd!==dir)rev++;dir=nd;ext=g;}}
   const span=(H[H.length-1].t-H[0].t)/1000, energy=dx/span, range=mx-mn;
-  const scanning=energy>.06&&range>.04&&rev>=2&&dx>dy;EYES.energy=energy;EYES.range=range;EYES.rev=rev;
+  const palmUp=now-(EYES.palmAt||-1e9)<2000; // a hand held up to scroll means you aren't reading
+  const scanning=!palmUp&&energy>.05&&range>.06&&rev>=2&&dx>dy;EYES.energy=energy;EYES.range=range;EYES.rev=rev;
   const card=readingShare()>.25;
   if(auto.dir&&card&&scanning){if(!EYES.reading){EYES.reading=true;EYES.since=now;}EYES.quietAt=now;}
   else if(EYES.reading&&(now-EYES.quietAt>1400||!card))EYES.reading=false;
