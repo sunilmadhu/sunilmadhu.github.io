@@ -7,7 +7,7 @@
 <meta name="description" content="Sunil Madhu: founder of Socure, Instnt and Asyml8, maker of Brahma. Thirty years in identity, security and AI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600&family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600&family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
 /* A dark warehouse. Hundreds of prints hang at different depths; from the
    opening viewpoint they line up into one giant portrait. Scrolling breaks the
@@ -89,6 +89,38 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .facts{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:28px}
 .facts h3{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
 .facts p{margin:0 0 .5em; font-size:.97rem}
+.modal[hidden],.vlayer[hidden]{display:none !important}
+html.pick body{cursor:pointer}
+main{transition:opacity .5s}
+body.holding main{opacity:0; pointer-events:none}
+.vlayer{position:fixed; inset:0; z-index:40; pointer-events:none}
+.vwin{position:absolute; pointer-events:auto; opacity:0; transition:opacity .35s; overflow:hidden}
+.vwin:has(iframe){background:#000}
+.vwin iframe{display:block; width:100%; height:100%; border:0}
+.vtoggle{position:absolute; inset:0; width:100%; height:100%; background:transparent; border:0; cursor:pointer}
+.vx,.m-x{width:38px; height:38px; border-radius:50%; background:rgba(10,11,14,.86); border:1px solid rgba(255,255,255,.4); color:#fff; display:grid; place-items:center; cursor:pointer; padding:0; transition:background .2s,opacity .3s}
+.vx:hover,.m-x:hover{background:#000; border-color:#fff}
+.vx{position:absolute; pointer-events:auto; opacity:0}
+.vx svg,.m-x svg{width:16px; height:16px}
+.modal{position:fixed; inset:0; z-index:50; display:grid; place-items:center; padding:4vh 4vw; background:rgba(5,6,8,.74); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); opacity:0; transition:opacity .3s}
+.modal.open{opacity:1}
+.m-card{position:relative; width:min(940px,100%); max-height:92vh; overflow:auto; display:grid; grid-template-columns:minmax(0,5fr) minmax(0,6fr); background:#f3efe6; color:#1b1a17; border-radius:3px; box-shadow:0 40px 100px rgba(0,0,0,.7); transform:translateY(26px) scale(.97); transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.modal.open .m-card{transform:none}
+.m-card.photo{grid-template-columns:1fr; width:min(980px,100%)}
+.m-media{background:#1a1a1a; min-height:280px; position:relative}
+.m-media img,.m-media canvas{display:block; width:100%; height:100%; object-fit:cover}
+.m-media img{object-fit:contain; background:#111}
+.m-media.paper{background:#efe8d8}
+.m-media.paper canvas{object-fit:contain; object-position:50% 0}
+.m-card.photo .m-media img{height:auto; max-height:72vh; object-fit:contain; background:#111}
+.m-body{padding:38px 36px 32px}
+.m-src{font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:#7a7264; padding-right:44px}
+.m-body h3{font-family:var(--display); font-style:italic; font-weight:500; font-size:clamp(1.45rem,2.5vw,2.05rem); line-height:1.14; letter-spacing:-.01em; margin:10px 0 16px; color:#1b1a17}
+.m-text p{font-family:var(--body); font-size:1rem; line-height:1.62; color:#2f2b25; margin:0 0 12px; white-space:pre-line}
+.m-link{display:inline-block; margin-top:8px; font-family:var(--mono); font-size:.78rem; color:#8a5a1c; text-decoration:none; border-bottom:1px solid rgba(138,90,28,.45)}
+.m-link:hover{color:#5f3c0f}
+.m-x{position:absolute; top:12px; right:12px; z-index:2}
+@media (max-width:720px){.m-card{grid-template-columns:1fr; max-height:94vh}.m-media{min-height:0; max-height:40vh}.m-media canvas,.m-media img{max-height:40vh}.m-body{padding:24px 22px 26px}}
 .contact{min-height:auto; display:block; padding-top:24vh; padding-bottom:14vh}
 .contact-head{max-width:620px}
 .contact-head p{color:var(--dim); font-size:1.05rem; margin-top:4px}
@@ -158,22 +190,6 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 .toast{position:absolute; right:0; bottom:calc(100% + 10px); margin:0; width:max-content; max-width:260px; font-family:var(--mono); font-size:.66rem; line-height:1.4; color:var(--text); background:rgba(10,11,14,.9); border:1px solid var(--line); border-radius:8px; padding:7px 10px; opacity:0; transition:opacity .2s; pointer-events:none}
 .toast.show{opacity:1}
 
-.oncam{padding:12vh 0 4vh}
-.oncam h2{font-size:clamp(2rem,4.2vw,3.2rem); letter-spacing:-.025em; margin:10px 0 24px}
-.reel{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
-.clip{position:relative; background:var(--card); border:1px solid var(--line); border-radius:6px; overflow:hidden; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px)}
-.clip .screen{position:relative; aspect-ratio:16/9; background:#000; display:block; width:100%; border:0; padding:0; cursor:pointer}
-.clip .screen img,.clip .screen video,.clip .screen iframe{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border:0}
-.clip .screen .play{position:absolute; left:50%; top:50%; width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%; background:rgba(10,11,14,.7); border:1px solid rgba(255,255,255,.4)}
-.clip .screen .play::after{content:""; position:absolute; left:23px; top:18px; border-left:16px solid var(--text); border-top:11px solid transparent; border-bottom:11px solid transparent}
-.clip .screen:hover .play{background:rgba(232,179,107,.85)}
-.clip .cap{padding:12px 14px 14px}
-.clip .cap b{display:block; font-family:var(--ui); font-weight:600; font-size:.95rem; line-height:1.3}
-.clip .cap span{display:block; margin-top:4px; font-family:var(--mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
-.more{margin-top:18px; display:flex; flex-wrap:wrap; gap:10px}
-.more a{font-family:var(--mono); font-size:.76rem; color:var(--text); text-decoration:none; border:1px solid var(--line); background:var(--card); padding:9px 13px; border-radius:99px}
-.more a:hover{border-color:rgba(255,255,255,.35)}
-@media (max-width:900px){.reel{grid-template-columns:1fr}}
 @media (max-width:900px){
   .stats{grid-template-columns:repeat(2,1fr)}
   .facts{grid-template-columns:1fr}
@@ -194,7 +210,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 <header class="bar">
   <a class="mark" href="#top" aria-label="Back to top">© 2026 Built by me ♥. All rights reserved.</a>
   <nav aria-label="Chapters">
-    <a href="#origins">Origins</a><a href="#socure">Socure</a><a href="#patents">Patents</a><a href="#instnt">Instnt</a><a href="#brahma">Brahma</a><a href="#oncamera">Videos</a><a href="#numbers">Record</a><a href="#contact">Contact</a>
+    <a href="#origins">Origins</a><a href="#socure">Socure</a><a href="#patents">Patents</a><a href="#instnt">Instnt</a><a href="#brahma">Brahma</a><a href="#numbers">Record</a><a href="#contact">Contact</a>
   </nav>
 </header>
 <div class="dock" id="dock">
@@ -335,31 +351,6 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="wrap oncam" id="oncamera">
-    <div class="era">On camera</div>
-    <h2>Interviews, demos and talks</h2>
-    <div class="reel">
-      <div class="clip">
-        <button class="screen yt" type="button" data-id="ChOQ5_LciCM" aria-label="Play: Sunil Madhu, Founder and CEO of Socure"><img src="https://i.ytimg.com/vi/ChOQ5_LciCM/hqdefault.jpg" alt="" loading="lazy"><span class="play"></span></button>
-        <div class="cap"><b>Sunil Madhu, Founder &amp; CEO, Socure</b><span>Socure years · YouTube</span></div>
-      </div>
-      <div class="clip">
-        <button class="screen yt" type="button" data-id="WUMLAS4kzHI" aria-label="Play: Socure demo at BAI Retail Delivery 2014"><img src="https://i.ytimg.com/vi/WUMLAS4kzHI/hqdefault.jpg" alt="" loading="lazy"><span class="play"></span></button>
-        <div class="cap"><b>Social Biometric Analysis in Risk and Compliance</b><span>BAI Retail Delivery 2014 · Socure demo</span></div>
-      </div>
-      <div class="clip">
-        <div class="screen"><video src="media/clips/sunil_on_camera.mp4" controls playsinline preload="metadata" poster="media/portraits/p_2022.jpg"></video></div>
-        <div class="cap"><b>Sunil Madhu on Instnt</b><span>Instnt · 2021</span></div>
-      </div>
-    </div>
-    <div class="more">
-      <a href="https://ffnews.com/videos/sunil-madhu-instnt-fintech-meetup-2023" rel="noopener">FF News · Fintech Meetup 2023</a>
-      <a href="https://instnt.ai/resources/videos/" rel="noopener">Instnt videos &amp; demos</a>
-      <a href="https://finovate.com/videos/finovatefall-2013-socure" rel="noopener">FinovateFall 2013 · Socure</a>
-      <a href="https://ppacc.player.fm/series/insurtechsio/the-founders-journey-ai-fraud-prevention-and-insurance-with-sunil-madhu" rel="noopener">Founders Journey podcast</a>
-      <a href="https://insights.som.yale.edu/insights/can-we-secure-online-identities" rel="noopener">Yale Insights interview</a>
-    </div>
-  </section>
 
   <section class="wrap" id="numbers" style="padding:14vh clamp(16px,4vw,48px)">
     <div class="stats">
@@ -422,6 +413,14 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 </main>
+<div class="vlayer" id="vlayer" hidden><div class="vwin" id="vwin"></div><button class="vx" id="vx" type="button" aria-label="Close the video"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <article class="m-card" data-lenis-prevent>
+    <button class="m-x" id="mX" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <div class="m-media" id="mMedia"></div>
+    <div class="m-body"><div class="m-src" id="mSrc"></div><h3 id="mTitle"></h3><div class="m-text" id="mText"></div><a class="m-link" id="mLink" target="_blank" rel="noopener"></a></div>
+  </article>
+</div>
 <footer><span>© 2026 Sunil Madhu</span><span>New York City</span></footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -429,24 +428,115 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script>
 /* ================= Media (swap or add files here) ================= */
-const MEDIA={
-  heroWide:"media/hero_wide.jpg", heroTall:"media/hero_tall.jpg",
-  photos:["media/portraits/p_2026.jpg","media/portraits/p_2022.jpg","media/portraits/p_2025.jpg","media/portraits/p_socure.jpg","media/portraits/p_bw.jpg","media/portraits/p_instnt.jpg",
-    "media/stills/keynote_cover.jpg","media/stills/slide_01.jpg","media/stills/slide_02.jpg","media/stills/slide_03.jpg","media/stills/slide_04.jpg","media/stills/slide_05.jpg","media/stills/slide_06.jpg",
-    "media/stills/slide_07.jpg","media/stills/slide_08.jpg","media/stills/slide_09.jpg","media/stills/slide_10.jpg","media/stills/slide_12.jpg","media/stills/slide_14.jpg","media/stills/slide_16.jpg","media/stills/slide_18.jpg"],
-  portraitCount:6,
-  videos:["media/clips/sunil_on_camera.mp4","media/clips/tiecon_clip_a.mp4"],
-  articles:[
-    {src:"Yale Insights",date:"October 2017",head:"Can we secure online identities?",dek:"An interview with Sunil Madhu at Yale SOM's Fintech Transformation Conference."},
-    {src:"United States Patent 9,147,117",date:"September 2015",head:"Analyzing facial recognition data and social network data for user authentication",dek:"Inventors: Sunil Madhu, Xinyu Li, Justin Kamerman"},
-    {src:"United States Patent 9,300,676",date:"March 2016",head:"Risk assessment using social networking data",dek:"Inventors: Sunil Madhu, Giacomo Pallotti, Edward J. Romano, Alexander K. Chavez"},
-    {src:"FinovateFall 2017",date:"September 2017",head:"Socure unveils digital-to-physical identity verification",dek:"Live demo on the Finovate stage."},
-    {src:"TiECon East 2026",date:"Opening keynote",head:"Who pays when the machine is wrong?",dek:"Sunil Madhu, Founder & CEO, Instnt"},
-    {src:"Instnt",date:"2019 to now",head:"Turning identity fraud losses into an insurable asset",dek:"Coverage backed by Munich Re and Swiss Re."},
-    {src:"Asyml8",date:"2026",head:"Brahma: run AI on the devices you already have",dek:"A graph-native AI mesh. Open source."},
-    {src:"InsurTech NY",date:"Match Education Day",head:"Getting to Series B/C",dek:"Panelist: Sunil Madhu"}
-  ]
-};
+const MEDIA={heroWide:"media/hero_wide.jpg", heroTall:"media/hero_tall.jpg"};
+/* ================= What hangs on the Polaroids =================
+   Every Polaroid back shows one of these. Clicking a video Polaroid plays it inside the print;
+   clicking anything else opens it in a reader with a close icon. */
+const LI_ACTIVITY="https://www.linkedin.com/in/sunilmadhu/recent-activity/all/";
+const ITEMS=[
+  // videos: these play inside the Polaroid
+  {type:"video",src:"media/clips/tiecon_clip_a.mp4",thumb:"media/stills/keynote_cover.jpg",cap:"TiECon East '26",source:"TiECon East 2026 · Opening keynote",title:"Who pays when the machine is wrong?"},
+  {type:"video",src:"media/clips/sunil_on_camera.mp4",thumb:"media/portraits/p_2022.jpg",cap:"On Instnt, 2021",source:"Instnt · 2021",title:"Sunil Madhu on Instnt"},
+  {type:"video",yt:"ChOQ5_LciCM",thumb:"media/thumbs/yt_ChOQ5_LciCM.jpg",cap:"The Socure years",source:"YouTube",title:"Sunil Madhu, Founder & CEO, Socure"},
+  {type:"video",yt:"WUMLAS4kzHI",thumb:"media/thumbs/yt_WUMLAS4kzHI.jpg",cap:"BAI demo, 2014",source:"BAI Retail Delivery 2014 · Socure demo",title:"Social Biometric Analysis in Risk and Compliance"},
+
+  // articles Sunil wrote
+  {type:"article",source:"American Banker · BankThink",date:"November 8, 2016",cap:"American Banker '16",
+   title:"Social data's distinct details can enhance authentication",url:"https://www.americanbanker.com/payments/opinion/social-datas-distinct-details-can-enhance-authentication",
+   text:["Social media data can fill the gaps where conventional financial records run thin. Combined with other trusted online and offline sources, the details in a social profile help companies confirm the identities of millennials and others who sit outside the traditional credit system.",
+         "The rules for using that data are complicated, Sunil concedes, but the extra detail makes authentication stronger and fraud harder."]},
+  {type:"article",source:"American Banker · BankThink",date:"June 2018",cap:"American Banker '18",
+   title:"Like any other data tech, 'garbage in, garbage out' hurts artificial intelligence",url:"https://www.americanbanker.com/payments/opinion/artificial-intelligence-relies-on-data-quality-to-thrive",
+   text:["AI and machine learning now shape how banks, payment processors and online businesses verify customers and spot fraud, but the results are only as good as what goes in.",
+         "Sunil sets out three requirements: data vetted to keep bias out, features chosen so they don't bring discrimination into decisions, and algorithms that fit how the data is actually distributed. Done well, the payoff is real-time decisions, fraud patterns that fixed rules miss, and fewer false declines for young, mobile-first customers."]},
+  {type:"article",source:"American Banker · BankThink",date:"September 18, 2018",cap:"American Banker '18",
+   title:"Digital 'exhaust' provides the fast ID security that millennials demand",url:"https://www.americanbanker.com/payments/opinion/static-id-protection-wont-work-for-younger-consumers",
+   text:["A risk system built on credit bureaus assumes people must borrow before they can be trusted, and that model fails younger consumers. Millennials and Gen Z are digital natives who expect fast, mobile service, and they are fast becoming a large share of the population and the workforce.",
+         "Sunil's answer: combine structured and unstructured online data with traditional offline records, and use data science to tell real identities from fake ones."]},
+  {type:"article",source:"American Banker · BankThink",date:"January 3, 2019",cap:"American Banker '19",
+   title:"Digital ID's 'trusted network' makes liability more complex",url:"https://www.americanbanker.com/payments/opinion/digital-ids-trusted-network-makes-liability-more-complex",
+   text:["Shared digital identity networks promise efficiency, but they also concentrate risk and blur who is liable when something goes wrong.",
+         "Sunil looks at the one-click identity schemes set to spread, from bankID to Project Verify and the GSMA's RCS universal profile, and at markets in Europe and Canada where a few large banks dominate and shared verification services are being built first."]},
+  {type:"article",source:"Insurance Thought Leadership",date:"June 12, 2025",cap:"ITL, 2025",
+   title:"How Identity Fraud Insurance Protects Businesses",url:"https://www.insurancethoughtleadership.com/commercial-lines/how-identity-fraud-insurance-protects-businesses",
+   text:["Identity fraud losses are climbing, and tools such as multi-factor authentication and anomaly detection can't stop every attack.",
+         "Sunil makes the case for identity fraud loss insurance: it moves the financial risk of fraud from the business to insurers and frees capital for growth. For brokers it is a way to stand out, and he suggests they check policy terms, data capture and claims speed before recommending a policy."]},
+
+  // interviews and press
+  {type:"article",source:"Yale Insights · Interview",date:"October 2017",cap:"Yale Insights '17",
+   title:"Can we secure online identities?",url:"https://insights.som.yale.edu/insights/can-we-secure-online-identities",
+   text:["In a conversation with Yale Insights at Yale SOM's fintech conference, Sunil explains why using credit history to identify people is out of date, and what new tools secure online commerce needs."]},
+  {type:"article",source:"PYMNTS · Interview",date:"September 11, 2017",cap:"PYMNTS, 2017",
+   title:"Looking Beyond The Selfie For ID Verification",url:"https://www.pymnts.com/authentication/2017/socure-ceo-sunil-madhu-on-digital-to-physical-id-verification-beyond-selfie-pay/",
+   text:["Talking with PYMNTS's Karen Webster, Sunil argues that identity checks should draw on a person's wider digital footprint, not only on matching a selfie to a document.",
+         "He walks through Socure's Sapphire 3.0 platform, a single API that checks data across many sources and verifies both digital and physical IDs, and explains how it opens finance to thin-file consumers while cutting fraud losses."]},
+  {type:"link",source:"The C-Suite Podcast",date:"2026",cap:"C-Suite Podcast",
+   title:"Moving Fraud off the Balance Sheet",url:LI_ACTIVITY,linkText:"Find the episode on LinkedIn",
+   text:["Sunil joins two credit union CEOs, Kent Lugrand of InTouch Credit Union and Mike Wilson of Members 1st Federal Credit Union, with host Debbie West, on what changes for growth when fraud loss stops landing on the balance sheet."]},
+  {type:"link",source:"FF News · Video",date:"Fintech Meetup 2023",cap:"FF News '23",
+   title:"Sunil Madhu, Instnt, at Fintech Meetup 2023",url:"https://ffnews.com/videos/sunil-madhu-instnt-fintech-meetup-2023",linkText:"Watch on FF News",
+   text:["A video interview with FF News on the floor of Fintech Meetup 2023."]},
+  {type:"link",source:"Finovate · Video",date:"FinovateFall 2013",cap:"Finovate '13",
+   title:"Socure on the FinovateFall stage",url:"https://finovate.com/videos/finovatefall-2013-socure",linkText:"Watch on Finovate",
+   text:["Socure's live demo at FinovateFall 2013."]},
+  {type:"link",source:"InsurTech.io · Podcast",date:"The Founders Journey",cap:"Founders Journey",
+   title:"AI, fraud prevention and insurance with Sunil Madhu",url:"https://ppacc.player.fm/series/insurtechsio/the-founders-journey-ai-fraud-prevention-and-insurance-with-sunil-madhu",linkText:"Listen to the episode",
+   text:["An episode of The Founders Journey on building in AI, fraud prevention and insurance."]},
+  {type:"link",source:"Instnt",date:"Videos & demos",cap:"Instnt demos",
+   title:"Instnt videos and product demos",url:"https://instnt.ai/resources/videos/",linkText:"Watch on instnt.ai",
+   text:["Product walkthroughs and talks from Instnt."]},
+
+  // Sunil's own LinkedIn posts, in his words
+  {type:"post",source:"LinkedIn",date:"2026",cap:"Who pays?",thumb:"media/stills/slide_01.jpg",title:"I opened my TiECon East keynote with two questions.",url:LI_ACTIVITY,
+   text:["I opened my TiECon East keynote with two questions.\nWho here used AI this morning?\nKeep your hand up if you checked whether it was right.\nThat's the whole talk.",
+         "In 2011 we started Socure to answer one question for banks: is this person real?\nIn 2026 the question is: is this answer real, and who pays if it isn't?",
+         "Congress is slow. Courts are slower. My answer is insurers.",
+         "In 1866, steam boilers were exploding across America. A group in Hartford started insuring them, and to price the risk they inspected every boiler. Insurers made boilers safe before any regulator did.",
+         "Today the boiler is a model.\nRegulators write rules. Insurers write prices. People follow prices.",
+         "That's what we built Instnt to do. AI underwriting the risk of AI, backed by AM Best A+ rated global insurers, including Munich Re and Swiss Re.",
+         "Thank you to TiE Boston for having me open the day."]},
+  {type:"post",source:"LinkedIn",date:"2026",cap:"Six people, fifty's work",thumb:"media/stills/slide_05.jpg",title:"We run Instnt with six people doing the work of fifty.",url:LI_ACTIVITY,
+   text:["We run Instnt with six people doing the work of fifty.\nI'm not saying that to brag. It's a warning.",
+         "If six people can do it, so can your competitor, including the 22-year-old in a dorm room who doesn't need to raise a dollar.",
+         "At TiECon East I showed how we build software now.",
+         "Waterfall: write a 100-page spec, wait 18 months, ship the wrong thing.\nAgile: ship the wrong thing every two weeks.\nNow: a requirement goes to a virtual product manager agent at a round table of 20 AI personas, from CFO and general counsel to DevOps and QA. It breaks the work down, maps the blast radius across every system, customer, contract and control, writes the plan, and hands each human the one decision only they can make. Then agent swarms deliver it in an afternoon.",
+         "The machine does the labor. People supply judgment, taste and accountability."]},
+  {type:"post",source:"LinkedIn",date:"2026",cap:"GPUs are melting",thumb:"media/stills/slide_08.jpg",title:"Nobody ever needed a power plant to make a meme. Now we do.",url:LI_ACTIVITY,
+   text:["Nobody ever needed a power plant to make a meme. Now we do.",
+         "In one week in March 2025, 130 million people made more than 700 million AI images, mostly turning themselves into Studio Ghibli cartoons. Sam Altman posted four words: \"Our GPUs are melting.\"\n\n(Yes, I did it too.)",
+         "I used that moment in my TiECon East keynote because it hides a serious point. America's four hyperscalers are on track to spend roughly $725 billion on capex this year. Allianz Research puts the gap between AI spending and AI revenue at around 46%. In the 2001 telecom bust it was 32%.",
+         "We built the railroad. We're still waiting for the towns.",
+         "For founders, that changes what winning looks like. When everyone has AI, AI stops being your advantage. It becomes the electricity, and nobody wins because they have electricity. You win on what the model can't copy: loss data nobody else has, distribution and trust that took years, and a balance sheet that stands behind the output."]},
+  {type:"post",source:"LinkedIn",date:"2026",cap:"Five principles",thumb:"media/stills/slide_12.jpg",title:"Five principles for building a company when everyone has AI.",url:LI_ACTIVITY,
+   text:["Five principles for building a company when everyone has AI.\nThey were the timeless part of my TiECon East keynote.",
+         "1. Your model is not your moat. Your loss data is. Anyone can rent intelligence. Nobody can rent the record of what went wrong for your customers, and how you fixed it.",
+         "2. Build for the auditor before the user. If you can't explain the decision, you can't sell it to anyone who answers to a regulator, and soon that's everyone.",
+         "3. Hire for judgment. Buy the labor.",
+         "4. Capital efficiency is a design choice now. If you need $100 million to prove an idea in 2026, you've designed the company wrong.",
+         "5. Be insurable. If nobody will underwrite your AI, nobody should buy it. If someone will, you have the best sales asset in the market.",
+         "And for investors: stop asking founders for their AI strategy. Everyone has one. Ask for their loss data, their audit trail, and who insures their model."]},
+  {type:"post",source:"LinkedIn",date:"2026",cap:"Nothing can go wrong",thumb:"media/stills/slide_03.jpg",title:"Everything old is new again. AI is no exception.",url:LI_ACTIVITY,
+   text:["Everything old is new again. AI is no exception.",
+         "In 1973, a Saturday-morning cartoon pitched the AI future better than most keynotes do today.",
+         "On Super Friends, a professor unveils the world's biggest computer, the G.E.E.C., and offers it to the government \"for the benefit of all people.\" Its purpose: to free mankind of all physical labor, brain work and responsibility.",
+         "Fifty-three years later, the cartoon got two things exactly right.\nWendy's point: people need work and responsibility, or they lose their purpose.\nSuperman's point: the machine has no heart, and it wouldn't know when it's causing harm.",
+         "The technology finally caught up with the cartoon. The question it raised still hasn't been answered: when the machine is wrong, who pays?"]},
+  {type:"post",source:"LinkedIn",date:"2026",cap:"Fintech Meetup '26",thumb:"media/portraits/p_instnt.jpg",title:"Fintech Meetup wrapped with over 100 banks, credit unions and fintechs.",url:LI_ACTIVITY,
+   text:["Thank you all for your support.",
+         "Fintech Meetup wrapped with over a 100 banks, credit unions and fintechs turning up over cocktails and a select few over dinner till 1am, after a couple of days of 'speed-dating' meetings, to learn about an entirely different way to tackle their fraud and growth problems: by simply adding fraud loss insurance from Instnt, a new AI-powered, actuarially-validated solution in partnership with A+ rated global insurers and reinsurers including Munich Re and Swiss Re.",
+         "Zero Fraud Loss is actually possible, rendering the effects of fraud essentially moot. There's no need to trade off growth for safety. Fraud risk reserves can be turned into working capital, and spiky fraud events become a predictable expense: file a claim and get financially cured of the loss within 30 days.",
+         "The 'Zero Fraud Loss' was the most popular libation."]},
+
+  // photographs
+  {type:"photo",thumb:"media/portraits/p_2026.jpg",cap:"2026",title:"Sunil Madhu, 2026"},
+  {type:"photo",thumb:"media/portraits/p_2025.jpg",cap:"2025",title:"Sunil Madhu, 2025"},
+  {type:"photo",thumb:"media/portraits/p_2022.jpg",cap:"2022",title:"Sunil Madhu, 2022"},
+  {type:"photo",thumb:"media/portraits/p_socure.jpg",cap:"Socure",title:"The Socure years"},
+  {type:"photo",thumb:"media/portraits/p_instnt.jpg",cap:"Instnt",title:"At Instnt"},
+  {type:"photo",thumb:"media/portraits/p_bw.jpg",cap:"Portrait",title:"Sunil Madhu"},
+  {type:"photo",thumb:"media/stills/keynote_cover.jpg",cap:"TiECon East '26",title:"Opening keynote, TiECon East 2026"},
+  ...["02","04","06","07","09","10","14","16","18"].map(n=>({type:"photo",thumb:`media/stills/slide_${n}.jpg`,cap:"TiECon East '26",title:"From the TiECon East 2026 keynote"}))
+];
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const MOBILE=matchMedia("(max-width: 760px)").matches;
 const clamp=(x,a,b)=>Math.min(b,Math.max(a,x)), lerp=(a,b,t)=>a+(b-a)*t;
@@ -578,30 +668,52 @@ for(let z=8-BAY/2;z>-170;z-=BAY){const m=new THREE.Mesh(new THREE.PlaneGeometry(
 const loader=new THREE.TextureLoader();
 const tall=innerWidth/innerHeight<.9;
 const heroTex=loader.load(tall?MEDIA.heroTall:MEDIA.heroWide);heroTex.encoding=THREE.sRGBEncoding;heroTex.anisotropy=8;
-const GX=8,GY=4,CS=256;
-const photoCanvas=document.createElement("canvas");photoCanvas.width=GX*CS;photoCanvas.height=GY*CS;const pctx=photoCanvas.getContext("2d");pctx.fillStyle="#222";pctx.fillRect(0,0,photoCanvas.width,photoCanvas.height);
-const photoTex=new THREE.CanvasTexture(photoCanvas);photoTex.encoding=THREE.sRGBEncoding;photoTex.anisotropy=8;
-MEDIA.photos.forEach((src,i)=>{const im=new Image();im.onload=()=>{const cx=(i%GX)*CS,cy=Math.floor(i/GX)*CS;const s=Math.max(CS/im.width,CS/im.height);const w=im.width*s,h=im.height*s;
-  pctx.save();pctx.beginPath();pctx.rect(cx,cy,CS,CS);pctx.clip();pctx.drawImage(im,cx+(CS-w)/2,cy+(CS-h)/2,w,h);pctx.restore();photoTex.needsUpdate=true;};im.src=src;});
-// press clippings
-const AX=4,AY=2,AS=512;
-const artCanvas=document.createElement("canvas");artCanvas.width=AX*AS;artCanvas.height=AY*AS;const actx=artCanvas.getContext("2d");
-const artTex=new THREE.CanvasTexture(artCanvas);artTex.encoding=THREE.sRGBEncoding;artTex.anisotropy=8;
-function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(" ");let line="",n=0;for(const w of words){const t=line?line+" "+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(line,x,y+n*lh);n++;line=w;if(n>=maxLines)return n;}else line=t;}if(line){g.fillText(line,x,y+n*lh);n++;}return n;}
-function drawArticles(){MEDIA.articles.forEach((a,i)=>{const x=(i%AX)*AS,y=Math.floor(i/AX)*AS,g=actx;const r=rng(100+i);
-  g.save();g.translate(x,y);g.fillStyle="#efe9dc";g.fillRect(0,0,AS,AS);
-  for(let k=0;k<1800;k++){g.fillStyle=`rgba(80,70,50,${r()*.05})`;g.fillRect(r()*AS,r()*AS,1+r()*2,1);}
-  g.fillStyle="#1b1a17";g.font="500 22px 'IBM Plex Mono', monospace";g.fillText(a.src.toUpperCase(),36,62);
-  g.fillStyle="#6a6457";g.font="400 18px 'IBM Plex Mono', monospace";g.fillText(a.date,36,92);
-  g.fillStyle="#1b1a17";g.fillRect(36,112,AS-72,3);
-  g.font="italic 500 46px Fraunces, Georgia, serif";const n=wrapText(g,a.head,36,176,AS-72,52,5);
-  g.font="400 22px 'Source Serif 4', Georgia, serif";g.fillStyle="#3b3730";wrapText(g,a.dek,36,176+n*52+26,AS-72,30,3);
-  g.fillStyle="rgba(27,26,23,.18)";for(let l=0;l<4;l++)g.fillRect(36,AS-120+l*22,(AS-72)*(.6+r()*.4),8);
-  g.restore();});artTex.needsUpdate=true;}
-document.fonts.ready.then(drawArticles);drawArticles();
-function videoTex(src){const v=document.createElement("video");v.src=src;v.muted=true;v.loop=true;v.playsInline=true;v.preload="auto";v.play().catch(()=>{});const t=new THREE.VideoTexture(v);t.encoding=THREE.sRGBEncoding;t.minFilter=THREE.LinearFilter;return{v,t};}
-const vids=MEDIA.videos.map(videoTex);
-addEventListener("pointerdown",()=>vids.forEach(x=>x.v.play().catch(()=>{})),{once:true});
+// One 2048px atlas, 8 x 6 cells; each cell is a whole Polaroid back: paper, photo window, handwritten caption.
+const AT=2048, CX=8, CW=256, CH=341, PW=244, PH=288, PG=6;
+const atlas=document.createElement("canvas");atlas.width=AT;atlas.height=AT;const at=atlas.getContext("2d");
+const itemTex=new THREE.CanvasTexture(atlas);itemTex.encoding=THREE.sRGBEncoding;itemTex.anisotropy=8;
+const WIN={x:.06,y:.04,w:.88,h:.74}; // the photo window, from the print's top-left corner
+const imgCache={};
+function loadImg(src){return imgCache[src]||(imgCache[src]=new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;}));}
+function cover(g,im,x,y,w,h){const k=Math.max(w/im.width,h/im.height),iw=im.width*k,ih=im.height*k;g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.drawImage(im,x+(w-iw)/2,y+(h-ih)/2,iw,ih);g.restore();}
+function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(/\s+/);let line="",n=0;for(const w of words){const t=line?line+" "+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(n===maxLines-1?line+"…":line,x,y+n*lh);n++;line=w;if(n>=maxLines)return n;}else line=t;}if(line){g.fillText(line,x,y+n*lh);n++;}return n;}
+function drawClipping(g,it,x,y,w,h){ // an article, set in type like a press clipping
+  const r=rng(7+it.title.length),k=w/220;g.save();g.translate(x,y);g.fillStyle="#efe8d8";g.fillRect(0,0,w,h);
+  for(let n=0;n<Math.round(500*k*k);n++){g.fillStyle=`rgba(80,70,50,${r()*.05})`;g.fillRect(r()*w,r()*h,1+r()*2,1);}
+  g.fillStyle="#1b1a17";g.font=`500 ${8.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.source.toUpperCase().slice(0,32),10*k,18*k);
+  g.fillStyle="#6a6457";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date||"",10*k,30*k);
+  g.fillStyle="#1b1a17";g.fillRect(10*k,36*k,w-20*k,1.5*k);
+  g.font=`italic 500 ${17*k}px Fraunces, Georgia, serif`;const n=wrapText(g,it.title,10*k,58*k,w-20*k,19*k,5);
+  g.fillStyle="rgba(27,26,23,.2)";for(let l=0;l<6;l++){const ly=58*k+n*19*k+2*k+l*9*k;if(ly>h-8*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3.5*k);}
+  g.restore();}
+function drawPostCard(g,it,x,y,w,h,im){ // a LinkedIn post: its still above the opening line
+  const k=w/220;g.save();g.translate(x,y);g.fillStyle="#fff";g.fillRect(0,0,w,h);
+  if(im)cover(g,im,0,0,w,h*.5);const t=h*.5;
+  g.fillStyle="#0a66c2";g.fillRect(9*k,t+9*k,15*k,15*k);g.fillStyle="#fff";g.font=`700 ${10*k}px Arial, sans-serif`;g.fillText("in",11.3*k,t+20.5*k);
+  g.fillStyle="#1b1a17";g.font=`600 ${9*k}px 'Bricolage Grotesque', Arial, sans-serif`;g.fillText("Sunil Madhu",29*k,t+19.5*k);
+  g.font=`400 ${10.5*k}px 'Source Serif 4', Georgia, serif`;wrapText(g,it.title,9*k,t+40*k,w-18*k,13*k,Math.max(1,Math.floor((h-t-40*k)/(13*k))));
+  g.restore();}
+function drawPlay(g,x,y,w,h){const cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.15;g.fillStyle="rgba(10,11,14,.62)";g.beginPath();g.arc(cx,cy,r,0,6.3);g.fill();g.strokeStyle="rgba(255,255,255,.85)";g.lineWidth=2;g.stroke();
+  g.fillStyle="#fff";g.beginPath();g.moveTo(cx-r*.3,cy-r*.45);g.lineTo(cx+r*.52,cy);g.lineTo(cx-r*.3,cy+r*.45);g.closePath();g.fill();}
+function drawThumb(g,it,x,y,w,h,im){ // the picture inside the window; also used large in the reader
+  g.fillStyle="#1a1a1a";g.fillRect(x,y,w,h);
+  if(it.type==="article"||it.type==="link")drawClipping(g,it,x,y,w,h);
+  else if(it.type==="post")drawPostCard(g,it,x,y,w,h,im);
+  else if(im)cover(g,im,x,y,w,h);
+  if(it.type==="video")drawPlay(g,x,y,w,h);}
+async function drawItem(i){const it=ITEMS[i],c=i%CX,r=Math.floor(i/CX),x0=c*CW+PG,y0=r*CH+PG,g=at;
+  const im=it.thumb?await loadImg(it.thumb):null; // load first, then draw in one go so cells never interleave
+  const wx=x0+PW*WIN.x,wy=y0+PH*WIN.y,ww=PW*WIN.w,wh=PH*WIN.h;
+  g.save();g.beginPath();g.rect(c*CW,r*CH,CW,CH);g.clip();
+  const pp=g.createLinearGradient(x0,y0,x0+PW,y0+PH);pp.addColorStop(0,"#f4f1ea");pp.addColorStop(1,"#e4dfd3");g.fillStyle=pp;g.fillRect(x0,y0,PW,PH);
+  drawThumb(g,it,wx,wy,ww,wh,im);
+  g.strokeStyle="rgba(0,0,0,.2)";g.lineWidth=1;g.strokeRect(wx+.5,wy+.5,ww-1,wh-1);
+  g.translate(x0+PW/2,y0+PH*.905);g.rotate(((i*37)%7-3)*.008);g.fillStyle="#2b2722";g.textAlign="center";
+  let fs=30;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;while(g.measureText(it.cap).width>PW*.86&&fs>18){fs-=2;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;}
+  g.fillText(it.cap,0,0);g.restore();itemTex.needsUpdate=true;}
+function drawAllItems(){ITEMS.forEach((_,i)=>drawItem(i));}
+document.fonts.ready.then(drawAllItems);drawAllItems();
+const blankTex=new THREE.DataTexture(new Uint8Array([0,0,0,255]),1,1);
 
 /* ================= The suspended portrait ================= */
 // The portrait is laid out on a virtual picture plane 10 units in front of the camera.
@@ -618,41 +730,40 @@ const prints=[];
 const START=new THREE.Vector3(0,0,10), END_Z=-118;
 let N=0, mesh=null, aHero, aKind, aCell, aSeed;
 const geo=new THREE.PlaneGeometry(1,1);
-const U={uHero:{value:heroTex},uPhoto:{value:photoTex},uArt:{value:artTex},uVidA:{value:vids[0].t},uVidB:{value:vids[1].t},
+const U={uHero:{value:heroTex},uItems:{value:itemTex},uLive:{value:blankTex},uLiveOn:{value:0},uActive:{value:-1},uHover:{value:-1},
   uFog:{value:FOG.clone().convertSRGBToLinear()},uFocus:{value:7},uDof:{value:0},uMosaic:{value:1},uTime:{value:0},uCamZ:{value:10}};
 const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
-  vertexShader:`attribute vec4 aHero;attribute float aKind;attribute float aCell;attribute float aSeed;
+  vertexShader:`attribute vec4 aHero;attribute float aKind;attribute float aCell;attribute float aSeed;attribute float aIndex;varying float vIndex;
     varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;
-    void main(){vUv=uv;vHero=aHero;vKind=aKind;vCell=aCell;vSeed=aSeed;vec4 w=modelMatrix*instanceMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vDepth=-mv.z;gl_Position=projectionMatrix*mv;}`,
-  fragmentShader:`uniform sampler2D uHero,uPhoto,uArt,uVidA,uVidB;uniform vec3 uFog;uniform float uFocus,uDof,uMosaic,uTime,uCamZ;
+    void main(){vIndex=aIndex;vUv=uv;vHero=aHero;vKind=aKind;vCell=aCell;vSeed=aSeed;vec4 w=modelMatrix*instanceMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vDepth=-mv.z;gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform sampler2D uHero,uItems,uLive;uniform vec3 uFog;uniform float uFocus,uDof,uMosaic,uTime,uCamZ,uLiveOn,uActive,uHover;varying float vIndex;
     varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;
     vec3 lin(vec3 c){return pow(c,vec3(2.2));}
     vec4 blurTex(sampler2D t,vec2 uv,float b){return texture2D(t,uv,b);}
     void main(){
-      float coc=clamp(abs(vDepth-uFocus)/(uFocus*.9),0.,1.)*uDof; float bias=coc*5.5;
+      float act=1.-step(.5,abs(vIndex-uActive)); // the print in your hands is never blurred or fogged
+      float coc=clamp(abs(vDepth-uFocus)/(uFocus*.9),0.,1.)*uDof*(1.-act); float bias=coc*5.5;
       vec3 col; vec2 uv=vUv;
       if(gl_FrontFacing){
         col=lin(blurTex(uHero,vHero.xy+(uv-.5)*vHero.zw,bias*.6).rgb);
         float e=min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y));col=mix(col*1.08+.008,col,smoothstep(.0,.03,e)); // thin paper edge
       } else {
         uv.x=1.-uv.x;
-        if(vKind>1.5){ // press clipping, full bleed
-          float c=mod(vCell,4.),r=floor(vCell/4.);col=lin(blurTex(uArt,(vec2(c,1.-r)+uv)/vec2(4.,2.),bias).rgb);
-        } else { // polaroid: photo or video
-          vec2 iuv=vec2((uv.x-.06)/.88,(uv.y-.22)/.74);bool inside=iuv.x>0.&&iuv.x<1.&&iuv.y>0.&&iuv.y<1.;
-          vec3 ph;
-          if(vKind>.5){ph=lin((vCell<.5?texture2D(uVidA,clamp(iuv,0.,1.)):texture2D(uVidB,clamp(iuv,0.,1.))).rgb);}
-          else{float c=mod(vCell,8.),r=floor(vCell/8.);ph=lin(blurTex(uPhoto,(vec2(c,3.-r)+clamp(iuv,0.,1.))/vec2(8.,4.),bias).rgb);}
-          col=inside?ph:lin(vec3(.93,.91,.86));
-        }
+        // the whole Polaroid back comes from the atlas cell for this print's item
+        float c=mod(vCell,8.),r=floor(vCell/8.);
+        vec2 auv=vec2((c*256.+6.+uv.x*244.)/2048.,1.-(r*341.+6.+(1.-uv.y)*288.)/2048.);
+        col=lin(blurTex(uItems,auv,bias).rgb);
+        vec2 iuv=vec2((uv.x-.06)/.88,(uv.y-.22)/.74);
+        if(act>.5&&uLiveOn>.5&&iuv.x>0.&&iuv.x<1.&&iuv.y>0.&&iuv.y<1.)col=lin(texture2D(uLive,iuv).rgb); // the video plays inside the print
+        col*=1.+.16*(1.-step(.5,abs(vIndex-uHover)));
       }
       // warehouse light: brighter under each skylight bay, a soft key light near the camera
       float bay=.55+.45*cos((vW.z-${(8-BAY/2).toFixed(1)})*6.2832/${BAY.toFixed(1)});
       float key=exp(-pow(vDepth/14.,2.));
-      float light=mix(.38+.5*bay*exp(-abs(vW.x)/9.)+.35*key,1.,uMosaic);
+      float light=mix(.38+.5*bay*exp(-abs(vW.x)/9.)+.35*key,1.,uMosaic);light=mix(light,max(light,1.02),act);
       col*=light;
       col=mix(col,col*vec3(.75,.78,.85),coc*.6); // distant prints go cooler and softer
-      float f=smoothstep(12.,95.,vDepth);col=mix(col,uFog,f);
+      float f=smoothstep(12.,95.,vDepth)*(1.-act);col=mix(col,uFog,f);
       gl_FragColor=vec4(col,1.);
       #include <encodings_fragment>
     }`});
@@ -668,17 +779,16 @@ function buildPrints(){
     while(q.length){const i=q.pop(),c=i%COLS,r=(i/COLS)|0;if(c>0)seed(c-1,r);if(c<COLS-1)seed(c+1,r);if(r>0)seed(c,r-1);if(r<ROWS-1)seed(c,r+1);}
     const list=[];
     for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const i=r*COLS+c;if(bg[i])continue;list.push({c,r,lum:L[i]});}
-    N=list.length;aHero=new Float32Array(N*4);aKind=new Float32Array(N);aCell=new Float32Array(N);aSeed=new Float32Array(N);
-    const nArt=MEDIA.articles.length;
+    N=list.length;aHero=new Float32Array(N*4);aKind=new Float32Array(N);aCell=new Float32Array(N);aSeed=new Float32Array(N);const aIdx=new Float32Array(N);
+    // a shuffled deck of everything on the Polaroids, dealt out across the warehouse
+    const deck=ITEMS.map((_,k)=>k);for(let k=deck.length-1;k>0;k--){const j=Math.floor(rand()*(k+1));[deck[k],deck[j]]=[deck[j],deck[k]];}
     list.forEach((L,i)=>{
       const px=-picW/2+(L.c+.5)*cellW, py=picH/2-(L.r+.5)*cellH;
       const depth=D*(.72+rand()*.56); // distance from the camera along the ray
       const s=depth/D;
       const p={rel:new THREE.Vector3(px*s,py*s,-depth),sx:cellW*s*1.004,sy:cellH*s*1.004,seed:rand()};
       aHero.set([(L.c+.5)/COLS,1-(L.r+.5)/ROWS,1/COLS,1/ROWS],i*4);
-      const r=rand();
-      aKind[i]=r<.12?2:(r<.2?1:0);
-      aCell[i]=aKind[i]===2?Math.floor(rand()*nArt):aKind[i]===1?(rand()<.75?0:1):(rand()<.45?Math.floor(rand()*MEDIA.portraitCount):Math.floor(rand()*MEDIA.photos.length));
+      aKind[i]=0;aCell[i]=deck[i%deck.length];aIdx[i]=i;
       aSeed[i]=p.seed;
       // flight: spread through the warehouse, some close and sharp, many far and soft
       const near=rand()<.35;
@@ -700,6 +810,7 @@ function buildPrints(){
     geo.setAttribute("aKind",new THREE.InstancedBufferAttribute(aKind,1));
     geo.setAttribute("aCell",new THREE.InstancedBufferAttribute(aCell,1));
     geo.setAttribute("aSeed",new THREE.InstancedBufferAttribute(aSeed,1));
+    geo.setAttribute("aIndex",new THREE.InstancedBufferAttribute(aIdx,1));
     mesh=new THREE.InstancedMesh(geo,mat,N);mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);mesh.frustumCulled=false;scene.add(mesh);
     // barely-there hanging wires, dark against the dark
     wirePos=new Float32Array(N*6);wireGeo.setAttribute("position",new THREE.BufferAttribute(wirePos,3).setUsage(THREE.DynamicDrawUsage));
@@ -708,6 +819,103 @@ function buildPrints(){
 }
 let wires=null,wirePos=null;const wireGeo=new THREE.BufferGeometry();
 buildPrints();
+
+/* ================= Picking up a Polaroid =================
+   Click a print: it lifts off its wire, turns to face you and comes close. Videos play inside it;
+   everything else opens in the reader. Close, Esc or a click elsewhere hangs it back up. */
+const HOLD={i:-1,k:0,e:0,target:0,pos:new THREE.Vector3(),q:new THREE.Quaternion(),scl:new THREE.Vector3(1,1,1),M:new THREE.Matrix4(),item:null,video:null,tex:null};
+const HOLD_D=3.2,tV=new THREE.Vector3(),tQ=new THREE.Quaternion(),tS=new THREE.Vector3(),fwdV=new THREE.Vector3(),upV=new THREE.Vector3(),prj=new THREE.Vector3();
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ptr={x:-1,y:-1,in:false};let hoverN=0,modalOpen=false;
+const NOPICK="a,button,input,textarea,select,iframe,video,label,.card,.panel,.contact-head,.booking,.dock,.bar,.stats,.modal,.vlayer,#career";
+function updateHold(dt){
+  HOLD.k+=(HOLD.target-HOLD.k)*(1-Math.exp(-dt*(HOLD.target?4.5:6)));HOLD.e=HOLD.k*HOLD.k*(3-2*HOLD.k);
+  if(HOLD.i<0)return;
+  fwdV.set(0,0,-1).applyQuaternion(camera.quaternion);upV.set(0,1,0).applyQuaternion(camera.quaternion);
+  HOLD.pos.copy(camera.position).addScaledVector(fwdV,HOLD_D).addScaledVector(upV,-.04);
+  HOLD.q.copy(camera.quaternion).multiply(qFlip);
+  const vh=2*HOLD_D*Math.tan(THREE.MathUtils.degToRad(20)),vw=vh*camera.aspect;let h=vh*.8,w=h*.846;if(w>vw*.86){w=vw*.86;h=w/.846;}
+  HOLD.scl.set(w,h,1);
+  if(HOLD.target===0&&HOLD.k<.003){HOLD.i=-1;HOLD.k=0;U.uActive.value=-1;}
+}
+function pickAt(x,y){
+  if(!mesh||U.uMosaic.value>.35||x<0)return -1;
+  const el=document.elementFromPoint(x,y);if(el&&el.closest(NOPICK))return -1;
+  ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
+  for(const h of ray.intersectObject(mesh)){if(h.distance>70)break;if(h.instanceId!==HOLD.i)return h.instanceId;}
+  return -1;}
+function hoverPick(){const i=(ptr.in&&HOLD.i<0&&!modalOpen)?pickAt(ptr.x,ptr.y):-1;U.uHover.value=i;document.documentElement.classList.toggle("pick",i>=0);}
+addEventListener("pointermove",e=>{ptr.x=e.clientX;ptr.y=e.clientY;ptr.in=e.pointerType==="mouse";},{passive:true});
+document.addEventListener("mouseleave",()=>{ptr.in=false;});
+const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
+function pickUp(i){
+  const it=ITEMS[aCell[i]];if(!it)return;
+  if(HOLD.i>=0&&HOLD.i!==i)release(true);
+  HOLD.i=i;HOLD.target=1;HOLD.item=it;U.uActive.value=i;U.uHover.value=-1;document.documentElement.classList.remove("pick");
+  document.body.classList.add("holding");
+  if(it.type==="video"){
+    window.musicDuck&&window.musicDuck(true);
+    vlayer.hidden=false;vwin.style.opacity=0;vx.style.opacity=0;
+    if(it.yt){vwin.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${it.yt}?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="${it.title.replace(/"/g,"&quot;")}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;}
+    else{
+      const v=document.createElement("video");v.src=it.src;v.playsInline=true;v.loop=true;v.preload="auto";
+      v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});
+      const t=new THREE.VideoTexture(v);t.encoding=THREE.sRGBEncoding;t.minFilter=THREE.LinearFilter;
+      HOLD.video=v;HOLD.tex=t;U.uLive.value=t;U.uLiveOn.value=1;
+      vwin.innerHTML=`<button class="vtoggle" type="button" aria-label="Pause or play the video"></button>`;
+      vwin.firstChild.addEventListener("click",e=>{e.stopPropagation();v.paused?v.play():v.pause();});
+    }
+  } else setTimeout(()=>{if(HOLD.i===i&&HOLD.target===1)openModal(it);},380);
+}
+function release(keepLayer){
+  HOLD.target=0;U.uLiveOn.value=0;
+  if(HOLD.video){HOLD.video.pause();HOLD.video.removeAttribute("src");HOLD.video.load();HOLD.video=null;}
+  if(HOLD.tex){HOLD.tex.dispose();HOLD.tex=null;}U.uLive.value=blankTex;
+  vwin.innerHTML="";if(!keepLayer)vlayer.hidden=true;
+  document.body.classList.remove("holding");
+  if(HOLD.item&&HOLD.item.type==="video")window.musicDuck&&window.musicDuck(false);HOLD.item=null;
+}
+vx.addEventListener("click",e=>{e.stopPropagation();release();});
+function placeHoldUI(){ // keep the video window and close icon pinned to the print in your hands
+  if(HOLD.i<0||HOLD.target===0||!HOLD.item||HOLD.item.type!=="video"){if(!vlayer.hidden&&HOLD.target===0)vlayer.hidden=true;return;}
+  const xs=[],ys=[],fx=[],fy=[];
+  [[-.44,-.28],[.44,-.28],[-.44,.46],[.44,.46]].forEach(([x,y])=>{prj.set(x,y,0).applyMatrix4(HOLD.M).project(camera);xs.push((prj.x+1)/2*innerWidth);ys.push((1-prj.y)/2*innerHeight);});
+  [[-.5,-.5],[.5,.5]].forEach(([x,y])=>{prj.set(x,y,0).applyMatrix4(HOLD.M).project(camera);fx.push((prj.x+1)/2*innerWidth);fy.push((1-prj.y)/2*innerHeight);});
+  const L=Math.min(...xs),T=Math.min(...ys);
+  vwin.style.cssText=`left:${L}px;top:${T}px;width:${Math.max(...xs)-L}px;height:${Math.max(...ys)-T}px;opacity:${HOLD.e>.93?1:0}`;
+  vx.style.left=(Math.max(...fx)-22)+"px";vx.style.top=(Math.min(...fy)-16)+"px";vx.style.opacity=HOLD.e>.8?1:0;
+}
+addEventListener("click",e=>{
+  if(modalOpen)return;
+  if(HOLD.i>=0&&HOLD.target===1){if(!e.target.closest(".vlayer,.dock,.bar"))release();return;}
+  const i=pickAt(e.clientX,e.clientY);if(i>=0){e.preventDefault();pickUp(i);}
+});
+addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(modalOpen)closeModal();else if(HOLD.i>=0)release();});
+
+/* the reader for articles, posts and photographs */
+const modal=document.getElementById("modal"),mCard=modal.querySelector(".m-card"),mMedia=document.getElementById("mMedia"),mSrc=document.getElementById("mSrc"),
+      mTitle=document.getElementById("mTitle"),mText=document.getElementById("mText"),mLink=document.getElementById("mLink"),mX=document.getElementById("mX");
+let lastFocus=null;
+function openModal(it){
+  modalOpen=true;lastFocus=document.activeElement;
+  mCard.classList.toggle("photo",it.type==="photo");
+  mMedia.innerHTML="";mMedia.classList.remove("paper");
+  if(it.type==="article"||it.type==="link"){const c=document.createElement("canvas");c.width=720;c.height=820;mMedia.append(c);drawThumb(c.getContext("2d"),it,0,0,720,820,null);mMedia.classList.add("paper");}
+  else if(it.thumb){const im=new Image();im.src=it.thumb;im.alt=it.title;mMedia.append(im);}
+  mSrc.textContent=[it.source,it.date].filter(Boolean).join(" · ");
+  mTitle.textContent=it.title;
+  mText.replaceChildren(...(it.text||[]).map(t=>{const q=document.createElement("p");q.textContent=t;return q;}));
+  if(it.url){mLink.hidden=false;mLink.href=it.url;mLink.textContent=(it.linkText||(it.type==="post"?"See it on LinkedIn":"Read the full piece on "+it.source.split(" · ")[0]))+" ↗";}else mLink.hidden=true;
+  modal.hidden=false;mCard.scrollTop=0;requestAnimationFrame(()=>modal.classList.add("open"));
+  if(window.lenis)lenis.stop();setTimeout(()=>mX.focus({preventScroll:true}),60);
+}
+function closeModal(){
+  modal.classList.remove("open");modalOpen=false;if(window.lenis)lenis.start();
+  setTimeout(()=>{if(!modalOpen)modal.hidden=true;},320);release();
+  if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
+}
+mX.addEventListener("click",e=>{e.stopPropagation();closeModal();});
+modal.addEventListener("click",e=>{if(e.target===modal)closeModal();});
+modal.addEventListener("keydown",e=>{if(e.key==="Tab"){const f=[...modal.querySelectorAll("button,a:not([hidden])")];const i=f.indexOf(document.activeElement);if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus();}else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();}}});
 
 /* ================= Story progress ================= */
 let P=0;
@@ -737,6 +945,7 @@ function frame(now){
   camera.position.set(cam.x+look.x*sway,cam.y+look.y*sway*.6,cam.z);
   camera.lookAt(cam.x*.6,cam.y*.6,cam.z-D);
   U.uMosaic.value=smooth(.2,1,mosaic);U.uDof.value=1-smooth(.3,.9,mosaic);U.uFocus.value=6.5;U.uCamZ.value=cam.z;
+  updateHold(dt);
   if(mesh){
     const base=assembledEnd>assembledStart?new THREE.Vector3(0,0,END_Z):START;
     for(let i=0;i<N;i++){const p=prints[i];
@@ -758,13 +967,17 @@ function frame(now){
       qB.setFromEuler(eul).multiply(qFlip);qA.identity().slerp(qB,1-a);p.q.slerp(qA,1-Math.exp(-dt*4));
       const kind=aKind[i];const fw=p.fs*(kind===2?1:.88), fh=p.fs*(kind===2?1:1.04);
       sT.set(lerp(fw,p.sx,a),lerp(fh,p.sy,a),1);p.scl.lerp(sT,1-Math.exp(-dt*4));
-      M.compose(p.pos,p.q,p.scl);mesh.setMatrixAt(i,M);
-      const j=i*6,top=p.pos.y+p.scl.y*.5;wirePos[j]=p.pos.x;wirePos[j+1]=top;wirePos[j+2]=p.pos.z;wirePos[j+3]=p.pos.x;wirePos[j+4]=(a<.6||i%4===0)?9.4:top;wirePos[j+5]=p.pos.z;
+      if(i===HOLD.i&&HOLD.k>.001){const e=HOLD.e;tV.lerpVectors(p.pos,HOLD.pos,e);tQ.copy(p.q).slerp(HOLD.q,e);tS.lerpVectors(p.scl,HOLD.scl,e);M.compose(tV,tQ,tS);HOLD.M.copy(M);}
+      else M.compose(p.pos,p.q,p.scl);
+      mesh.setMatrixAt(i,M);
+      const j=i*6,top=p.pos.y+p.scl.y*.5;wirePos[j]=p.pos.x;wirePos[j+1]=top;wirePos[j+2]=p.pos.z;wirePos[j+3]=p.pos.x;wirePos[j+4]=(i===HOLD.i&&HOLD.k>.05)?top:((a<.6||i%4===0)?9.4:top);wirePos[j+5]=p.pos.z;
     }
     mesh.instanceMatrix.needsUpdate=true;wireGeo.attributes.position.needsUpdate=true;
     wires.material.opacity=.3*(1-.6*mosaic);
   }
   renderer.render(scene,camera);
+  placeHoldUI();
+  if(++hoverN%3===0)hoverPick();
   requestAnimationFrame(frame);
 }
 addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);});
@@ -820,6 +1033,8 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   muteBtn.addEventListener("click",()=>{if(!ready)return;player.isMuted()?soundOn():soundOff();});
   document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();setTimeout(updateUI,600);}});
   setInterval(()=>{if(ready)updateUI();},4000);
+  let ducked=false;
+  window.musicDuck=on=>{if(!ready)return;if(on){ducked=playing();if(ducked)player.pauseVideo();}else if(ducked){ducked=false;player.playVideo();}};
 })();
 /* ================= Let's talk: Calendly hung like a print ================= */
 const BOOKING={url:"https://calendly.com/sunilmadhu/external-meeting"};
@@ -856,10 +1071,6 @@ const BOOKING={url:"https://calendly.com/sunilmadhu/external-meeting"};
   if(window.ScrollTrigger)ScrollTrigger.create({trigger:"#booking",start:"top 78%",once:true,onEnter:hang});
   else hang();
 })();
-/* On camera: load the YouTube player only when a card is clicked */
-document.querySelectorAll(".clip .yt").forEach(b=>b.addEventListener("click",()=>{
-  const f=document.createElement("iframe");f.src=`https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1&rel=0`;
-  f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";f.allowFullscreen=true;f.title=b.getAttribute("aria-label");b.replaceChildren(f);b.style.cursor="default";}));
 requestAnimationFrame(t=>{last=t;frame(t);});
 </script>
 </body>
