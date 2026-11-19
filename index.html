@@ -83,6 +83,9 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .card ul{list-style:none; margin:14px 0 0; padding:0; display:grid; gap:9px}
 .card li{position:relative; padding-left:20px; color:var(--dim); font-size:.97rem}
 .card li::before{content:""; position:absolute; left:0; top:.75em; width:10px; height:1px; background:var(--accent)}
+.stack{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:14px 0 4px}
+.stack span{font-family:var(--mono); font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-right:4px}
+.stack i{font-style:normal; font-family:var(--mono); font-size:.68rem; color:var(--text); border:1px solid rgba(232,179,107,.35); background:rgba(232,179,107,.06); border-radius:999px; padding:4px 9px}
 .role{font-family:var(--ui); font-weight:600; font-size:.94rem; color:var(--cool); margin-top:-6px; margin-bottom:12px}
 .word{display:inline-block; will-change:transform,opacity}
 
@@ -225,7 +228,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 <header class="bar">
   <a class="mark" href="#top" aria-label="Back to top">© 2026 Built by me ♥. All rights reserved.</a>
   <nav aria-label="Chapters">
-    <a href="#brahma">Asyml8</a><a href="#instnt">Instnt</a><a href="#patents">Patents</a><a href="#socure">Socure</a><a href="#origins">Education</a><a href="#numbers">Record</a><a href="#contact">Contact</a>
+    <a href="#brahma">Asyml8</a><a href="#instnt">Instnt</a><a href="#socure">Socure</a><a href="#numbers">Record</a><a href="#patents">Patents</a><a href="#contact">Contact</a>
   </nav>
 </header>
 <div class="dock" id="dock">
@@ -276,6 +279,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
         <li>Prompts and replies stay on your own node; only vectors travel between machines</li>
         <li>Open source under AGPL-3.0, now heading into private beta</li>
       </ul>
+      <div class="stack"><span>In the stack</span><i>Semantic web</i><i>Graph neural networks</i><i>Native generative AI</i><i>LLMs</i><i>SLMs</i><i>Machine learning</i></div>
       <p style="margin-top:14px">The goal: AI that is green, accessible, private and free. <a href="https://asyml8.com" rel="noopener">asyml8.com</a> · <a href="https://mybrahma.com" rel="noopener">mybrahma.com</a></p>
     </div>
   </section>
@@ -321,7 +325,8 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
       <div class="era">2011 – 2019 · Socure</div>
       <h2 class="split">One question for banks: <em>is this person real?</em></h2>
       <div class="role">Founder, CEO &amp; CTO, later Chief Strategy Officer</div>
-      <p>No ChatGPT, no TensorFlow. I founded Socure and built its first AI: machine learning that read social graphs and the open internet to risk-rate identities in real time, paired with face matching against online profiles. Then I built the business around it.</p>
+      <p>No ChatGPT, no TensorFlow. I founded Socure in 2011 and built its first AI: semantic inferencing and machine learning on open, unstructured data from social graphs and the wider internet to risk-rate identities in real time, plus computer vision at scale to match faces against online profiles. It served identity verification, fraud prevention and compliance. Then I built the business around it.</p>
+      <div class="stack"><span>In the stack</span><i>Semantic inferencing</i><i>Machine learning on open, unstructured data</i><i>Social Biometrics</i><i>Computer vision at scale</i></div>
       <ul>
         <li>Zero to double-digit millions in revenue, serving America's top banks</li>
         <li>Named a top AI company in the US by Forbes and CB Insights</li>
@@ -337,7 +342,8 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
       <div class="era">2010 – 2012 · Hopskoch</div>
       <h2 class="split">The first company <em>of my own</em></h2>
       <div class="role">Founder, CEO &amp; Chairman</div>
-      <p>Hopskoch was the first end-to-end platform for running campaigns across websites, social networks, mobile apps and ad networks from one place. I bootstrapped it and led product and sales.</p>
+      <p>In 2009 I took the rules engines, statistical models and semantic web from Securent to social media. That became Hopskoch, the first end-to-end platform for running campaigns across websites, social networks, mobile apps and ad networks from one place. I bootstrapped it and led product and sales.</p>
+      <div class="stack"><span>In the stack</span><i>Semantic web</i><i>Statistical models</i><i>Social media data</i></div>
       <ul>
         <li>Several thousand early users shaped its gamification features</li>
         <li>Enterprise pilots in the US, Europe and China</li>
@@ -349,7 +355,8 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     <div class="card">
       <div class="era">1999 – 2010 · The identity architect</div>
       <h2 class="split">A decade inside <em>identity and access</em></h2>
-      <p>I architected authentication for Fortune 500 firms at Netegrity, stayed on through its move to CA, and joined Securent, where I helped drive the $100M sale to Cisco.</p>
+      <p>I architected authentication for Fortune 500 firms at Netegrity, working with Oracle and Sun on single sign-on and identity at scale. I stayed on through its move to CA, then joined Securent, where in 2006 I worked with rules engines, statistical models and the semantic web, and helped drive the $100M sale to Cisco.</p>
+      <div class="stack"><span>In the stack</span><i>Single sign-on</i><i>Identity at scale</i><i>Rules engines</i><i>Statistical models</i><i>Semantic web</i></div>
       <ul>
         <li>Chief Architect for Cisco's Policy Management unit, across WebEx, NAC and Call Manager</li>
         <li>VP of Solutions Engineering at SunGard: 200 engineers and a $20M budget</li>
@@ -360,10 +367,12 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 
   <section class="chapter right wrap" id="gulf">
     <div class="card">
-      <div class="era">1994 – 1999 · The Gulf</div>
-      <h2 class="split">Where the work started: <em>running IT</em> across the Middle East</h2>
-      <div class="role">Systems Administrator, then IT Manager, Texaco</div>
-      <p>My first real systems job was running IT for Texaco across the Middle East: wide-area networks, an SAP rollout, and a turn as Y2K compliance officer.</p>
+      <div class="era">The 1990s · IBM and the Gulf</div>
+      <h2 class="split">Where the work started: <em>decision systems and early AI</em></h2>
+      <div class="role">IBM; then Texaco (now Chevron), Systems Administrator to IT Manager</div>
+      <p>I started on decision processing systems and early AI at IBM, then worked with machine learning at scale through the 90s.</p>
+      <p>At Texaco I ran IT across the Middle East on Wang VS 6000 mainframes: wide-area networks, an SAP rollout, and a turn as Y2K compliance officer.</p>
+      <div class="stack"><span>In the stack</span><i>Decision processing systems</i><i>Early AI</i><i>Machine learning at scale</i><i>Wang VS 6000 mainframes</i></div>
     </div>
   </section>
 
