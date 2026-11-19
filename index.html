@@ -830,7 +830,7 @@ const selbox=document.getElementById("selbox"),fdot=document.getElementById("fdo
 function updatePoint(now){
   const pointingNow=now-POINT.last<450&&POINT.hist.length>=4;
   const frozen=!pointingNow&&POINT.sel>=0&&now-(cam.handAt||0)<400&&now-POINT.last<2500; // hand still up, finger curling into a pinch
-  const live=cam.on&&(pointingNow||frozen)&&mesh&&U.uMosaic.value<.35&&!modalOpen&&HOLD.i<0;
+  const live=cam.on&&(pointingNow||frozen)&&mesh&&!modalOpen&&HOLD.i<0;
   if(!live){if(POINT.sel>=0){POINT.sel=-1;U.uHover.value=-1;}selbox.classList.remove("on");fdot.classList.remove("on");if(now-POINT.last>450){POINT.hist.length=0;POINT.acc=0;}return;}
   if(frozen){drawSel();return;}
   // the anchor is the average of recent fingertip positions, so a twirl doesn't drag the box around
@@ -840,7 +840,7 @@ function updatePoint(now){
   fdot.style.transform=`translate(${POINT.sx}px,${POINT.sy}px)`;fdot.classList.add("on");
   // prints in the region you are pointing at, nearest first
   const R=Math.max(160,innerWidth*.14),cand=[];
-  for(let i=0;i<N;i++){const p=prints[i];if(p.stored>.5)continue;prj.copy(p.pos).project(camera);if(prj.z>1||prj.z<-1)continue;
+  const walking=U.uMosaic.value<.5;for(let i=0;i<N;i++){const p=prints[i];if(walking&&p.stored)continue;prj.copy(p.pos).project(camera);if(prj.z>1||prj.z<-1)continue;
     if(p.pos.distanceTo(camera.position)>48)continue;
     const sx=(prj.x+1)/2*innerWidth,sy=(1-prj.y)/2*innerHeight,d=Math.hypot(sx-POINT.sx,sy-POINT.sy);if(d<R)cand.push([d,i]);}
   cand.sort((a,b)=>a[0]-b[0]);POINT.order=cand.slice(0,7).map(c=>c[1]);
@@ -1118,7 +1118,7 @@ function updateHold(dt){
   if(HOLD.target===0&&HOLD.k<.003){HOLD.i=-1;HOLD.k=0;U.uActive.value=-1;}
 }
 function pickAt(x,y){
-  if(!mesh||U.uMosaic.value>.35||x<0)return -1;
+  if(!mesh||x<0)return -1;
   const el=document.elementFromPoint(x,y);if(el&&el.closest(NOPICK))return -1;
   ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
   for(const h of ray.intersectObject(mesh)){if(h.distance>70)break;if(h.instanceId!==HOLD.i)return h.instanceId;}
