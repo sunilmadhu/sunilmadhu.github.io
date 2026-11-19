@@ -803,6 +803,11 @@ function eraOf(it){
 ITEMS.forEach(it=>it.era=eraOf(it));
 const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
 SETS.brahma=SETS.ai=[...new Set([...SETS.brahma,...SETS.ai])]; // both chapters are 2026
+// prints that show the same picture count as one, and faces are kept apart: at most one face in view at a time
+const SAME_PIC={"media/stills/slide_01.jpg":"media/stills/keynote_cover.jpg"};
+const FACE_RE=/media\/portraits\/|fb_car_selfie|yt_ChOQ5_LciCM/,FACE_MAX=1;
+const IMG_KEY=ITEMS.map((it,k)=>it.thumb?(SAME_PIC[it.thumb]||it.thumb):"item:"+k);
+const IS_FACE=ITEMS.map(it=>!!(it.thumb&&FACE_RE.test(it.thumb)));
 const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
 // real items go to prints you will actually pass: the camera's path through the section is sampled, the
 // nearest visible prints at each point get real items, and an item is only reused far from where it already hangs
@@ -821,17 +826,18 @@ function assignEra(era){
     const endB=smooth(.88,.97,ps)>1-smooth(.1,.22,ps),bx=endB?0:START.x,by=endB?0:START.y,bz=endB?END_Z:START.z;
     return _pv.set(lerp(p.fx,bx+p.rel.x,a),lerp(p.stored?15+p.seed*4:p.fy,by+p.rel.y,a),lerp(p.fz,bz+p.rel.z,a));};
   // where the camera will be: 14 points through the section; which prints each point can see
-  _tc.copy(camera);const SAMPLES=14,VIS=24,Ls=[],seenFrom=new Map();
+  _tc.copy(camera);const SAMPLES=30,VIS=24,Ls=[],seenFrom=new Map();
   for(let sIdx=0;sIdx<SAMPLES;sIdx++){const ps=lerp(p0,p1,(sIdx+.5)/SAMPLES),c=camAt(ps);
     _tc.position.set(c.x,c.y,c.z);_tc.lookAt(c.x*.6,c.y*.6,c.z-D);_tc.updateMatrixWorld();const L=[];
     for(let i=0;i<N;i++){if(!posAt(prints[i],ps))continue;
       const d=_pv.distanceTo(_tc.position);if(d>VIS)continue;_pv.project(_tc);if(_pv.z>1||Math.abs(_pv.x)>1.1||Math.abs(_pv.y)>1.1)continue;L.push([d,i]);}
     L.sort((x,y)=>x[0]-y[0]);Ls.push(L.map(e=>e[1]));for(const [,i] of L){if(!seenFrom.has(i))seenFrom.set(i,[]);seenFrom.get(i).push(sIdx);}}
-  // nearest prints first; an item goes up only where no copy of it can be seen from any of the same points
-  const showing=Ls.map(()=>new Set()),uses=new Map(set.map(k=>[k,0]));
+  // nearest prints first; an item goes up only where no copy of it, and no print with the same picture, can be
+  // seen from any of the same points, and where no other face is already in view
+  const showing=Ls.map(()=>new Set()),faces=Ls.map(()=>0),uses=new Map(set.map(k=>[k,0]));
   for(let sIdx=0;sIdx<SAMPLES;sIdx++)for(const i of Ls[sIdx]){if(out[i]<PH_BASE)continue;const from=seenFrom.get(i);
-    let pick=-1;for(const k of set){if(from.some(q=>showing[q].has(k)))continue;if(pick<0||uses.get(k)<uses.get(pick))pick=k;}
-    if(pick<0)continue;out[i]=pick;uses.set(pick,uses.get(pick)+1);from.forEach(q=>showing[q].add(pick));}
+    let pick=-1;for(const k of set){const key=IMG_KEY[k];if(from.some(q=>showing[q].has(key)||(IS_FACE[k]&&faces[q]>=FACE_MAX)))continue;if(pick<0||uses.get(k)<uses.get(pick))pick=k;}
+    if(pick<0)continue;out[i]=pick;uses.set(pick,uses.get(pick)+1);from.forEach(q=>{showing[q].add(IMG_KEY[pick]);if(IS_FACE[pick])faces[q]++;});}
   return out;}
 function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}const e=ERA_OF_SECTION[id];return e==="keep"?(ERA.cur||"instnt"):(e||"all");}
 
