@@ -463,7 +463,7 @@ function toast(msg,ms=3200){toastEl.textContent=msg;toastEl.classList.add("show"
 const cam={on:false,stream:null,video:null,raf:0,face:null,hand:null,lastY:null,target:null,starting:false};
 const camBtn=document.getElementById("camBtn"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d"),camTip=document.getElementById("camTip"),camView=camCanvas;
 function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camCanvas.hidden=!on;
-  camTip.textContent=on?"Camera on. Hold up an open palm and the page scrolls down on its own. Make a fist to stop. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
+  camTip.textContent=on?"Camera on. Hold up an open palm and the page scrolls down on its own. Make a fist to stop; pull the fist down to scroll back up. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
 async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
   const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
   let pref=null;try{pref=localStorage.getItem("sm-cam");}catch(e){}
@@ -486,12 +486,12 @@ async function startCamera(){
     setCamUI(true);toast("Loading hand and face tracking…",8000);
     await loadModels();
     cam.on=true;look.src="camera";cam.palm=0;cam.fist=0;
-    toast("Camera on. It stays on your device. Hold up an open palm to scroll down; make a fist to stop.",6000);
+    toast("Camera on. It stays on your device. Open palm scrolls down, a fist stops, pulling the fist down scrolls up.",6000);
     loopCamera();
   }catch(err){stopCamera(true);toast("Camera tracking isn't available here, so the portrait follows your cursor.",5000);}
   finally{cam.starting=false;camBtn.disabled=false;}
 }
-function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);setAutoScroll(false);if(!silent)toast("Camera off.");}
+function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);setAutoScroll(0);if(!silent)toast("Camera off.");}
 function extended(h,tip,pip){return h[tip].y<h[pip].y-.02;}
 let lastVT=-1,frameN=0;
 function loopCamera(){
@@ -510,27 +510,29 @@ function loopCamera(){
     const n=[[8,6],[12,10],[16,14],[20,18]].filter(([t,p])=>extended(h,t,p)).length;
     camCtx.fillStyle=n>=3?"#43e07a":"rgba(255,255,255,.7)";h.forEach(p=>{camCtx.beginPath();camCtx.arc((1-p.x)*W,p.y*H,1.8,0,6.3);camCtx.fill();});
     cam.palm=n>=3?(cam.palm||0)+1:0; cam.fist=n<=1?(cam.fist||0)+1:0;
-    if(cam.palm>=3)setAutoScroll(true);   // about a quarter second of open palm
-    if(cam.fist>=2)setAutoScroll(false);
-  }else{cam.palm=0;cam.fist=0;}
+    if(cam.palm>=3)setAutoScroll(1);   // about a quarter second of open palm: scroll down
+    if(cam.fist===2){setAutoScroll(0);cam.fistY=h[9].y;}  // making a fist stops
+    // pulling the closed fist down (about a tenth of the frame) scrolls back up
+    if(cam.fist>2&&cam.fistY!=null&&h[9].y-cam.fistY>.1){setAutoScroll(-1);cam.fistY=null;}
+  }else{cam.palm=0;cam.fist=0;cam.fistY=null;}
 }
 // auto-scroll runs on its own animation loop so it stays smooth whatever the camera frame rate is
-const auto={on:false,v:0,raf:0,t:0};
-function setAutoScroll(on){
-  if(auto.on===on)return;auto.on=on;camView.classList.toggle("scrolling",on);
-  if(on&&!auto.raf){auto.t=performance.now();auto.raf=requestAnimationFrame(autoStep);}
+const auto={dir:0,v:0,raf:0,t:0};
+function setAutoScroll(dir){
+  dir=+dir; if(auto.dir===dir)return;auto.dir=dir;camView.classList.toggle("scrolling",dir!==0);
+  if(dir&&!auto.raf){auto.t=performance.now();auto.raf=requestAnimationFrame(autoStep);}
 }
 function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
-  auto.v+=((auto.on?innerHeight*.22:0)-auto.v)*Math.min(1,dt*3);  // ease in and out, about a fifth of a screen per second
+  auto.v+=(auto.dir*innerHeight*.22-auto.v)*Math.min(1,dt*3);  // ease in and out, about a fifth of a screen per second
   const y=window.lenis?lenis.scroll:scrollY;
-  if(y>=max-1)setAutoScroll(false);
-  if(auto.v>1){const ny=Math.min(max,y+auto.v*dt);window.lenis?lenis.scrollTo(ny,{immediate:true}):window.scrollTo(0,ny);}
-  if(auto.on||auto.v>1)auto.raf=requestAnimationFrame(autoStep);else{auto.raf=0;auto.v=0;}
+  if((auto.dir>0&&y>=max-1)||(auto.dir<0&&y<=1))setAutoScroll(0);
+  if(Math.abs(auto.v)>1){const ny=clamp(y+auto.v*dt,0,max);window.lenis?lenis.scrollTo(ny,{immediate:true}):window.scrollTo(0,ny);}
+  if(auto.dir||Math.abs(auto.v)>1)auto.raf=requestAnimationFrame(autoStep);else{auto.raf=0;auto.v=0;}
 }
 // any wheel, touch or key scroll by the visitor takes over from the hand
-["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(false),{passive:true}));
+["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(0),{passive:true}));
 detectCamera();
 
 /* ================= Renderer and warehouse ================= */
