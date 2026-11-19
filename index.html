@@ -43,11 +43,15 @@ main{position:relative; z-index:3}
 .yearfx.l{align-items:flex-start}
 .yearfx.r{align-items:flex-end}
 @media (max-width:760px){.yearfx,.yearfx.l,.yearfx.r{align-items:center; justify-content:flex-start; padding-top:13vh}.yearfx .yf-label,.yearfx.r .yf-label{align-self:center}.yf-num{font-size:30vw}}
-.yf-num{display:flex; font-family:var(--display); font-weight:300; font-size:clamp(6.5rem,min(16.5vw,34vh),17rem); line-height:1; letter-spacing:-.03em; color:rgba(237,234,227,.07);
-  -webkit-text-stroke:1.2px rgba(232,179,107,.6); text-shadow:0 0 40px rgba(232,179,107,.25), 0 0 120px rgba(232,179,107,.12); will-change:transform,filter,opacity}
-.yf-col{display:block; height:1em; overflow:hidden}
+.yearfx{perspective:1400px}
+.yf-num{display:flex; font-family:var(--display); font-weight:700; font-variation-settings:"opsz" 144,"SOFT" 0; font-size:clamp(6.5rem,min(16.5vw,34vh),17rem); line-height:1; letter-spacing:-.03em; color:#f6f3ec;
+  transform-style:preserve-3d; will-change:transform,filter,opacity;
+  text-shadow:.005em .006em 0 #e2ded5,.01em .012em 0 #d6d1c6,.015em .018em 0 #c9c3b7,.02em .024em 0 #bcb5a8,.025em .03em 0 #aea698,.03em .036em 0 #a0978a,
+    .035em .042em 0 #91887b,.04em .048em 0 #82796d,.045em .054em 0 #73695e,.05em .06em 0 #625a50,
+    .06em .08em .04em rgba(0,0,0,.55),.08em .16em .22em rgba(0,0,0,.5),0 0 .6em rgba(255,255,255,.08)}
+.yf-col{display:block; height:1.2em; overflow:hidden; padding-right:.07em; margin-right:-.07em}
 .yf-strip{display:flex; flex-direction:column; will-change:transform}
-.yf-strip span,.yf-ch{display:block; height:1em; line-height:1}
+.yf-strip span,.yf-ch{display:block; height:1.2em; line-height:1.2em}
 .yearfx.r .yf-label{align-self:flex-end}
 .yf-label{margin-top:-.2em; font-family:var(--mono); font-size:clamp(.7rem,1.1vw,.9rem); letter-spacing:.42em; text-transform:uppercase; color:rgba(237,234,227,.75); text-shadow:0 1px 14px rgba(0,0,0,.9)}
 .yf-flare{position:absolute; left:50%; top:50%; width:70vw; height:2px; margin:-1px 0 0 -35vw; opacity:0;
@@ -720,6 +724,14 @@ const NEWS=[
    text:["An MSc in Computer Information Systems at Glasgow Caledonian University."]},
 ];
 ITEMS.push(...NEWS);
+// "In the stack" cards, taken from each chapter's own stack row, so the shorter periods have more to show
+const STACK_ERA={brahma:"brahma",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf"};
+for(const [sid,era] of Object.entries(STACK_ERA)){const sec=document.getElementById(sid);if(!sec)continue;
+  const label=(sec.querySelector(".era")||{}).textContent||"",para=(sec.querySelector("p")||{}).textContent||"";
+  sec.querySelectorAll(".stack i").forEach(el=>ITEMS.push({era,type:"stack",kicker:"In the stack",title:el.textContent,source:"In the stack",date:label,cap:label.split(" · ")[0],text:[para]}));}
+{const sec=document.getElementById("origins"),para=sec?(sec.querySelector("p")||{}).textContent:"";
+  [["Computer Science","University of Strathclyde, 1990"],["Computer Information Systems","Glasgow Caledonian University, 1992"],["Glasgow","Strathclyde, 1990 · GCU, 1992"]]
+    .forEach(([title,cap])=>ITEMS.push({era:"origins",type:"stack",kicker:"Education",title,source:"Education",date:"1986 – 1992",cap,text:[para]}));}
 
 // which chapter each earlier item belongs to
 function eraOf(it){
@@ -728,15 +740,36 @@ function eraOf(it){
   if(it.type==="post")return /Fintech Meetup/.test(t)?"instnt":"ai";
   if(/slide_|keynote|TiECon/.test(t))return "ai";
   if(/American Banker|Yale|PYMNTS|Socure|BAI|Finovate|p_socure/.test(t))return "socure";
-  if(/p_2026|fb_car|ig_on/.test(t))return "brahma";
+  if(/ig_on/.test(t))return "instnt"; // May 2023
+  if(/p_2026|fb_car/.test(t))return "brahma";
   if(/p_2025/.test(t))return "ai";
-  if(/p_bw/.test(t))return "hopskoch";
+  if(/p_bw/.test(t))return "undated"; // no date, so it stays off the period walls
   return "instnt";
 }
 ITEMS.forEach(it=>it.era=eraOf(it));
 const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
+SETS.brahma=SETS.ai=[...new Set([...SETS.brahma,...SETS.ai])]; // both chapters are 2026
 const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
-function pickFor(i,era){const set=SETS[era]||SETS.all;let h=2166136261;for(const c of era)h=Math.imul(h^c.charCodeAt(0),16777619);return set[((Math.imul(i+1,2654435761)^h)>>>0)%set.length];}
+// real items go to prints you will actually pass: the camera's path through the section is sampled,
+// and each sample takes turns claiming its nearest visible print, so every item appears once along the way
+const _pv=new THREE.Vector3(),_tc=new THREE.PerspectiveCamera();
+function sectionFor(era){for(const [id,e] of Object.entries(ERA_OF_SECTION))if(e===era&&id!=="top")return document.getElementById(id);return null;}
+function assignEra(era){
+  const set=(SETS[era]||SETS.all).slice();let h=2166136261;for(const c of era)h=Math.imul(h^c.charCodeAt(0),16777619);
+  const r=rng(h>>>0);for(let k=set.length-1;k>0;k--){const j=Math.floor(r()*(k+1));[set[k],set[j]]=[set[j],set[k]];}
+  const REAL=Math.min(set.length,24),out=new Array(N);
+  for(let i=0;i<N;i++)out[i]=PH_BASE+(Math.imul(i+1,2654435761)>>>0)%PH_N;
+  const max=Math.max(1,document.documentElement.scrollHeight-innerHeight),sec=sectionFor(era);
+  let p0=P,p1=P;if(sec){const top=sec.getBoundingClientRect().top+scrollY;p0=clamp((top-innerHeight*.55)/max,0,1);p1=clamp((top+sec.offsetHeight-innerHeight*.55)/max,0,1);}
+  _tc.copy(camera);const lists=[];
+  for(let sIdx=0;sIdx<5;sIdx++){const ps=lerp(p0,p1,(sIdx+.5)/5),c=camAt(ps),flight=ps>.24&&ps<.86;
+    _tc.position.set(c.x,c.y,c.z);_tc.lookAt(c.x*.6,c.y*.6,c.z-D);_tc.updateMatrixWorld();const L=[];
+    for(let i=0;i<N;i++){const p=prints[i];if(flight){if(p.stored)continue;_pv.set(p.fx,p.fy,p.fz);}else _pv.copy(p.pos);
+      const d=_pv.distanceTo(_tc.position);if(d>26)continue;_pv.project(_tc);if(_pv.z>1||Math.abs(_pv.x)>.95||Math.abs(_pv.y)>.95)continue;L.push([d,i]);}
+    L.sort((x,y)=>x[0]-y[0]);lists.push(L);}
+  const used=new Set();let j=0,round=0;
+  while(j<REAL&&round<400){let any=false;for(const L of lists){while(L.length&&used.has(L[0][1]))L.shift();if(!L.length||j>=REAL)continue;const i=L.shift()[1];used.add(i);out[i]=set[j++];any=true;}round++;if(!any)break;}
+  return out;}
 function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}const e=ERA_OF_SECTION[id];return e==="keep"?(ERA.cur||"instnt"):(e||"all");}
 
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -784,7 +817,10 @@ async function startCamera(){
   finally{cam.starting=false;camBtn.disabled=false;}
 }
 function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);setAutoScroll(0);if(!silent)toast("Camera off.");}
-function extended(h,tip,pip){return h[tip].y<h[pip].y-.02;}
+function extended(h,tip,pip){ // straight finger: tip clearly farther from the wrist than the middle knuckle, whatever the hand's angle
+  const ax=(cam.video&&cam.video.videoWidth)?cam.video.videoWidth/cam.video.videoHeight:1.333,w=h[0];
+  const d=k=>Math.hypot((h[k].x-w.x)*ax,h[k].y-w.y,(h[k].z-w.z)*ax);
+  return d(tip)>d(pip)*1.15;}
 let lastVT=-1,frameN=0;
 function loopCamera(){
   if(!cam.on)return;cam.raf=requestAnimationFrame(loopCamera);
@@ -859,7 +895,7 @@ function updatePoint(now){
   fdot.style.transform=`translate(${POINT.sx}px,${POINT.sy}px)`;fdot.classList.add("on");
   // prints in the region you are pointing at, nearest first
   const R=Math.max(160,innerWidth*.14),cand=[];
-  const walking=U.uMosaic.value<.5;for(let i=0;i<N;i++){const p=prints[i];if(walking&&p.stored)continue;prj.copy(p.pos).project(camera);if(prj.z>1||prj.z<-1)continue;
+  const walking=U.uMosaic.value<.5;for(let i=0;i<N;i++){const p=prints[i];if(!isReal(i)||(walking&&p.stored))continue;prj.copy(p.pos).project(camera);if(prj.z>1||prj.z<-1)continue;
     if(p.pos.distanceTo(camera.position)>48)continue;
     const sx=(prj.x+1)/2*innerWidth,sy=(1-prj.y)/2*innerHeight,d=Math.hypot(sx-POINT.sx,sy-POINT.sy);if(d<R)cand.push([d,i]);}
   cand.sort((a,b)=>a[0]-b[0]);POINT.order=cand.slice(0,7).map(c=>c[1]);
@@ -884,7 +920,7 @@ function setAutoScroll(dir){
 }
 let READ_EL=null;
 function readingShare(){ // how much of the middle of the screen is covered by something to read (0 to 1)
-  READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking,.hero .lede")];
+  READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking")];
   const a=innerHeight*.15,b=innerHeight*.85;let best=0;
   for(const el of READ_EL){const r=el.getBoundingClientRect();const v=Math.max(0,Math.min(r.bottom,b)-Math.max(r.top,a))/(b-a);if(v>best)best=v;}
   return best;
@@ -893,7 +929,7 @@ function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
   // reading pace while a text card fills the middle of the screen, a brisk glide through the warehouse in between
-  const rd=readingShare(),rate=lerp(.6,.045,smooth(.12,.42,rd));
+  const rd=readingShare(),rate=lerp(.6,.06,smooth(.12,.42,rd));
   auto.v+=(auto.dir*innerHeight*rate-auto.v)*Math.min(1,dt*1.6);
   const y=window.lenis?lenis.scroll:scrollY;
   if((auto.dir>0&&y>=max-1)||(auto.dir<0&&y<=1))setAutoScroll(0);
@@ -951,8 +987,8 @@ for(let z=8-BAY/2;z>-170;z-=BAY){const m=new THREE.Mesh(new THREE.PlaneGeometry(
 const loader=new THREE.TextureLoader();
 const tall=innerWidth/innerHeight<.9;
 const heroTex=loader.load(tall?MEDIA.heroTall:MEDIA.heroWide);heroTex.encoding=THREE.sRGBEncoding;heroTex.anisotropy=8;
-// One 2048px atlas, 8 x 6 cells; each cell is a whole Polaroid back: paper, photo window, handwritten caption.
-const AT=2048, CX=8, CW=256, CH=341, PW=244, PH=288, PG=6;
+// One 4096px atlas, 16 x 12 cells; each cell is a whole Polaroid back: paper, photo window, handwritten caption.
+const AT=4096, CX=16, CW=256, CH=341, PW=244, PH=288, PG=6;
 const ATH=4096;const atlas=document.createElement("canvas");atlas.width=AT;atlas.height=ATH;const at=atlas.getContext("2d");
 const itemTex=new THREE.CanvasTexture(atlas);itemTex.encoding=THREE.sRGBEncoding;itemTex.anisotropy=8;
 const WIN={x:.06,y:.04,w:.88,h:.74}; // the photo window, from the print's top-left corner
@@ -963,16 +999,17 @@ function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(/\s+/);let
 function drawClipping(g,it,x,y,w,h){ // an article, set in type like a press clipping
   const r=rng(7+it.title.length),k=w/220;g.save();g.translate(x,y);g.fillStyle="#efe8d8";g.fillRect(0,0,w,h);
   for(let n=0;n<Math.round(500*k*k);n++){g.fillStyle=`rgba(80,70,50,${r()*.05})`;g.fillRect(r()*w,r()*h,1+r()*2,1);}
-  g.fillStyle="#1b1a17";g.font=`500 ${8.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.source.toUpperCase().slice(0,32),10*k,18*k);
-  g.fillStyle="#6a6457";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date||"",10*k,30*k);
-  g.fillStyle="#1b1a17";g.fillRect(10*k,36*k,w-20*k,1.5*k);
-  g.font=`italic 500 ${17*k}px Fraunces, Georgia, serif`;const n=wrapText(g,it.title,10*k,58*k,w-20*k,19*k,5);
-  g.fillStyle="rgba(27,26,23,.2)";for(let l=0;l<6;l++){const ly=58*k+n*19*k+2*k+l*9*k;if(ly>h-8*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3.5*k);}
+  g.fillStyle="#1b1a17";g.fillRect(0,0,w,40*k); // masthead
+  g.fillStyle="#efe8d8";g.font=`500 ${9*k}px 'IBM Plex Mono', monospace`;g.fillText(it.source.toUpperCase().slice(0,30),10*k,18*k);
+  g.fillStyle="#e8b36b";g.font=`400 ${8*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date||"",10*k,31*k);
+  g.fillStyle="#1b1a17";g.font=`italic 600 ${20*k}px Fraunces, Georgia, serif`;const n=wrapText(g,it.title,10*k,64*k,w-20*k,22*k,5);
+  g.fillStyle="rgba(27,26,23,.28)";for(let l=0;l<6;l++){const ly=64*k+n*22*k+l*9*k;if(ly>h-8*k)break;g.fillRect(10*k,ly,(w-20*k)*(.55+r()*.45),3.5*k);}
   g.restore();}
 function drawPatent(g,it,x,y,w,h){ // a US patent front page, number first
   const k=w/220;g.save();g.translate(x,y);g.fillStyle="#f7f5ef";g.fillRect(0,0,w,h);
-  g.fillStyle="#6a6457";g.font=`600 ${8*k}px 'Source Serif 4', Georgia, serif`;g.fillText("United States Patent",10*k,16*k);
-  g.textAlign="right";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date,w-10*k,16*k);g.textAlign="left";
+  g.fillStyle="#1f2b3d";g.fillRect(0,0,w,23*k);
+  g.fillStyle="#f7f5ef";g.font=`600 ${8*k}px 'Source Serif 4', Georgia, serif`;g.fillText("United States Patent",10*k,15*k);
+  g.fillStyle="#e8b36b";g.textAlign="right";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText(it.date,w-10*k,15*k);g.textAlign="left";
   g.fillStyle="#1b1a17";let fs=24*k;g.font=`700 ${fs}px 'IBM Plex Mono', monospace`;const num="US "+it.source.replace("US Patent ","");
   while(g.measureText(num).width>w-20*k&&fs>12*k){fs-=1*k;g.font=`700 ${fs}px 'IBM Plex Mono', monospace`;}
   g.fillText(num,10*k,22*k+fs);
@@ -990,11 +1027,21 @@ function drawPostCard(g,it,x,y,w,h,im){ // a LinkedIn post: its still above the 
   g.fillStyle="#1b1a17";g.font=`600 ${9*k}px 'Bricolage Grotesque', Arial, sans-serif`;g.fillText("Sunil Madhu",29*k,t+19.5*k);
   g.font=`400 ${10.5*k}px 'Source Serif 4', Georgia, serif`;wrapText(g,it.title,9*k,t+40*k,w-18*k,13*k,Math.max(1,Math.floor((h-t-40*k)/(13*k))));
   g.restore();}
+function drawStack(g,it,x,y,w,h){ // one technology from the chapter, white on ink
+  const k=w/220;g.save();g.translate(x,y);const bg=g.createLinearGradient(0,0,w,h);bg.addColorStop(0,"#1d2027");bg.addColorStop(1,"#121418");g.fillStyle=bg;g.fillRect(0,0,w,h);
+  g.fillStyle="#e8b36b";g.font=`500 ${8.5*k}px 'IBM Plex Mono', monospace`;g.fillText((it.kicker||"In the stack").toUpperCase(),12*k,22*k);g.fillRect(12*k,30*k,26*k,1.6*k);
+  g.fillStyle="#f4f1ea";let fs=34*k,n=9;while(fs>16*k){g.font=`600 ${fs}px Fraunces, Georgia, serif`;const words=it.title.split(/\s+/);let lines=1,line="";
+      for(const wd of words){const t=line?line+" "+wd:wd;if(g.measureText(t).width>w-24*k&&line){lines++;line=wd;}else line=t;}
+      if(lines*fs*1.1<h-80*k&&words.every(wd=>g.measureText(wd).width<w-24*k)){n=lines;break;}fs-=2*k;}
+  wrapText(g,it.title,12*k,58*k+fs*.8,w-24*k,fs*1.1,6);
+  g.fillStyle="rgba(244,241,234,.6)";g.font=`400 ${7.5*k}px 'IBM Plex Mono', monospace`;g.fillText((it.date||"").toUpperCase().slice(0,34),12*k,h-14*k);
+  g.restore();}
 function drawPlay(g,x,y,w,h){const cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.15;g.fillStyle="rgba(10,11,14,.62)";g.beginPath();g.arc(cx,cy,r,0,6.3);g.fill();g.strokeStyle="rgba(255,255,255,.85)";g.lineWidth=2;g.stroke();
   g.fillStyle="#fff";g.beginPath();g.moveTo(cx-r*.3,cy-r*.45);g.lineTo(cx+r*.52,cy);g.lineTo(cx-r*.3,cy+r*.45);g.closePath();g.fill();}
 function drawThumb(g,it,x,y,w,h,im){ // the picture inside the window; also used large in the reader
   g.fillStyle="#1a1a1a";g.fillRect(x,y,w,h);
   if(it.type==="patent")drawPatent(g,it,x,y,w,h);
+  else if(it.type==="stack")drawStack(g,it,x,y,w,h);
   else if(it.type==="article"||it.type==="link")drawClipping(g,it,x,y,w,h);
   else if(it.type==="post")drawPostCard(g,it,x,y,w,h,im);
   else if(im)cover(g,im,x,y,w,h);
@@ -1009,7 +1056,44 @@ async function drawItem(i){const it=ITEMS[i],c=i%CX,r=Math.floor(i/CX),x0=c*CW+P
   g.translate(x0+PW/2,y0+PH*.905);g.rotate(((i*37)%7-3)*.008);g.fillStyle="#2b2722";g.textAlign="center";
   let fs=30;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;while(g.measureText(it.cap).width>PW*.86&&fs>18){fs-=2;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;}
   g.fillText(it.cap,0,0);g.restore();itemTex.needsUpdate=true;}
-function drawAllItems(){ITEMS.forEach((_,i)=>drawItem(i));}
+const PH_N=36, PH_BASE=ITEMS.length; // placeholder cells live after the real items in the atlas
+const isReal=i=>aCell&&aCell[i]<PH_BASE;
+function softText(g,draw){ // text drawn only as its own blur, so it reads as handwriting you can't quite make out
+  g.save();g.shadowColor=g.fillStyle;g.shadowBlur=3.2;g.shadowOffsetX=0;g.shadowOffsetY=0;g.globalAlpha=.55;draw();g.restore();}
+function drawScene(g,r,x,y,w,h,kind){ // a generated photograph: no real people or places
+  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+  const hue=Math.floor(r()*360),sky=g.createLinearGradient(0,y,0,y+h);
+  if(kind===0){ // dusk over hills
+    sky.addColorStop(0,`hsl(${hue},45%,22%)`);sky.addColorStop(.6,`hsl(${(hue+30)%360},60%,58%)`);sky.addColorStop(1,`hsl(${(hue+50)%360},70%,72%)`);g.fillStyle=sky;g.fillRect(x,y,w,h);
+    g.fillStyle=`hsla(${(hue+40)%360},90%,85%,.9)`;g.beginPath();g.arc(x+w*(.25+r()*.5),y+h*(.45+r()*.15),w*.09,0,6.3);g.fill();
+    for(let l=0;l<3;l++){g.fillStyle=`hsla(${(hue+200)%360},25%,${14+l*-4}%,${.7+l*.15})`;g.beginPath();g.moveTo(x,y+h);let yy=y+h*(.62+l*.1);g.lineTo(x,yy);
+      for(let s2=0;s2<=8;s2++)g.lineTo(x+w*s2/8,yy+(r()-.5)*h*.12);g.lineTo(x+w,y+h);g.fill();}}
+  else if(kind===1){ // bokeh lights at night
+    sky.addColorStop(0,"#0d0f14");sky.addColorStop(1,`hsl(${hue},30%,14%)`);g.fillStyle=sky;g.fillRect(x,y,w,h);
+    for(let b=0;b<26;b++){const cx=x+r()*w,cy=y+r()*h,rr=w*(.03+r()*.09),gr=g.createRadialGradient(cx,cy,0,cx,cy,rr);
+      gr.addColorStop(0,`hsla(${(hue+r()*80)%360},90%,70%,.75)`);gr.addColorStop(1,`hsla(${hue},90%,60%,0)`);g.fillStyle=gr;g.fillRect(cx-rr,cy-rr,rr*2,rr*2);}}
+  else if(kind===2){ // a city skyline at blue hour
+    sky.addColorStop(0,`hsl(${210+r()*30},55%,18%)`);sky.addColorStop(1,`hsl(${20+r()*20},70%,55%)`);g.fillStyle=sky;g.fillRect(x,y,w,h);
+    let bx=x;while(bx<x+w){const bw=w*(.05+r()*.1),bh=h*(.2+r()*.45);g.fillStyle="#0e1016";g.fillRect(bx,y+h-bh,bw,bh);
+      g.fillStyle="rgba(255,214,140,.55)";for(let q=0;q<bh/(h*.05);q++)if(r()<.35)g.fillRect(bx+bw*(.2+r()*.6),y+h-bh+q*h*.05+3,2,2);bx+=bw+1;}}
+  else { // sea and horizon
+    sky.addColorStop(0,`hsl(${190+r()*30},50%,70%)`);sky.addColorStop(.5,`hsl(${200+r()*20},45%,82%)`);sky.addColorStop(.52,`hsl(${200+r()*20},50%,40%)`);sky.addColorStop(1,`hsl(${210},55%,20%)`);g.fillStyle=sky;g.fillRect(x,y,w,h);
+    g.strokeStyle="rgba(255,255,255,.25)";for(let q=0;q<14;q++){const yy=y+h*(.55+r()*.42);g.beginPath();g.moveTo(x+r()*w,yy);g.lineTo(x+r()*w,yy);g.stroke();}}
+  // film grain and a soft vignette so they sit with the real photographs
+  for(let n=0;n<600;n++){g.fillStyle=`rgba(${r()<.5?0:255},${r()<.5?0:255},${r()<.5?0:255},.05)`;g.fillRect(x+r()*w,y+r()*h,1,1);}
+  const vg=g.createRadialGradient(x+w/2,y+h/2,w*.2,x+w/2,y+h/2,w*.75);vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.35)");g.fillStyle=vg;g.fillRect(x,y,w,h);
+  g.restore();}
+const SCRIBBLE="the and of a at in on for with our team night day trip view city sea home light walk spring".split(" ");
+function drawPlaceholder(v){const cell=PH_BASE+v,c=cell%CX,r=Math.floor(cell/CX),x0=c*CW+PG,y0=r*CH+PG,g=at,R=rng(9001+v*131);
+  const wx=x0+PW*WIN.x,wy=y0+PH*WIN.y,ww=PW*WIN.w,wh=PH*WIN.h;
+  g.save();g.beginPath();g.rect(c*CW,r*CH,CW,CH);g.clip();
+  const pp=g.createLinearGradient(x0,y0,x0+PW,y0+PH);pp.addColorStop(0,"#f2eee6");pp.addColorStop(1,"#e1dbce");g.fillStyle=pp;g.fillRect(x0,y0,PW,PH);
+  drawScene(g,R,wx,wy,ww,wh,v%4);
+  g.strokeStyle="rgba(0,0,0,.2)";g.lineWidth=1;g.strokeRect(wx+.5,wy+.5,ww-1,wh-1);
+  g.translate(x0+PW/2,y0+PH*.905);g.rotate((R()-.5)*.06);g.fillStyle="#2b2722";g.textAlign="center";g.font="600 26px Caveat, 'Bradley Hand', cursive";
+  const words=[];for(let k=0;k<2+Math.floor(R()*3);k++)words.push(SCRIBBLE[Math.floor(R()*SCRIBBLE.length)]);
+  softText(g,()=>g.fillText(words.join(" "),0,0));g.restore();itemTex.needsUpdate=true;}
+function drawAllItems(){ITEMS.forEach((_,i)=>drawItem(i));for(let v=0;v<PH_N;v++)drawPlaceholder(v);}
 document.fonts.ready.then(drawAllItems);drawAllItems();
 const blankTex=new THREE.DataTexture(new Uint8Array([0,0,0,255]),1,1);
 
@@ -1048,8 +1132,8 @@ const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
       } else {
         uv.x=1.-uv.x;
         // the whole Polaroid back comes from the atlas cell for this print's item
-        float c=mod(vCell,8.),r=floor(vCell/8.);
-        vec2 auv=vec2((c*256.+6.+uv.x*244.)/2048.,1.-(r*341.+6.+(1.-uv.y)*288.)/4096.);
+        float c=mod(vCell,16.),r=floor(vCell/16.);
+        vec2 auv=vec2((c*256.+6.+uv.x*244.)/4096.,1.-(r*341.+6.+(1.-uv.y)*288.)/4096.);
         col=lin(blurTex(uItems,auv,bias).rgb);
         vec2 iuv=vec2((uv.x-.06)/.88,(uv.y-.22)/.74);
         if(act>.5&&uLiveOn>.5&&iuv.x>0.&&iuv.x<1.&&iuv.y>0.&&iuv.y<1.)col=lin(texture2D(uLive,iuv).rgb); // the video plays inside the print
@@ -1103,7 +1187,7 @@ function buildPrints(){
       prints.push(p);
     });
     // every print shows something from the chapter in view; they change as the story moves on
-    const era0=sectionEra();for(let i=0;i<N;i++)aCell[i]=pickFor(i,era0);ERA.cur=era0;
+    const era0=sectionEra(),as0=assignEra(era0);for(let i=0;i<N;i++)aCell[i]=as0[i];ERA.cur=era0;
     geo.setAttribute("aHero",new THREE.InstancedBufferAttribute(aHero,4));
     geo.setAttribute("aKind",new THREE.InstancedBufferAttribute(aKind,1));
     geo.setAttribute("aCell",new THREE.InstancedBufferAttribute(aCell,1));
@@ -1138,16 +1222,16 @@ function showYear(year,label){
   });
   yfLabel.textContent=label;
   if(yearTL)yearTL.kill();
-  if(REDUCED||!window.gsap){strips.forEach(([st,,to])=>st.style.transform=`translateY(${-to}em)`);yearfx.style.opacity=1;clearTimeout(showYear.t);showYear.t=setTimeout(()=>yearfx.style.opacity=0,2600);return;}
-  strips.forEach(([st,from])=>gsap.set(st,{y:-from+"em"}));
+  if(REDUCED||!window.gsap){strips.forEach(([st,,to])=>st.style.transform=`translateY(${-to*1.2}em)`);yearfx.style.opacity=1;clearTimeout(showYear.t);showYear.t=setTimeout(()=>yearfx.style.opacity=0,2600);return;}
+  strips.forEach(([st,from])=>gsap.set(st,{y:-from*1.2+"em"}));const side=yearfx.classList.contains("l")?1:-1;
   yearTL=gsap.timeline()
     .set(yearfx,{opacity:1})
-    .fromTo(yfNum,{opacity:0,scale:1.16,filter:"blur(26px)",letterSpacing:".18em",y:20},{opacity:1,scale:1,filter:"blur(0px)",letterSpacing:"-.03em",y:0,duration:1.5,ease:"expo.out"},0)
+    .fromTo(yfNum,{opacity:0,scale:1.16,filter:"blur(26px)",letterSpacing:".18em",y:20,rotationY:side*34,rotationX:14},{opacity:1,scale:1,filter:"blur(0px)",letterSpacing:"-.03em",y:0,rotationY:side*11,rotationX:5,duration:1.5,ease:"expo.out"},0)
     .to(yfNum,{keyframes:[{opacity:.55,duration:.06},{opacity:1,duration:.08},{opacity:.75,duration:.05},{opacity:1,duration:.1}]},.12)   // a projector flicker
-    .add(strips.map(([st,,to],k)=>gsap.to(st,{y:-to+"em",duration:1.7,ease:"power4.out",delay:k*.11})),.05)
+    .add(strips.map(([st,,to],k)=>gsap.to(st,{y:-to*1.2+"em",duration:1.7,ease:"power4.out",delay:k*.11})),.05)
     .fromTo(yfFlare,{opacity:0,x:"-45vw",scaleX:.4},{keyframes:[{opacity:1,x:"0vw",scaleX:1,duration:.7,ease:"power2.out"},{opacity:0,x:"45vw",scaleX:.5,duration:.8,ease:"power2.in"}]},.25)
     .fromTo(yfLabel,{opacity:0,y:18,letterSpacing:".8em"},{opacity:1,y:0,letterSpacing:".42em",duration:1.1,ease:"power3.out"},.55)
-    .to(yfNum,{opacity:0,scale:.93,y:-36,filter:"blur(18px)",duration:1.6,ease:"power2.in"},"+=1.5")
+    .to(yfNum,{opacity:0,scale:.93,y:-36,rotationY:side*-6,filter:"blur(18px)",duration:1.6,ease:"power2.in"},"+=1.5")
     .to(yfLabel,{opacity:0,y:-12,duration:1.1,ease:"power2.in"},"<.15")
     .set(yearfx,{opacity:0});
 }
@@ -1173,7 +1257,8 @@ const ERA={cur:null,dirty:false};
 function eraCheck(){
   if(!mesh)return;const era=sectionEra();if(era===ERA.cur)return;ERA.cur=era;
   const t0=performance.now();
-  for(let i=0;i<N;i++){if(i===HOLD.i)continue;const to=pickFor(i,era),p=prints[i];if(to===aCell[i]&&!p.swap)continue;
+  const as=assignEra(era);
+  for(let i=0;i<N;i++){if(i===HOLD.i)continue;const to=as[i],p=prints[i];if(to===aCell[i]&&!p.swap)continue;
     const d=Math.min(p.pos.distanceTo(camera.position),70);
     p.swap={to,t0:t0+d/70*1400+Math.random()*700,kick:(Math.random()<.5?-1:1)*(1.9+Math.random()*.4)};}
 }
@@ -1192,14 +1277,14 @@ function pickAt(x,y){
   if(!mesh||x<0)return -1;
   const el=document.elementFromPoint(x,y);if(el&&el.closest(NOPICK))return -1;
   ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
-  for(const h of ray.intersectObject(mesh)){if(h.distance>70)break;if(h.instanceId!==HOLD.i)return h.instanceId;}
+  for(const h of ray.intersectObject(mesh)){if(h.distance>70)break;if(h.instanceId!==HOLD.i)return isReal(h.instanceId)?h.instanceId:-1;}
   return -1;}
 function hoverPick(){if(POINT.sel>=0)return;const i=(ptr.in&&HOLD.i<0&&!modalOpen)?pickAt(ptr.x,ptr.y):-1;U.uHover.value=i;document.documentElement.classList.toggle("pick",i>=0);}
 addEventListener("pointermove",e=>{ptr.x=e.clientX;ptr.y=e.clientY;ptr.in=e.pointerType==="mouse";},{passive:true});
 document.addEventListener("mouseleave",()=>{ptr.in=false;});
 const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
 function pickUp(i){
-  const it=ITEMS[aCell[i]];if(!it)return;
+  if(!isReal(i))return;const it=ITEMS[aCell[i]];if(!it)return;
   if(HOLD.i>=0&&HOLD.i!==i)release(true);
   HOLD.i=i;HOLD.target=1;HOLD.item=it;U.uActive.value=i;U.uHover.value=-1;document.documentElement.classList.remove("pick");
   document.body.classList.add("holding");
@@ -1250,7 +1335,7 @@ function openModal(it){
   modalOpen=true;lastFocus=document.activeElement;
   mCard.classList.toggle("photo",it.type==="photo");
   mMedia.innerHTML="";mMedia.classList.remove("paper");
-  if(it.type==="article"||it.type==="link"||it.type==="patent"){const c=document.createElement("canvas");c.width=720;c.height=820;mMedia.append(c);drawThumb(c.getContext("2d"),it,0,0,720,820,null);mMedia.classList.add("paper");}
+  if(it.type==="article"||it.type==="link"||it.type==="patent"||it.type==="stack"){const c=document.createElement("canvas");c.width=720;c.height=820;mMedia.append(c);drawThumb(c.getContext("2d"),it,0,0,720,820,null);mMedia.classList.add("paper");}
   else if(it.thumb){const im=new Image();im.src=it.thumb;im.alt=it.title;mMedia.append(im);}
   mSrc.textContent=[it.source,it.date].filter(Boolean).join(" · ");
   mTitle.textContent=it.title;
