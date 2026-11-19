@@ -57,6 +57,19 @@ main{position:relative; z-index:3}
 button.chip{cursor:pointer}
 button.chip:hover{border-color:rgba(255,255,255,.35)}
 .chip .dot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-right:8px; vertical-align:1px}
+.fold{position:fixed; left:50%; bottom:clamp(18px,3.2vh,30px); z-index:20; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; transition:opacity .5s, transform .5s}
+.fold.gone{opacity:0; transform:translate(-50%,12px); pointer-events:none}
+.fold .cue{text-shadow:0 1px 12px rgba(0,0,0,.9); color:var(--text)}
+.mouse{width:20px; height:32px; border:1.5px solid rgba(237,234,227,.7); border-radius:11px; position:relative}
+.mouse i{position:absolute; left:50%; top:6px; width:3px; height:7px; margin-left:-1.5px; border-radius:2px; background:var(--accent); animation:wheel 1.8s ease-in-out infinite}
+@keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(10px);opacity:0}100%{transform:translateY(0);opacity:0}}
+.gest{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.66rem; letter-spacing:.06em; color:var(--dim); background:rgba(10,11,14,.6); border:1px solid var(--line); border-radius:999px; padding:6px 12px 6px 9px; cursor:pointer; transition:color .2s,border-color .2s}
+.gest svg{width:15px; height:15px}
+.gest:hover{color:var(--text); border-color:rgba(232,179,107,.6)}
+.gest[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.mouse i{animation:none}}
+.gest .short{display:none}
+@media (max-width:640px){.fold{bottom:84px; width:calc(100% - 40px)}.gest .long{display:none}.gest .short{display:inline}.hero{padding-bottom:200px}}
 .cue{font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--dim)}
 .status{font-family:var(--mono); font-size:.72rem; color:var(--dim); min-height:1.2em; margin:10px 0 0}
 
@@ -161,6 +174,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 .ic:hover{background:rgba(255,255,255,.07)}
 .ic .led{position:absolute; right:4px; top:4px; width:7px; height:7px; border-radius:50%; background:#3a3d42; box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
 .ic.small .led{right:2px; top:2px; width:6px; height:6px}
+.ic[aria-pressed="false"] .led{background:#e5483f; box-shadow:0 0 5px 1px rgba(229,72,63,.6), 0 0 12px 3px rgba(229,72,63,.22)}
 .ic[aria-pressed="true"] .led{background:#43e07a; box-shadow:0 0 6px 2px rgba(67,224,122,.65), 0 0 14px 4px rgba(67,224,122,.25)}
 .ic[aria-pressed="false"] .wave{opacity:.25}
 .thumb{width:56px; height:42px; border-radius:6px; background:#000; border:1px solid var(--line); display:block}
@@ -176,10 +190,11 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 .pill b{font-family:var(--ui); font-weight:600; font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px}
 .pill em{font-style:normal; font-family:var(--mono); font-size:.62rem; color:var(--dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px}
 .spk:hover .pill,.spk:focus-within .pill{opacity:1; transform:none}
-.spk.open .pill{opacity:0}
+.spk.on:hover .pill,.spk.on:focus-within .pill{opacity:0}
 .dock:has(.toast.show) .pill{opacity:0}
 .pop{position:absolute; right:0; bottom:calc(100% + 8px); width:216px; background:rgba(10,11,14,.92); border:1px solid var(--line); border-radius:10px; padding:8px; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .18s, transform .18s}
-.spk.open .pop{opacity:1; transform:none; pointer-events:auto}
+.spk.on:hover .pop,.spk.on:focus-within .pop{opacity:1; transform:none; pointer-events:auto}
+.pop::after{content:""; position:absolute; left:0; right:0; top:100%; height:14px} /* keeps the panel open while the pointer crosses the gap */
 .pop .frame{width:200px; height:200px; border-radius:6px; overflow:hidden; background:#000}
 .pop .frame iframe{width:200px; height:200px; border:0; display:block}
 .vol{display:flex; align-items:center; gap:6px; margin-top:8px}
@@ -237,14 +252,16 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
   </div>
   <p class="toast" id="toast" role="status" aria-live="polite"></p>
 </div>
+<div class="fold" id="fold">
+  <span class="mouse" aria-hidden="true"><i></i></span>
+  <span class="cue">Scroll to step inside</span>
+  <button class="gest" id="foldCam" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5h3l1.6-2.2h8.8L18 7.5h3v11H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="long">or turn on the camera and scroll with your hand</span><span class="short">or turn on the camera to scroll by hand</span></button>
+</div>
 <main>
   <section class="hero wrap" id="top">
     <div class="copy">
       <h1>Sunil <em>Madhu</em></h1>
       <p class="lede">Founder of Socure, Instnt and Asyml8. Thirty years teaching machines to tell who is real, insuring them when they get it wrong, and now putting AI on the devices people already own.</p>
-      <div class="row">
-        <span class="cue">Scroll to step inside</span>
-      </div>
     </div>
   </section>
 
@@ -554,7 +571,7 @@ const toastEl=document.getElementById("toast");let toastT=0;
 function toast(msg,ms=3200){toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove("show"),ms);}
 const cam={on:false,stream:null,video:null,raf:0,face:null,hand:null,lastY:null,target:null,starting:false};
 const camBtn=document.getElementById("camBtn"),camCanvas=document.getElementById("camCanvas"),camCtx=camCanvas.getContext("2d"),camTip=document.getElementById("camTip"),camView=camCanvas;
-function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camCanvas.hidden=!on;
+function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camCanvas.hidden=!on;foldState();
   camTip.textContent=on?"Camera on. Hold up an open palm and the page scrolls down on its own. Make a fist to stop; pull the fist down to scroll back up. Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
 async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
   const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
@@ -626,6 +643,10 @@ function autoStep(t){
 // any wheel, touch or key scroll by the visitor takes over from the hand
 ["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(0),{passive:true}));
 detectCamera();
+const fold=document.getElementById("fold"),foldCam=document.getElementById("foldCam");
+function foldState(){const live=cam.on||cam.starting;fold.classList.toggle("gone",scrollY>60||live);foldCam.hidden=camBtn.hidden||live;}
+addEventListener("scroll",foldState,{passive:true});setTimeout(foldState,1500);foldState();
+foldCam.addEventListener("click",e=>{e.stopPropagation();camBtn.click();});
 
 /* ================= Renderer and warehouse ================= */
 const canvas=document.getElementById("scene");
@@ -1014,7 +1035,7 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   vol.value=volume;
   const playing=()=>ready&&!userMuted&&!player.isMuted();
   const save=()=>{try{localStorage.setItem("sm-music-muted",userMuted?"1":"0");localStorage.setItem("sm-music-vol",String(volume));}catch(e){}};
-  function updateUI(){const on=playing();btn.setAttribute("aria-pressed",on?"true":"false");btn.title=on?"Sound: on (click for volume)":"Sound: off (click to play)";muteBtn.textContent=ready&&player.isMuted()?"Unmute":"Mute";
+  function updateUI(){const on=playing();btn.setAttribute("aria-pressed",on?"true":"false");btn.title=on?"Sound on: click to turn off":"Sound off: click to play";spk.classList.toggle("on",on);pop.setAttribute("aria-hidden",on?"false":"true");muteBtn.textContent=ready&&player.isMuted()?"Unmute":"Mute";
     if(ready){const d=player.getVideoData&&player.getVideoData();if(d&&d.video_id){pillImg.src=`https://i.ytimg.com/vi/${d.video_id}/mqdefault.jpg`;pillTitle.textContent=d.title||"Sunil's Music Stream";pillArtist.textContent=(d.author||"")+(on?"":" · paused or muted");}}}
   function soundOn(){if(!ready)return;userMuted=false;save();player.unMute();player.setVolume(volume);player.playVideo();setTimeout(updateUI,300);}
   function soundOff(){if(!ready)return;userMuted=true;save();player.mute();updateUI();}
@@ -1028,9 +1049,7 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   ["pointerdown","keydown","touchend"].forEach(ev=>addEventListener(ev,unlock,{once:true,passive:true}));
   btn.addEventListener("click",e=>{e.stopPropagation();
     if(!ready){toast("The music player is still loading.");return;}
-    if(!playing()){soundOn();return;}
-    const open=!spk.classList.contains("open");spk.classList.toggle("open",open);pop.setAttribute("aria-hidden",open?"false":"true");});
-  document.addEventListener("pointerdown",e=>{if(!e.target.closest("#spk")){spk.classList.remove("open");pop.setAttribute("aria-hidden","true");}});
+    playing()?soundOff():soundOn();});
   vol.addEventListener("input",()=>{volume=+vol.value;save();if(!ready)return;player.setVolume(volume);if(volume===0){player.mute();}else if(player.isMuted()&&!userMuted){player.unMute();}updateUI();});
   muteBtn.addEventListener("click",()=>{if(!ready)return;player.isMuted()?soundOn():soundOff();});
   document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();setTimeout(updateUI,600);}});
