@@ -1101,14 +1101,16 @@ function loopCamera(){
     // the index finger, but the index tip is curled back toward the wrist, so a fist never reads as a pinch.
     const reach=Math.hypot(h[8].x-h[0].x,h[8].y-h[0].y)/(Math.hypot(h[5].x-h[0].x,h[5].y-h[0].y)+1e-6);
     const pinchPose=pr<.3&&reach>1.15;
-    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;cam.pinchN=pinchPose?(cam.pinchN||0)+1:0;if(pr>.5)cam.openAt=now;if(cam.pinchN===1)cam.pinchStart=now;
+    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;cam.pinchN=pinchPose?(cam.pinchN||0)+1:0;if(pr>.45)cam.openAt=now;if(cam.pinchN===1)cam.pinchStart=now;
     /* a pinch opens a print only when it is deliberate: the box has rested on the same print for a moment, the thumb and
        index were visibly apart just before, and they stay together for a few tracking frames. A hand passing through,
        or fingers closing into a fist, opens nothing. */
-    const aimed=POINT.sel>=0?now-POINT.selSince>450:(now-(POINT.selAt||0)<600&&POINT.lastSel>=0&&POINT.selAt-POINT.selSince>450);
-    const armed=modalOpen||HOLD.i>=0||aimed;
-    const approach=(cam.pinchStart||0)-(cam.openAt||0)<900; // the fingers were apart just before they met
-    if(!cam.pinched&&cam.pinchN>=3&&now-cam.pinchStart>=150&&armed&&approach&&now-(cam.tapAt||0)>900){cam.pinched=true;cam.tapAt=now;pinchTap();}
+    // closing: any held pinch puts an open print back. Opening: you have been pointing for a moment (at any print; the box
+    // may hop between neighbours as they sway), and the thumb and index were apart shortly before they met.
+    const closing=modalOpen||(HOLD.i>=0&&HOLD.target===1);
+    const aimed=(POINT.sel>=0||now-(POINT.selAt||0)<800)&&POINT.lastSel>=0&&now-(POINT.since||now)>300;
+    const approach=(cam.pinchStart||0)-(cam.openAt||0)<1500;
+    if(!cam.pinched&&cam.pinchN>=2&&now-(cam.tapAt||0)>900&&(closing||(aimed&&approach))){cam.pinched=true;cam.tapAt=now;pinchTap();}
     else if(cam.pinched&&(pr>.55||reach<1.0))cam.pinched=false;
     fdot.classList.toggle("pinch",cam.pinched);
     /* Real tracking flickers: a finger reads bent for a frame, or the hand drops out for a moment. So each gesture builds
@@ -1139,6 +1141,7 @@ function loopCamera(){
    twirl the finger in a small circle to cycle to the next print nearby, like casting a spell */
 const POINT={hist:[],last:0,acc:0,prev:null,sel:-1,order:[],k:0,lastCycle:0,sx:-1,sy:-1,lastSel:-1,selAt:0,selSince:0};
 function pointAt(tip,now){
+  if(now-POINT.last>500)POINT.since=now; // start of this stretch of pointing
   POINT.last=now;POINT.hist.push({x:1-tip.x,y:tip.y});if(POINT.hist.length>14)POINT.hist.shift();
   const H=POINT.hist;if(H.length<6)return;
   let cx=0,cy=0;H.forEach(q=>{cx+=q.x;cy+=q.y;});cx/=H.length;cy/=H.length;
