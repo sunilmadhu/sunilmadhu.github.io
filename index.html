@@ -115,7 +115,26 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 .firsts li{counter-increment:f; position:relative; padding:10px 0 10px 40px; border-top:1px solid var(--line); font-size:.95rem; line-height:1.5}
 .firsts li::before{content:counter(f,decimal-leading-zero); position:absolute; left:0; top:11px; font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; color:var(--accent)}
 .firsts b{font-weight:600; color:var(--text)}
-.builds{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr)); gap:16px; margin-bottom:28px}
+.builds{display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:16px; margin-bottom:28px; grid-auto-flow:dense}
+.b-brahma{grid-column:span 7}.b-instnt{grid-column:span 5}
+.b-socure{grid-column:span 5}.b-hop{grid-column:span 3}.b-cisco{grid-column:span 4}
+.b-ca{grid-column:span 5}.b-ibm{grid-column:span 7}
+.build{display:flex; flex-direction:column; transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s, border-color .35s}
+.build:hover{transform:translateY(-3px); box-shadow:0 18px 40px rgba(0,0,0,.45); border-color:rgba(232,179,107,.35)}
+.build:hover .b-shot img{filter:saturate(1) brightness(1)}
+.build .b-today{margin-top:auto; padding-top:6px; font-size:.86rem; color:var(--dim)}
+.build.big{border-top-width:3px}
+.build.big h3{font-size:clamp(1.8rem,3vw,2.5rem); margin:12px 0 10px}
+.build.big p{font-size:1.02rem}
+.build.big .b-shot img{aspect-ratio:16/8}
+.build:not(.big) h3{font-size:clamp(1.15rem,1.6vw,1.4rem)}
+.build:not(.big) p{font-size:.9rem}
+.build.b-ibm{position:relative; padding-left:calc(52% + 22px); justify-content:center; min-height:220px}
+.build.b-ibm .b-shot{position:absolute; left:0; top:0; bottom:0; width:52%; margin:0; border-bottom:0; border-right:1px solid var(--line)}
+.build.b-ibm .b-shot img{height:100%; aspect-ratio:auto}
+.build .b-shot img{object-position:50% 0}
+@media (max-width:980px){.b-brahma,.b-instnt{grid-column:span 12}.b-socure,.b-ca{grid-column:span 7}.b-hop,.b-cisco{grid-column:span 5}.b-ibm{grid-column:span 12}}
+@media (max-width:640px){.builds>.build{grid-column:span 12}.build.b-ibm{padding-left:22px;min-height:0}.build.b-ibm .b-shot{position:relative;width:auto;margin:-20px -22px 16px; border-right:0; border-bottom:1px solid var(--line)}.build.b-ibm .b-shot img{aspect-ratio:960/420;height:auto}}
 .build{border:1px solid var(--line); border-top:2px solid rgba(232,179,107,.55); border-radius:6px; padding:20px 22px 18px; background:rgba(255,255,255,.02)}
 .build{overflow:hidden}
 .b-shot{display:block; position:relative; margin:-20px -22px 16px; border-bottom:1px solid var(--line); background:#0c0c0c}
@@ -123,9 +142,6 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 a.b-shot:hover img,a.b-shot:focus-visible img{filter:none}
 .b-shot span{position:absolute; left:10px; bottom:8px; font-family:var(--mono); font-size:.62rem; letter-spacing:.06em; color:var(--text); background:rgba(10,10,10,.74); padding:3px 7px; border-radius:3px}
 a.b-shot span::after{content:" ↗"}
-.build.shot-only{padding:0; border-radius:10px; overflow:hidden; transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s}
-.build.shot-only:hover{transform:translateY(-4px); box-shadow:0 18px 40px rgba(0,0,0,.45)}
-.build.shot-only .b-shot{margin:0; border-bottom:0}
 .b-shot .b-two{display:flex; gap:6px; background:none; padding:0}
 .b-shot .b-two a{font-family:var(--mono); font-size:.62rem; letter-spacing:.06em; color:var(--text); background:rgba(10,10,10,.74); padding:3px 7px; border-radius:3px; text-decoration:none}
 .b-shot .b-two a::after{content:" ↗"}
@@ -539,26 +555,53 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
         <li><b>Brahma, built on my own</b>, with a big leg up from AI.</li>
       </ol>
       <div class="builds">
-        <article class="build shot-only" aria-label="Asyml8">
+        <article class="build big b-brahma">
           <a class="b-shot" href="https://mybrahma.com" target="_blank" rel="noopener"><img src="media/builds/brahma.webp" width="960" height="420" loading="lazy" decoding="async" alt="The mybrahma.com home page"><span>mybrahma.com</span></a>
+          <div class="b-meta"><span>2025 – now</span><span>Asyml8</span><span class="tag">Founder</span></div>
+          <h3>Brahma</h3>
+          <p>A graph-native AI mesh that splits an open-weight model across ordinary Macs, PCs and Raspberry Pis. No GPU, no datacenter, and prompts stay on your own node.</p>
+          <p class="b-today"><b class="b-k">Today</b>Open source and heading into private beta at <a class="src" href="https://mybrahma.com" target="_blank" rel="noopener">mybrahma.com</a></p>
         </article>
-        <article class="build shot-only" aria-label="Instnt">
+        <article class="build big b-instnt">
           <a class="b-shot" href="https://instnt.ai" target="_blank" rel="noopener"><img src="media/builds/instnt.webp" width="960" height="420" loading="lazy" decoding="async" alt="The instnt.ai home page"><span>instnt.ai</span></a>
+          <div class="b-meta"><span>2019 – now</span><span>Instnt</span><span class="tag">Founder</span></div>
+          <h3>Fraud Loss Insurance</h3>
+          <p>An AI underwriting platform that moves identity fraud losses off a lender's balance sheet, with reinsurance capacity from Munich Re.</p>
+          <p class="b-today"><b class="b-k">Today</b>Live at <a class="src" href="https://instnt.ai" target="_blank" rel="noopener">instnt.ai</a></p>
         </article>
-        <article class="build shot-only" aria-label="Socure">
+        <article class="build b-socure">
           <a class="b-shot" href="https://www.socure.com" target="_blank" rel="noopener"><img src="media/builds/socure.webp" width="960" height="420" loading="lazy" decoding="async" alt="The socure.com home page"><span>socure.com</span></a>
+          <div class="b-meta"><span>2011 – 2019</span><span>Socure</span><span class="tag">Founder</span></div>
+          <h3>Identity verification from the open internet</h3>
+          <p>The first real-time identity verification API, on a semantic graph AI platform I wrote in Scala. I took it from zero to double-digit millions in ARR.</p>
+          <p class="b-today"><b class="b-k">Today</b>More than 3,000 customers, valued at $5.2 billion <a class="src" href="https://www.summitpartners.com/news/socure-announces-strategic-growth-investment-from-summit-partners" target="_blank" rel="noopener">Summit Partners</a></p>
         </article>
-        <article class="build shot-only" aria-label="Hopskoch">
+        <article class="build b-hop">
           <figure class="b-shot"><img src="media/builds/hopskoch.webp" width="960" height="420" loading="lazy" decoding="async" alt="Hopskoch's 360° seamless storytelling across websites, social, mobile and ad networks"><span>Hopskoch, 2013</span></figure>
+          <div class="b-meta"><span>2010 – 2012</span><span>Hopskoch</span><span class="tag">Founder</span></div>
+          <h3>Transmedia marketing</h3>
+          <p>The first transmedia marketing platform built on social data.</p>
+          <p class="b-today"><b class="b-k">Today</b>Acquired by WPP</p>
         </article>
-        <article class="build shot-only" aria-label="Securent, then Cisco">
+        <article class="build b-cisco">
           <a class="b-shot" href="https://www.cisco.com" target="_blank" rel="noopener"><img src="media/builds/cisco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The cisco.com home page"><span>cisco.com</span></a>
+          <div class="b-meta"><span>2006 – 2010</span><span>Securent, Cisco</span><span class="tag">Architect</span></div>
+          <h3>Entitlement management</h3>
+          <p>XACML policy for who can do what in any application.</p>
+          <p class="b-today"><b class="b-k">Today</b>Bought by Cisco for about $100M <a class="src" href="https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2007/m11/cisco-announces-definitive-agreement-to-acquire-securent.html" target="_blank" rel="noopener">Cisco</a></p>
         </article>
-        <article class="build shot-only" aria-label="Netegrity, then CA">
+        <article class="build b-ca">
           <a class="b-shot" href="https://www.ca.com" target="_blank" rel="noopener"><img src="media/builds/ca.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ca.com home page, now Broadcom"><span>ca.com, now Broadcom</span></a>
+          <div class="b-meta"><span>1999 – 2006</span><span>Netegrity, CA</span><span class="tag">Architect</span></div>
+          <h3>SiteMinder single sign-on</h3>
+          <p>One login across every web app, for Fortune 500 companies and most of the US federal government.</p>
+          <p class="b-today"><b class="b-k">Today</b>Still sold by Broadcom <a class="src" href="https://www.broadcom.com/products/identity/siteminder" target="_blank" rel="noopener">Broadcom</a></p>
         </article>
-        <article class="build shot-only" aria-label="IBM and Texaco">
+        <article class="build b-ibm">
           <figure class="b-shot"><img src="media/builds/ibm_texaco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ibm.com and texaco.com home pages"><span class="b-two"><a href="https://www.ibm.com" target="_blank" rel="noopener">ibm.com</a><a href="https://www.texaco.com" target="_blank" rel="noopener">texaco.com</a></span></figure>
+          <div class="b-meta"><span>The 1990s</span><span>IBM, Texaco</span><span class="tag">Engineer</span></div>
+          <h3>Where it started</h3>
+          <p>Early AI at IBM, then IT across the Middle East for Texaco.</p>
         </article>
       </div>
       <div class="facts">
