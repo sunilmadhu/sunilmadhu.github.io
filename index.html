@@ -1026,7 +1026,7 @@ async function startCamera(){
   }catch(err){stopCamera(true);toast("Camera tracking isn't available here, so the portrait follows your cursor.",5000);}
   finally{cam.starting=false;camBtn.disabled=false;}
 }
-function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);setAutoScroll(0);if(!silent)toast("Camera off.");}
+function stopCamera(silent){cam.on=false;cancelAnimationFrame(cam.raf);if(cam.stream)cam.stream.getTracks().forEach(t=>t.stop());cam.stream=null;cam.video=null;look.src="cursor";setCamUI(false);stopAuto();if(typeof idle!=="undefined")idle.last=performance.now();if(!silent)toast("Camera off.");}
 function extended(h,tip,pip){ // straight finger: tip clearly farther from the wrist than the middle knuckle, whatever the hand's angle
   const ax=(cam.video&&cam.video.videoWidth)?cam.video.videoWidth/cam.video.videoHeight:1.333,w=h[0];
   const d=k=>Math.hypot((h[k].x-w.x)*ax,h[k].y-w.y,(h[k].z-w.z)*ax);
@@ -1058,26 +1058,43 @@ function loopCamera(){
     // the index finger, but the index tip is curled back toward the wrist, so a fist never reads as a pinch.
     const reach=Math.hypot(h[8].x-h[0].x,h[8].y-h[0].y)/(Math.hypot(h[5].x-h[0].x,h[5].y-h[0].y)+1e-6);
     const pinchPose=pr<.3&&reach>1.15;
-    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;cam.pinchN=pinchPose?(cam.pinchN||0)+1:0;
-    const armed=modalOpen||HOLD.i>=0||POINT.sel>=0||now-(POINT.selAt||0)<1500; // a pinch only means something when a print is selected, held or open
-    if(!cam.pinched&&cam.pinchN>=2&&armed&&now-(cam.tapAt||0)>900){cam.pinched=true;cam.tapAt=now;pinchTap();}
+    cam.handAt=now;cam.pr=pr;cam.reach=reach;cam.n=n;cam.pinchN=pinchPose?(cam.pinchN||0)+1:0;if(pr>.5)cam.openAt=now;if(cam.pinchN===1)cam.pinchStart=now;
+    /* a pinch opens a print only when it is deliberate: the box has rested on the same print for a moment, the thumb and
+       index were visibly apart just before, and they stay together for a few tracking frames. A hand passing through,
+       or fingers closing into a fist, opens nothing. */
+    const aimed=POINT.sel>=0?now-POINT.selSince>450:(now-(POINT.selAt||0)<600&&POINT.lastSel>=0&&POINT.selAt-POINT.selSince>450);
+    const armed=modalOpen||HOLD.i>=0||aimed;
+    const approach=(cam.pinchStart||0)-(cam.openAt||0)<900; // the fingers were apart just before they met
+    if(!cam.pinched&&cam.pinchN>=3&&now-cam.pinchStart>=150&&armed&&approach&&now-(cam.tapAt||0)>900){cam.pinched=true;cam.tapAt=now;pinchTap();}
     else if(cam.pinched&&(pr>.55||reach<1.0))cam.pinched=false;
     fdot.classList.toggle("pinch",cam.pinched);
-    cam.palm=(n>=3&&!cam.pinched)?(cam.palm||0)+1:0; cam.fist=(n===0&&!cam.pinched&&reach<1.12)?(cam.fist||0)+1:0;
+    /* Real tracking flickers: a finger reads bent for a frame, or the hand drops out for a moment. So each gesture builds
+       a score that rises while it is shown and only eases off on a stray frame, instead of resetting to zero. */
+    const isPalm=n>=3&&!cam.pinched, isFist=!cam.pinched&&reach<1.15&&(n===0||(n===1&&!extended(h,8,6)));
+    cam.palm=isPalm?(cam.palm||0)+1:isFist?0:Math.max(0,(cam.palm||0)-1);
+    cam.fist=isFist?(cam.fist||0)+1:isPalm?0:Math.max(0,(cam.fist||0)-1);
+    cam.label=cam.pinched?"PINCH":isFist?"FIST":isPalm?"PALM":pointing?"POINT":"";
     if(pointing)pointAt(h[8],now);
-    // open palm: walk on. Not while a print is held or open, and right after a stop the palm must be held about half a
-    // second, so the fingers opening as a fist relaxes don't restart the walk
-    const palmNeed=performance.now()-(auto.stopAt||0)<2500?8:2;
-    if(cam.palm>=palmNeed&&HOLD.i<0&&!document.body.classList.contains("holding")&&!(typeof modalOpen!=="undefined"&&modalOpen)&&!document.querySelector(".st-box[open]"))handScroll(1);
-    if(cam.fist===1){handScroll(0);cam.fistY=h[9].y;}  // a fist stops at once
-    // pulling the closed fist down (about a tenth of the frame) scrolls back up
-    if(cam.fist>1&&cam.fistY!=null&&h[9].y-cam.fistY>.1){handScroll(-1);cam.fistY=null;}
-  }else{cam.palm=0;cam.fist=0;cam.fistY=null;cam.pinched=false;fdot.classList.remove("pinch");}
+    // open palm: walk on. Not while a print is held or open, and right after a stop the palm is held a little longer,
+    // so the fingers opening as a fist relaxes don't restart the walk
+    const palmNeed=now-(auto.stopAt||0)<2000?5:2;
+    if(cam.palm>=palmNeed&&HOLD.i<0&&!document.body.classList.contains("holding")&&!modalOpen&&!document.querySelector(".st-box[open]"))handScroll(1);
+    if(!cam.fistOn&&cam.fist>=2){cam.fistOn=true;handScroll(0);cam.fistY=h[9].y;} // a fist stops at once
+    else if(cam.fistOn&&cam.fist===0){cam.fistOn=false;cam.fistY=null;}
+    // pulling the closed fist down (about a twelfth of the frame) scrolls back up
+    if(cam.fistOn&&cam.fistY!=null&&h[9].y-cam.fistY>.08){handScroll(-1);cam.fistY=null;}
+    cam.lostAt=0;
+  }else{ // a short dropout keeps the scores; a hand gone for a moment clears them
+    if(!cam.lostAt)cam.lostAt=now;cam.label="";
+    if(now-cam.lostAt>400){cam.palm=0;cam.fist=0;cam.fistOn=false;cam.fistY=null;cam.pinched=false;fdot.classList.remove("pinch");}}
+  if(cam.label){camCtx.fillStyle="rgba(10,11,14,.72)";camCtx.fillRect(0,0,W,14);camCtx.fillStyle=cam.label==="PALM"?"#43e07a":cam.label==="FIST"?"#e5483f":"#e8b36b";
+    camCtx.font="600 9px 'IBM Plex Mono', monospace";camCtx.textAlign="center";
+    camCtx.fillText(cam.label==="PALM"?"PALM · WALK":cam.label==="FIST"?(auto.dir<0?"FIST · BACK":"FIST · STOP"):cam.label,W/2,10);camCtx.textAlign="left";}
 }
 
 /* point with your index finger: a selection box locks onto the nearest Polaroid under your fingertip and follows it;
    twirl the finger in a small circle to cycle to the next print nearby, like casting a spell */
-const POINT={hist:[],last:0,acc:0,prev:null,sel:-1,order:[],k:0,lastCycle:0,sx:-1,sy:-1,lastSel:-1,selAt:0};
+const POINT={hist:[],last:0,acc:0,prev:null,sel:-1,order:[],k:0,lastCycle:0,sx:-1,sy:-1,lastSel:-1,selAt:0,selSince:0};
 function pointAt(tip,now){
   POINT.last=now;POINT.hist.push({x:1-tip.x,y:tip.y});if(POINT.hist.length>14)POINT.hist.shift();
   const H=POINT.hist;if(H.length<6)return;
@@ -1094,7 +1111,7 @@ function pinchTap(){
   const now=performance.now();
   if(modalOpen){closeModal();return;}
   if(HOLD.i>=0&&HOLD.target===1){release();return;}
-  const sel=POINT.sel>=0?POINT.sel:(now-POINT.selAt<1500?POINT.lastSel:-1); // the finger curls as you pinch, so remember the last selection
+  const sel=POINT.sel>=0?POINT.sel:(now-POINT.selAt<600?POINT.lastSel:-1); // the finger curls as you pinch, so remember the last selection briefly
   if(sel>=0){POINT.hist.length=0;POINT.sel=-1;selbox.classList.add("tap");setTimeout(()=>selbox.classList.remove("tap"),260);pickUp(sel);}
 }
 function cyclePoint(dir){if(!POINT.order.length)return;POINT.k=(POINT.k+dir+POINT.order.length)%POINT.order.length;POINT.sel=POINT.order[POINT.k];POINT.lastCycle=performance.now();}
@@ -1121,7 +1138,7 @@ function updatePoint(now){
   if(!keep){POINT.sel=POINT.order.length?POINT.order[0]:-1;POINT.k=0;}else POINT.k=POINT.order.indexOf(POINT.sel);
   U.uHover.value=POINT.sel;
   if(POINT.sel<0){selbox.classList.remove("on");return;}
-  POINT.lastSel=POINT.sel;POINT.selAt=now;drawSel();
+  if(POINT.sel!==POINT.lastSel||now-POINT.selAt>800)POINT.selSince=now;POINT.lastSel=POINT.sel;POINT.selAt=now;drawSel();
 }
 function drawSel(i){
   mesh.getMatrixAt(i>=0?i:POINT.sel,M2);const xs=[],ys=[];
@@ -1174,11 +1191,11 @@ function readingShare(){ // how much of the middle of the screen is covered by s
   READ_BEST=null;for(const el of READ_EL){const r=el.getBoundingClientRect();const v=Math.max(0,Math.min(r.bottom,b)-Math.max(r.top,a))/(b-a);if(v>best){best=v;READ_BEST=el;}}
   return best;
 }
-const WALK=.09; // the walk: about a tenth of a screen a second, slow enough to see every print
+const WALK=.06; // the walk: about a sixteenth of a screen a second, slow enough to take in every print
 function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
-  // a steady glide, about a fifth of a screen a second; it holds still while your eyes are reading a card
+  // a steady glide; it holds still while your eyes are reading a card
   const hold=paused(),want=hold?0:auto.dir*innerHeight*WALK;
   auto.v+=(want-auto.v)*Math.min(1,dt*(hold?4:2));
   const y=window.lenis?lenis.scroll:scrollY;
@@ -1189,7 +1206,22 @@ function autoStep(t){
 }
 // any wheel, touch or key scroll by the visitor takes over from the hand
 ["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>{if(auto.dir||Math.abs(auto.v)>1)stopAuto();},{passive:true}));
-// the walk starts only with an open palm; otherwise scrolling is the visitor's own (mouse, trackpad, keys, touch)
+/* Without a camera (none, or switched off) the mouse is in charge, and after 5 seconds with no input the walk
+   starts by itself at the slow pace. Any mouse movement, wheel, key or touch stops it and hands control back;
+   the 5 seconds then start again. With the camera on there is no idle walk: the hand gestures drive it. */
+const IDLE_MS=5000;const idle={last:performance.now(),x:-1,y:-1};
+function idleAct(){idle.last=performance.now();if(auto.src==="idle"&&(auto.dir||Math.abs(auto.v)>1)){stopAuto();auto.src=null;}}
+addEventListener("mousemove",e=>{ // only real pointer movement counts (some browsers send a mousemove when the page scrolls under a still cursor)
+  if(Math.abs(e.clientX-idle.x)+Math.abs(e.clientY-idle.y)<3)return;const first=idle.x<0;idle.x=e.clientX;idle.y=e.clientY;if(!first)idleAct();},{passive:true});
+["wheel","pointerdown","touchstart","keydown"].forEach(e=>addEventListener(e,idleAct,{passive:true}));
+idle.ready=document.readyState==="complete";addEventListener("load",()=>{idle.ready=true;idle.last=performance.now();});
+function idleTick(now){
+  if(cam.on||cam.starting){idle.last=now;if(auto.src==="idle"){stopAuto();auto.src=null;}return;}
+  if(!idle.ready||auto.dir||now-idle.last<IDLE_MS)return;
+  if(HOLD.i>=0||document.body.classList.contains("holding")||(typeof modalOpen!=="undefined"&&modalOpen)||document.querySelector(".st-box[open],dialog[open]")||document.hidden)return;
+  const max=document.documentElement.scrollHeight-innerHeight,y=window.lenis?lenis.scroll:scrollY;if(y>=max-2)return;
+  auto.src="idle";setAutoScroll(1);auto.v=Math.max(auto.v,innerHeight*WALK*.4);
+  if(window.track)track("gesture",{label:"idle: walk starts"});}
 detectCamera();
 const fold=document.getElementById("fold"),foldCam=document.getElementById("foldCam");
 function foldState(){const live=cam.on||cam.starting;fold.classList.toggle("gone",scrollY>60||live);foldCam.hidden=camBtn.hidden||live;}
@@ -1298,6 +1330,37 @@ function drawStack(g,it,x,y,w,h){ // one technology from the chapter, white on i
   g.restore();}
 function drawPlay(g,x,y,w,h){const cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.15;g.fillStyle="rgba(10,11,14,.62)";g.beginPath();g.arc(cx,cy,r,0,6.3);g.fill();g.strokeStyle="rgba(255,255,255,.85)";g.lineWidth=2;g.stroke();
   g.fillStyle="#fff";g.beginPath();g.moveTo(cx-r*.3,cy-r*.45);g.lineTo(cx+r*.52,cy);g.lineTo(cx-r*.3,cy+r*.45);g.closePath();g.fill();}
+/* Photo-real finish. Two textures are made once and reused on every print: paper fibre and film grain. */
+const FIBRE=(()=>{const c=document.createElement("canvas");c.width=PW;c.height=PH;const g=c.getContext("2d"),d=g.createImageData(PW,PH),R=rng(424242);
+  for(let i=0;i<PW*PH;i++){const v=236+R()*19;d.data[i*4]=v;d.data[i*4+1]=v-2;d.data[i*4+2]=v-6;d.data[i*4+3]=255;}g.putImageData(d,0,0);
+  g.globalAlpha=.09;for(let n=0;n<260;n++){const x=R()*PW,y=R()*PH,a=R()*Math.PI,l=3+R()*10;g.strokeStyle=R()<.5?"#8a7f6c":"#fffaf0";g.lineWidth=.5;
+    g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke();}return c;})();
+const GRAIN=(()=>{const W=Math.round(PW*WIN.w),H=Math.round(PH*WIN.h),c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d"),d=g.createImageData(W,H),R=rng(7171);
+  for(let i=0;i<W*H;i++){const v=128+(R()+R()+R()-1.5)*70;d.data[i*4]=d.data[i*4+1]=d.data[i*4+2]=v;d.data[i*4+3]=255;}g.putImageData(d,0,0);return c;})();
+function drawPaper(g,x0,y0,seed){ // Polaroid card: warm white, fibre, faint ageing towards the edges, a smudge now and then
+  const R=rng(seed),L=94+R()*2.5,H=40+R()*8;g.fillStyle=`hsl(${H},${16+R()*12}%,${L}%)`;g.fillRect(x0,y0,PW,PH);
+  g.save();g.globalCompositeOperation="multiply";g.globalAlpha=.7;g.drawImage(FIBRE,x0,y0);g.restore();
+  const lt=g.createLinearGradient(x0,y0,x0+PW*.4,y0+PH);lt.addColorStop(0,"rgba(255,255,255,.18)");lt.addColorStop(1,"rgba(255,255,255,0)");g.fillStyle=lt;g.fillRect(x0,y0,PW,PH);
+  const age=g.createRadialGradient(x0+PW/2,y0+PH/2,PW*.35,x0+PW/2,y0+PH/2,PW*.8);age.addColorStop(0,"rgba(140,110,60,0)");age.addColorStop(1,`rgba(140,110,60,${.06+R()*.1})`);
+  g.fillStyle=age;g.fillRect(x0,y0,PW,PH);
+  g.strokeStyle=`rgba(110,95,70,${.12+R()*.12})`;g.lineWidth=1.4;g.strokeRect(x0+.7,y0+.7,PW-1.4,PH-1.4); // worn edge
+  if(R()<.3){const sx=x0+PW*(.1+R()*.8),sy=y0+PH*(.8+R()*.15),sr=10+R()*16,sm=g.createRadialGradient(sx,sy,0,sx,sy,sr);
+    sm.addColorStop(0,"rgba(120,100,70,.08)");sm.addColorStop(1,"rgba(120,100,70,0)");g.fillStyle=sm;g.fillRect(sx-sr,sy-sr,sr*2,sr*2);}}
+function photoFinish(g,x,y,w,h,seed){ // instant-film look over the picture, then the window sits recessed under the card's lip
+  const R=rng(seed);g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+  g.globalCompositeOperation="soft-light";g.fillStyle=`rgba(${255},${205+R()*25|0},${150+R()*40|0},.32)`;g.fillRect(x,y,w,h); // warm emulsion
+  g.globalCompositeOperation="screen";g.fillStyle="rgba(38,30,48,.16)";g.fillRect(x,y,w,h); // lifted, faded blacks
+  g.globalCompositeOperation="overlay";g.globalAlpha=.22;g.drawImage(GRAIN,x,y,w,h);g.globalAlpha=1;
+  g.globalCompositeOperation="multiply";const vg=g.createRadialGradient(x+w/2,y+h*.45,w*.25,x+w/2,y+h/2,w*.78);vg.addColorStop(0,"rgba(255,255,255,1)");vg.addColorStop(1,"rgba(150,135,120,1)");
+  g.fillStyle=vg;g.fillRect(x,y,w,h);
+  g.globalCompositeOperation="source-over";
+  const t=g.createLinearGradient(0,y,0,y+7);t.addColorStop(0,"rgba(0,0,0,.42)");t.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=t;g.fillRect(x,y,w,7);
+  const l=g.createLinearGradient(x,0,x+5,0);l.addColorStop(0,"rgba(0,0,0,.3)");l.addColorStop(1,"rgba(0,0,0,0)");g.fillStyle=l;g.fillRect(x,y,5,h);
+  const sh=g.createLinearGradient(x,y,x+w,y+h);sh.addColorStop(0,"rgba(255,255,255,0)");sh.addColorStop(.42,"rgba(255,255,255,0)");sh.addColorStop(.5,"rgba(255,255,255,.07)");
+  sh.addColorStop(.6,"rgba(255,255,255,0)");g.fillStyle=sh;g.fillRect(x,y,w,h); // faint gloss on the print surface
+  g.restore();
+  g.strokeStyle="rgba(45,35,25,.45)";g.lineWidth=1;g.strokeRect(x+.5,y+.5,w-1,h-1);
+  g.strokeStyle="rgba(255,255,255,.55)";g.beginPath();g.moveTo(x,y+h+.8);g.lineTo(x+w,y+h+.8);g.moveTo(x+w+.8,y);g.lineTo(x+w+.8,y+h);g.stroke();} // light catching the lip
 function drawThumb(g,it,x,y,w,h,im){ // the picture inside the window; also used large in the reader
   g.fillStyle="#1a1a1a";g.fillRect(x,y,w,h);
   if(it.type==="patent")drawPatent(g,it,x,y,w,h);
@@ -1310,10 +1373,9 @@ async function drawItem(i){const it=ITEMS[i],c=i%CX,r=Math.floor(i/CX),x0=c*CW+P
   const im=it.thumb?await loadImg(it.thumb):null; // load first, then draw in one go so cells never interleave
   const wx=x0+PW*WIN.x,wy=y0+PH*WIN.y,ww=PW*WIN.w,wh=PH*WIN.h;
   g.save();g.beginPath();g.rect(c*CW,r*CH,CW,CH);g.clip();
-  const pp=g.createLinearGradient(x0,y0,x0+PW,y0+PH);pp.addColorStop(0,"#f4f1ea");pp.addColorStop(1,"#e4dfd3");g.fillStyle=pp;g.fillRect(x0,y0,PW,PH);
-  drawThumb(g,it,wx,wy,ww,wh,im);
-  g.strokeStyle="rgba(0,0,0,.2)";g.lineWidth=1;g.strokeRect(wx+.5,wy+.5,ww-1,wh-1);
-  g.translate(x0+PW/2,y0+PH*.905);g.rotate(((i*37)%7-3)*.008);g.fillStyle="#2b2722";g.textAlign="center";
+  drawPaper(g,x0,y0,1000+i*7);
+  drawThumb(g,it,wx,wy,ww,wh,im);photoFinish(g,wx,wy,ww,wh,2000+i*13);
+  g.translate(x0+PW/2,y0+PH*.905);g.rotate(((i*37)%7-3)*.008);g.fillStyle="#232634";g.shadowColor="rgba(35,38,52,.55)";g.shadowBlur=.8;g.textAlign="center"; // marker ink, a touch of bleed
   let fs=30;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;while(g.measureText(it.cap).width>PW*.86&&fs>18){fs-=2;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;}
   g.fillText(it.cap,0,0);g.restore();itemTex.needsUpdate=true;}
 const PH_N=20, PH_BASE=ITEMS.length; // placeholder cells live after the real items in the atlas
@@ -1347,10 +1409,9 @@ const SCRIBBLE="the and of a at in on for with our team night day trip view city
 function drawPlaceholder(v){const cell=PH_BASE+v,c=cell%CX,r=Math.floor(cell/CX),x0=c*CW+PG,y0=r*CH+PG,g=at,R=rng(9001+v*131);
   const wx=x0+PW*WIN.x,wy=y0+PH*WIN.y,ww=PW*WIN.w,wh=PH*WIN.h;
   g.save();g.beginPath();g.rect(c*CW,r*CH,CW,CH);g.clip();
-  const pp=g.createLinearGradient(x0,y0,x0+PW,y0+PH);pp.addColorStop(0,"#f2eee6");pp.addColorStop(1,"#e1dbce");g.fillStyle=pp;g.fillRect(x0,y0,PW,PH);
-  drawScene(g,R,wx,wy,ww,wh,v%4);
-  g.strokeStyle="rgba(0,0,0,.2)";g.lineWidth=1;g.strokeRect(wx+.5,wy+.5,ww-1,wh-1);
-  g.translate(x0+PW/2,y0+PH*.905);g.rotate((R()-.5)*.06);g.fillStyle="#2b2722";g.textAlign="center";g.font="600 26px Caveat, 'Bradley Hand', cursive";
+  drawPaper(g,x0,y0,5000+v*7);
+  drawScene(g,R,wx,wy,ww,wh,v%4);photoFinish(g,wx,wy,ww,wh,6000+v*13);
+  g.translate(x0+PW/2,y0+PH*.905);g.rotate((R()-.5)*.06);g.fillStyle="#232634";g.textAlign="center";g.font="600 26px Caveat, 'Bradley Hand', cursive";
   const words=[];for(let k=0;k<2+Math.floor(R()*3);k++)words.push(SCRIBBLE[Math.floor(R()*SCRIBBLE.length)]);
   softText(g,()=>g.fillText(words.join(" "),0,0));g.restore();itemTex.needsUpdate=true;}
 function drawAllItems(){ITEMS.forEach((_,i)=>drawItem(i));for(let v=0;v<PH_N;v++)drawPlaceholder(v);}
@@ -1376,16 +1437,19 @@ const U={uHero:{value:heroTex},uItems:{value:itemTex},uLive:{value:blankTex},uLi
   uFog:{value:FOG.clone().convertSRGBToLinear()},uFocus:{value:7},uDof:{value:0},uMosaic:{value:1},uTime:{value:0},uCamZ:{value:10}};
 const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
   vertexShader:`attribute vec4 aHero;attribute float aKind;attribute float aCell;attribute float aSeed;attribute float aIndex;varying float vIndex;
-    varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;
-    void main(){vIndex=aIndex;vUv=uv;vHero=aHero;vKind=aKind;vCell=aCell;vSeed=aSeed;vec4 w=modelMatrix*instanceMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vDepth=-mv.z;gl_Position=projectionMatrix*mv;}`,
+    varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;varying vec3 vN;
+    void main(){vN=normalize(mat3(modelMatrix*instanceMatrix)*vec3(0.,0.,1.));vIndex=aIndex;vUv=uv;vHero=aHero;vKind=aKind;vCell=aCell;vSeed=aSeed;vec4 w=modelMatrix*instanceMatrix*vec4(position,1.);vW=w.xyz;vec4 mv=viewMatrix*w;vDepth=-mv.z;gl_Position=projectionMatrix*mv;}`,
   fragmentShader:`uniform sampler2D uHero,uItems,uLive;uniform vec3 uFog;uniform float uFocus,uDof,uMosaic,uTime,uCamZ,uLiveOn,uActive,uHover;varying float vIndex;
-    varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;
+    varying vec2 vUv;varying vec4 vHero;varying float vKind;varying float vCell;varying float vDepth;varying vec3 vW;varying float vSeed;varying vec3 vN;
     vec3 lin(vec3 c){return pow(c,vec3(2.2));}
     vec4 blurTex(sampler2D t,vec2 uv,float b){return texture2D(t,uv,b);}
     void main(){
       float act=1.-step(.5,abs(vIndex-uActive)); // the print in your hands is never blurred or fogged
       float coc=clamp(abs(vDepth-uFocus)/(uFocus*.9),0.,1.)*uDof*(1.-act); float bias=coc*5.5;
-      vec3 col; vec2 uv=vUv;
+      vec3 col; vec2 uv=vUv; float flight=1.-uMosaic;
+      { // slightly rounded corners, like a real print (only once the portrait has broken apart, so the mosaic stays seamless)
+        vec2 q=abs(vUv-.5)*vec2(1.,1.18)-(vec2(.5,.59)-.018);if(flight>.5&&length(max(q,0.))>.018)discard; }
+      float glossy=1.;
       if(gl_FrontFacing){
         col=lin(blurTex(uHero,vHero.xy+(uv-.5)*vHero.zw,bias*.6).rgb);
         float e=min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y));col=mix(col*1.08+.008,col,smoothstep(.0,.03,e)); // thin paper edge
@@ -1397,6 +1461,8 @@ const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
         col=lin(blurTex(uItems,auv,bias).rgb);
         vec2 iuv=vec2((uv.x-.06)/.88,(uv.y-.22)/.74);
         if(act>.5&&uLiveOn>.5&&iuv.x>0.&&iuv.x<1.&&iuv.y>0.&&iuv.y<1.)col=lin(texture2D(uLive,iuv).rgb); // the video plays inside the print
+        glossy=step(0.,iuv.x)*step(iuv.x,1.)*step(0.,iuv.y)*step(iuv.y,1.); // the photo is glossy, the paper around it matte
+        float e=min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y));col*=mix(.86,1.,smoothstep(0.,.012,e)); // the card's edge in shadow
         col*=1.+.16*(1.-step(.5,abs(vIndex-uHover)));
       }
       // warehouse light: brighter under each skylight bay, a soft key light near the camera
@@ -1404,6 +1470,12 @@ const mat=new THREE.ShaderMaterial({uniforms:U,side:THREE.DoubleSide,
       float key=exp(-pow(vDepth/14.,2.));
       float light=mix(.38+.5*bay*exp(-abs(vW.x)/9.)+.35*key,1.,uMosaic);light=mix(light,max(light,1.02),act);
       col*=light;
+      { // each print catches the light as it turns: soft shading, a little curl, and a sheen off the glossy photo
+        vec3 N=normalize(gl_FrontFacing?vN:-vN),V=normalize(cameraPosition-vW),Lk=normalize(cameraPosition+vec3(2.,5.,3.)-vW);
+        float curl=1.-.07*pow(abs(vUv.x-.5)*2.,2.)*(.5+vSeed);
+        float diff=mix(1.,(.7+.3*max(dot(N,Lk),0.))*curl,flight);
+        vec3 Hh=normalize(Lk+V);float sp=pow(max(dot(N,Hh),0.),70.)*.55*glossy+pow(max(dot(N,Hh),0.),6.)*.035;
+        col=col*diff+vec3(1.,.97,.92)*sp*flight*(1.-.7*act)*light; }
       col=mix(col,col*vec3(.75,.78,.85),coc*.6); // distant prints go cooler and softer
       float f=smoothstep(12.,95.,vDepth)*(1.-act);col=mix(col,uFog,f);
       gl_FragColor=vec4(col,1.);
@@ -1605,8 +1677,11 @@ function placeHoldUI(){ // keep the video window and close icon pinned to the pr
   vwin.style.cssText=`left:${L}px;top:${T}px;width:${Math.max(...xs)-L}px;height:${Math.max(...ys)-T}px;opacity:${HOLD.e>.93?1:0}`;
   vx.style.left=(Math.max(...fx)-22)+"px";vx.style.top=(Math.min(...fy)-16)+"px";vx.style.opacity=HOLD.e>.8?1:0;
 }
+const press={x:0,y:0,t:0};addEventListener("pointerdown",e=>{press.x=e.clientX;press.y=e.clientY;press.t=performance.now();},{passive:true});
 addEventListener("click",e=>{
-  if(modalOpen)return;
+  if(modalOpen||!e.isTrusted)return;
+  const dragged=Math.hypot(e.clientX-press.x,e.clientY-press.y)>8||performance.now()-press.t>700; // the end of a drag or a long press is not a click
+  if(dragged&&!(HOLD.i>=0))return;
   if(HOLD.i>=0&&HOLD.target===1){if(!e.target.closest(".vlayer,.dock,.bar"))release();return;}
   const i=pickAt(e.clientX,e.clientY);if(i>=0){e.preventDefault();pickUp(i);}
 });
@@ -1706,7 +1781,7 @@ function frame(now){
     mesh.instanceMatrix.needsUpdate=true;wireGeo.attributes.position.needsUpdate=true;
     wires.material.opacity=.3*(1-.6*mosaic);
   }
-  eraTick(now);ambientTick(now);
+  eraTick(now);ambientTick(now);idleTick(now);
   if(ERA.dirty&&mesh){mesh.geometry.attributes.aCell.needsUpdate=true;ERA.dirty=false;}
   renderer.render(scene,camera);
   updatePoint(now);
