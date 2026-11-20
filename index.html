@@ -1130,7 +1130,7 @@ function drawSel(i){
   selbox.style.transform=`translate(${L}px,${T}px)`;selbox.style.width=Wd+"px";selbox.style.height=Ht+"px";selbox.classList.add("on");
 }
 // auto-scroll runs on its own animation loop so it stays smooth whatever the camera frame rate is
-const auto={dir:0,v:0,raf:0,t:0};
+const auto={dir:0,v:0,raf:0,t:0,src:null};
 function stopAuto(){setAutoScroll(0);auto.v=0;auto.stopAt=performance.now();} // a hard stop: no glide-out
 function setAutoScroll(dir){
   dir=+dir; if(auto.dir===dir)return;auto.dir=dir;camView.classList.toggle("scrolling",dir!==0);
@@ -1144,7 +1144,7 @@ const paused=()=>performance.now()<EYES.pauseUntil;
 function handScroll(dir){ // hand gestures overrule the eyes
   const now=performance.now();EYES.pauseUntil=0;EYES.reading=false;EYES.handAt=now;EYES.lastCard=READ_BEST;
   if(dir===0){stopAuto();if(window.lenis)lenis.scrollTo(lenis.scroll,{immediate:true});}
-  else{const was=auto.dir;setAutoScroll(dir);if(was!==dir||Math.abs(auto.v)<innerHeight*.07)auto.v=dir*innerHeight*WALK;}
+  else{auto.src="hand";const was=auto.dir;setAutoScroll(dir);if(was!==dir||Math.abs(auto.v)<innerHeight*.07)auto.v=dir*innerHeight*WALK;}
   if(window.track&&was0(dir))track("gesture",{label:dir>0?"palm: scroll":dir<0?"fist pull: reverse":"fist: stop"});}
 let _lastHand=null;function was0(d){const ch=d!==_lastHand;_lastHand=d;return ch;}
 function eyeSample(f,now){
@@ -1189,6 +1189,21 @@ function autoStep(t){
 }
 // any wheel, touch or key scroll by the visitor takes over from the hand
 ["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>{if(auto.dir||Math.abs(auto.v)>1)stopAuto();},{passive:true}));
+/* The walk starts by itself after 10 seconds with no activity: no mouse, wheel, key, touch or hand in front of the
+   camera, and nothing open. Any activity stops a walk that started this way; gestures work as before. */
+const IDLE_MS=10000;let lastAct=performance.now();
+["pointermove","pointerdown","wheel","keydown","touchstart"].forEach(e=>addEventListener(e,ev=>{
+  if(ev.type==="pointermove"&&Math.abs(ev.movementX||0)+Math.abs(ev.movementY||0)<2&&ev.pointerType==="mouse")return; // ignore sub-pixel jitter
+  lastAct=performance.now();if(auto.src==="idle"&&(auto.dir||Math.abs(auto.v)>1))stopAuto();},{passive:true,capture:true}));
+document.addEventListener("visibilitychange",()=>{lastAct=performance.now();});
+addEventListener("load",()=>{lastAct=performance.now();});
+function idleTick(now){
+  if(REDUCED||auto.dir||document.hidden)return;
+  const quiet=now-Math.max(lastAct,cam.handAt||0,auto.stopAt||0);if(quiet<IDLE_MS)return;
+  if(HOLD.i>=0||document.body.classList.contains("holding")||(typeof modalOpen!=="undefined"&&modalOpen)||document.querySelector(".st-box[open]")||document.activeElement&&document.activeElement.tagName==="IFRAME")return;
+  const max=document.documentElement.scrollHeight-innerHeight,y=window.lenis?lenis.scroll:scrollY;if(y>=max-2)return;
+  auto.src="idle";auto.v=0;setAutoScroll(1); // eases in from a standstill
+  if(window.track)track("gesture",{label:"idle: walk starts"});}
 detectCamera();
 const fold=document.getElementById("fold"),foldCam=document.getElementById("foldCam");
 function foldState(){const live=cam.on||cam.starting;fold.classList.toggle("gone",scrollY>60||live);foldCam.hidden=camBtn.hidden||live;}
@@ -1705,7 +1720,7 @@ function frame(now){
     mesh.instanceMatrix.needsUpdate=true;wireGeo.attributes.position.needsUpdate=true;
     wires.material.opacity=.3*(1-.6*mosaic);
   }
-  eraTick(now);ambientTick(now);
+  eraTick(now);ambientTick(now);idleTick(now);
   if(ERA.dirty&&mesh){mesh.geometry.attributes.aCell.needsUpdate=true;ERA.dirty=false;}
   renderer.render(scene,camera);
   updatePoint(now);
