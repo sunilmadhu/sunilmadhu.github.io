@@ -1539,8 +1539,8 @@ function hoverPick(){if(POINT.sel>=0)return;const i=(ptr.in&&HOLD.i<0&&!modalOpe
 addEventListener("pointermove",e=>{ptr.x=e.clientX;ptr.y=e.clientY;ptr.in=e.pointerType==="mouse";},{passive:true});
 document.addEventListener("mouseleave",()=>{ptr.in=false;});
 const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
-/* In the keynote chapter, the keynote print nearest the middle of the view plays its segment inside the wall,
-   with sound once the visitor has turned the site's sound on, otherwise silently. Opening a print takes over. */
+/* In the keynote chapter, the keynote print nearest the middle of the view plays its segment inside the wall, silently.
+   Opening a print plays it with sound. */
 const AMB={i:-1,video:null,tex:null,at:0,loud:false};
 function stopAmbient(){if(AMB.i<0)return;if(AMB.video){AMB.video.pause();AMB.video.removeAttribute("src");AMB.video.load();}
   if(AMB.tex)AMB.tex.dispose();if(AMB.loud)window.musicDuck&&window.musicDuck(false);
@@ -1555,10 +1555,10 @@ function ambientTick(now){
   if(keep||best<0){if(best<0)stopAmbient();return;}
   stopAmbient();const it=ITEMS[aCell[best]];
   const v=document.createElement("video");v.src=it.src;v.playsInline=true;v.loop=true;v.preload="auto";
-  const loud=!!(window.siteSoundOn&&window.siteSoundOn());v.muted=!loud;
-  v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});
+  v.muted=true;v.defaultMuted=true;v.setAttribute("muted",""); // always silent in the wall: sound only when a print is opened
+  v.play().catch(()=>{});
   const t=new THREE.VideoTexture(v);t.encoding=THREE.sRGBEncoding;t.minFilter=THREE.LinearFilter;
-  AMB.i=best;AMB.video=v;AMB.tex=t;AMB.loud=loud&&!v.muted;if(AMB.loud)window.musicDuck&&window.musicDuck(true);
+  AMB.i=best;AMB.video=v;AMB.tex=t;AMB.loud=false;
   U.uActive.value=best;U.uLive.value=t;U.uLiveOn.value=1;}
 function pickUp(i){
   if(!isReal(i))return;stopAmbient();const it=ITEMS[aCell[i]];if(!it)return;
