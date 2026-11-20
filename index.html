@@ -1123,8 +1123,8 @@ function updatePoint(now){
   if(POINT.sel<0){selbox.classList.remove("on");return;}
   POINT.lastSel=POINT.sel;POINT.selAt=now;drawSel();
 }
-function drawSel(){
-  mesh.getMatrixAt(POINT.sel,M2);const xs=[],ys=[];
+function drawSel(i){
+  mesh.getMatrixAt(i>=0?i:POINT.sel,M2);const xs=[],ys=[];
   [[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5]].forEach(([x,y])=>{prj.set(x,y,0).applyMatrix4(M2).project(camera);xs.push((prj.x+1)/2*innerWidth);ys.push((1-prj.y)/2*innerHeight);});
   const L=Math.min(...xs)-8,T=Math.min(...ys)-8,Wd=Math.max(...xs)-L+8,Ht=Math.max(...ys)-T+8;
   selbox.style.transform=`translate(${L}px,${T}px)`;selbox.style.width=Wd+"px";selbox.style.height=Ht+"px";selbox.classList.add("on");
@@ -1539,9 +1539,11 @@ function pickAt(x,y){
   ndc.set(x/innerWidth*2-1,-(y/innerHeight)*2+1);ray.setFromCamera(ndc,camera);
   for(const h of ray.intersectObject(mesh)){if(h.distance>70)break;if(h.instanceId!==HOLD.i)return isReal(h.instanceId)?h.instanceId:-1;}
   return -1;}
-function hoverPick(){if(POINT.sel>=0)return;const i=(ptr.in&&HOLD.i<0&&!modalOpen)?pickAt(ptr.x,ptr.y):-1;U.uHover.value=i;document.documentElement.classList.toggle("pick",i>=0);}
+let HOVER=-1; // the print under the mouse: it gets the same selection box as a pointing finger
+function hoverPick(){if(POINT.sel>=0){HOVER=-1;return;}const i=(ptr.in&&HOLD.i<0&&!modalOpen)?pickAt(ptr.x,ptr.y):-1;HOVER=i;U.uHover.value=i;document.documentElement.classList.toggle("pick",i>=0);}
+function hoverBox(){if(POINT.sel>=0)return;if(HOVER>=0&&HOLD.i<0&&!modalOpen&&ptr.in&&mesh)drawSel(HOVER);else selbox.classList.remove("on");}
 addEventListener("pointermove",e=>{ptr.x=e.clientX;ptr.y=e.clientY;ptr.in=e.pointerType==="mouse";},{passive:true});
-document.addEventListener("mouseleave",()=>{ptr.in=false;});
+document.addEventListener("mouseleave",()=>{ptr.in=false;HOVER=-1;U.uHover.value=-1;selbox.classList.remove("on");});
 const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
 /* In the keynote chapter, the keynote print nearest the middle of the view plays its segment inside the wall, silently.
    Opening a print plays it with sound. */
@@ -1709,6 +1711,7 @@ function frame(now){
   updatePoint(now);
   placeHoldUI();
   if(++hoverN%3===0)hoverPick();
+  hoverBox();
   requestAnimationFrame(frame);
 }
 addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);});
