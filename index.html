@@ -1044,9 +1044,8 @@ function setCamUI(on){camBtn.setAttribute("aria-pressed",on?"true":"false");camC
   camTip.textContent=on?"Camera on. Open palm scrolls down; a fist stops; pull the fist down to scroll up. Point with one finger to select a Polaroid, twirl it to cycle to the next, and pinch to open it (pinch again to close). Click to turn the camera off.":"Camera off. Click to let the portrait follow your eyes and scroll with your hand.";}
 async function detectCamera(){try{if(!navigator.mediaDevices?.enumerateDevices){camBtn.hidden=true;return;}
   const d=await navigator.mediaDevices.enumerateDevices();if(!d.some(x=>x.kind==="videoinput")){camBtn.hidden=true;return;}
-  let pref=null;try{pref=localStorage.getItem("sm-cam");}catch(e){}
-  let g=false;try{g=(await navigator.permissions.query({name:"camera"})).state==="granted";}catch(e){}
-  if(g&&pref!=="off")startCamera();}catch(e){}}
+  // the camera is off by default: it starts only when the visitor turns it on, every visit
+  }catch(e){}}
 camBtn.addEventListener("click",()=>{if(cam.on||cam.starting){stopCamera();try{localStorage.setItem("sm-cam","off");}catch(e){}}else{try{localStorage.setItem("sm-cam","on");}catch(e){}startCamera();}});
 let vision=null;
 async function loadModels(){
