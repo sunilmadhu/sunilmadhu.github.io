@@ -290,38 +290,65 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 /* ---- On stage: a collage of talks that flies in, drifts, and plays on hover ---- */
 #stage{padding:12vh clamp(16px,4vw,48px) 10vh; position:relative}
 .stage-head{max-width:1200px; margin:0 auto 28px}.stage-head h2{font-size:clamp(2rem,4.6vw,3.6rem); margin:.1em 0 .2em}.stage-head p{color:var(--muted)}
-.stage-grid{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(6,1fr); grid-auto-rows:clamp(120px,13vw,170px); grid-auto-flow:dense; gap:12px; perspective:1400px}
-.st{position:relative; display:block; grid-column:span 2; border-radius:12px; overflow:hidden; background:#0d0d12; border:1px solid rgba(255,255,255,.08); color:var(--text); text-decoration:none; cursor:pointer; padding:0; font:inherit; text-align:left;
-  transform-style:preserve-3d; transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(0); transition:transform .25s ease-out, box-shadow .3s, border-color .3s;
-  animation:stFloat 9s ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s)}
-.st.big{grid-column:span 4; grid-row:span 2}.st.wide{grid-column:span 4}
-.st:hover,.st:focus-visible{box-shadow:0 22px 50px rgba(0,0,0,.55),0 0 0 1px rgba(232,179,107,.55); border-color:rgba(232,179,107,.55); z-index:2}
-.st-media{position:absolute; inset:0; overflow:hidden}
-.st-media img,.st-media video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
-.st-media img{animation:stKen 18s ease-in-out infinite alternate; animation-delay:calc(var(--i) * -2.1s); filter:saturate(.9) brightness(.82); transition:filter .4s}
-.st-media video{opacity:0; transition:opacity .45s}
-.st.playing .st-media video{opacity:1}.st:hover .st-media img{filter:none}
-.st::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.82)); pointer-events:none}
-.st-sheen{position:absolute; inset:-40%; background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%); transform:translateX(-70%); animation:stSheen 7s ease-in-out infinite; animation-delay:calc(var(--i) * .55s); pointer-events:none; z-index:1}
-.st-badge{position:absolute; top:10px; right:10px; z-index:2; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:rgba(10,10,10,.6); border:1px solid rgba(255,255,255,.25); font-size:.72rem; animation:stPulse 2.6s ease-in-out infinite}
-.st-cap{position:absolute; left:14px; right:14px; bottom:12px; z-index:2; font-size:.92rem; line-height:1.25; transform:translateY(4px); transition:transform .35s}
-.st.big .st-cap{font-size:1.35rem}.st-cap small{display:block; font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent,#e8b36b); margin-bottom:4px}
-.st:hover .st-cap{transform:translateY(0)}
-.st.pod,.st.text{background:radial-gradient(120% 120% at 20% 0%,#2a1d3f 0%,#0d0d12 60%)}
-.st-wave{position:absolute; left:14px; right:14px; top:22%; height:42%; display:flex; align-items:center; gap:4px}
-.st-wave b{flex:1; height:30%; border-radius:2px; background:linear-gradient(#e8b36b,#a86d24); animation:stWave 1.2s ease-in-out infinite; animation-delay:calc(var(--k,0) * -.13s)}
-.st-wave b:nth-child(3n){--k:3}.st-wave b:nth-child(3n+1){--k:5}.st-wave b:nth-child(4n){--k:8}.st-wave b:nth-child(5n){--k:11}
-.st-mark{position:absolute; top:16px; left:14px; font-family:var(--serif,Georgia,serif); font-style:italic; font-size:2.1rem; line-height:.95; color:rgba(232,179,107,.85)}
-@keyframes stKen{from{transform:scale(1.04) translate(-1.5%,-1%)}to{transform:scale(1.16) translate(1.5%,1.2%)}}
-@keyframes stSheen{0%,70%{transform:translateX(-70%)}100%{transform:translateX(70%)}}
-@keyframes stFloat{0%,100%{translate:0 0}50%{translate:0 -5px}}
-@keyframes stPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,179,107,.0)}50%{box-shadow:0 0 0 6px rgba(232,179,107,.18)}}
-@keyframes stWave{0%,100%{height:18%}50%{height:96%}}
+.holo-deck{position:relative; max-width:1200px; margin:0 auto; padding-top:clamp(250px,26vw,320px); border-radius:14px; overflow:hidden;
+  background:radial-gradient(70% 90% at 50% 100%,rgba(60,150,255,.12),rgba(8,10,16,0) 70%),linear-gradient(180deg,rgba(7,9,14,.86),rgba(6,8,13,.96)); border:1px solid rgba(120,190,255,.12)}
+.holo-floor{position:absolute; left:-20%; right:-20%; bottom:0; height:62%; transform:perspective(500px) rotateX(62deg); transform-origin:bottom;
+  background-image:linear-gradient(rgba(110,190,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(110,190,255,.14) 1px,transparent 1px); background-size:42px 42px;
+  -webkit-mask-image:linear-gradient(0deg,#000 10%,transparent 85%); mask-image:linear-gradient(0deg,#000 10%,transparent 85%); pointer-events:none}
+.holo-hint{position:absolute; left:0; right:0; top:42%; text-align:center; margin:0; font-family:var(--mono); font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:rgba(150,205,255,.45); transition:opacity .4s; pointer-events:none}
+.holo-deck.on .holo-hint{opacity:0}
+.holo-strip{position:relative; z-index:2; display:flex; gap:10px; overflow-x:auto; padding:14px 18px 18px; scroll-snap-type:x proximity; scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent); mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.holo-strip::-webkit-scrollbar{display:none}
+.th{position:relative; flex:0 0 clamp(128px,12vw,164px); aspect-ratio:16/10; border-radius:8px; overflow:hidden; scroll-snap-align:start; padding:0; font:inherit; text-align:left; color:var(--text); text-decoration:none; cursor:pointer;
+  background:#0d0f16; border:1px solid rgba(255,255,255,.1); transition:transform .3s cubic-bezier(.2,.7,.2,1),opacity .3s,border-color .3s,box-shadow .3s; opacity:0; transform:translateY(16px)}
+.holo-deck.in .th{opacity:1; transform:none; transition-delay:calc(var(--i)*45ms)}
+.holo-strip:hover .th:not(.lit){opacity:.55}
+.th.lit{transform:translateY(-6px)!important; opacity:1!important; border-color:rgba(120,200,255,.8); box-shadow:0 0 0 1px rgba(120,200,255,.5),0 0 22px rgba(80,170,255,.45),0 -10px 30px rgba(80,170,255,.25); transition-delay:0s}
+.th::before{content:""; position:absolute; left:50%; top:-1px; width:30%; height:2px; margin-left:-15%; border-radius:2px; background:#8fd3ff; box-shadow:0 0 10px 3px rgba(110,200,255,.8); opacity:0; transition:opacity .25s; z-index:3}
+.th.lit::before{opacity:1}
+.th-face{position:absolute; inset:0}
+.th-face img{width:100%; height:100%; object-fit:cover; filter:saturate(.85) brightness(.8); transition:filter .3s}
+.th.lit .th-face img{filter:none}
+.th::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.85)); pointer-events:none}
+.th-cap{position:absolute; left:8px; right:8px; bottom:6px; z-index:2; font-size:.66rem; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+.th-cap small{display:block; font-family:var(--mono); font-size:.52rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent,#e8b36b); margin-bottom:2px}
+.th-badge{position:absolute; top:6px; right:6px; z-index:2; width:20px; height:20px; display:grid; place-items:center; border-radius:50%; background:rgba(10,10,10,.6); border:1px solid rgba(255,255,255,.25); font-size:.55rem}
+.th[data-kind="pod"],.th[data-kind="text"]{background:radial-gradient(120% 120% at 20% 0%,#1e2a44 0%,#0d0f16 60%)}
+.th-wave{position:absolute; left:10px; right:10px; top:18%; height:36%; display:flex; align-items:center; gap:3px}
+.th-wave b,.holo-wave b{flex:1; height:30%; border-radius:2px; background:linear-gradient(#e8b36b,#a86d24); animation:stWave 1.2s ease-in-out infinite; animation-delay:calc(var(--k,0) * -.13s)}
+.th-wave b:nth-child(3n),.holo-wave b:nth-child(3n){--k:3}.th-wave b:nth-child(3n+1),.holo-wave b:nth-child(3n+1){--k:5}.th-wave b:nth-child(4n),.holo-wave b:nth-child(4n){--k:8}
+.th-mark{position:absolute; top:10px; left:10px; font-family:var(--serif,Georgia,serif); font-style:italic; font-size:1.2rem; line-height:.95; color:rgba(232,179,107,.85)}
+/* the hologram: a beam from the thumbnail's emitter, and the clip floating above it in flickering blue */
+.holo{position:absolute; z-index:1; left:0; bottom:0; width:var(--hw,300px); pointer-events:none; opacity:0; transform:translateX(var(--hx,0px)); transition:opacity .25s}
+.holo-deck.on .holo{opacity:1}
+.holo-clip{position:absolute; left:0; right:0; bottom:var(--hb,150px); aspect-ratio:16/9; opacity:.9; transform-origin:50% 100%; transform:perspective(700px) rotateX(10deg) scaleY(.02); border-radius:3px;
+  box-shadow:0 0 24px rgba(90,180,255,.55),inset 0 0 18px rgba(120,200,255,.35); outline:1px solid rgba(140,210,255,.45); animation:holoFlicker 3.2s steps(1) infinite}
+.holo-deck.on .holo-clip{transform:perspective(700px) rotateX(10deg) scaleY(1); transition:transform .45s cubic-bezier(.2,1.4,.3,1)}
+.holo-media{position:absolute; inset:0; overflow:hidden; border-radius:3px; background:#000; isolation:isolate; mix-blend-mode:screen; -webkit-mask-image:linear-gradient(0deg,rgba(0,0,0,.55),#000 30%,#000 85%,rgba(0,0,0,.7)); mask-image:linear-gradient(0deg,rgba(0,0,0,.55),#000 30%,#000 85%,rgba(0,0,0,.7))}
+.holo-media::after{content:""; position:absolute; inset:0; background:#3d9bff; mix-blend-mode:multiply; pointer-events:none}
+.holo-media img,.holo-media video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:grayscale(1) brightness(.92) contrast(1.3)}
+.holo-media img{animation:holoDrift 9s ease-in-out infinite alternate; filter:grayscale(1) brightness(.78) contrast(1.45); opacity:.8}
+.holo-media .holo-wave{position:absolute; left:12%; right:12%; top:30%; height:40%; display:flex; align-items:center; gap:4px; filter:hue-rotate(185deg) saturate(2) brightness(1.3)}
+.holo-media .holo-mark{position:absolute; inset:0; display:grid; place-items:center; font-family:var(--serif,Georgia,serif); font-style:italic; font-size:2.2rem; line-height:.95; color:#8fd3ff; text-align:center; text-shadow:0 0 14px rgba(110,200,255,.8)}
+.holo-scan{position:absolute; inset:0; border-radius:3px; background:repeating-linear-gradient(0deg,rgba(150,215,255,.16) 0 1px,transparent 1px 3px); mix-blend-mode:screen; animation:holoRoll 2.4s linear infinite}
+.holo-scan::after{content:""; position:absolute; left:0; right:0; height:22%; background:linear-gradient(180deg,transparent,rgba(160,220,255,.22),transparent); animation:holoBand 3.6s linear infinite}
+.holo-beam{position:absolute; left:0; right:0; bottom:0; height:var(--hb,150px);
+  clip-path:polygon(0 0,100% 0,calc(50% + var(--tw,60px)) 100%,calc(50% - var(--tw,60px)) 100%);
+  background:linear-gradient(0deg,rgba(110,200,255,.55),rgba(110,200,255,.08) 80%,rgba(110,200,255,.18)); filter:blur(1.5px); opacity:0; transition:opacity .3s; animation:holoBeam 1.6s ease-in-out infinite}
+.holo-deck.on .holo-beam{opacity:1}
+.holo-cap{position:absolute; left:0; right:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; bottom:calc(var(--hb,150px) + var(--hw,300px)*.5625 + 12px); font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:#a9dcff; text-align:center; text-shadow:0 0 8px rgba(110,200,255,.8); opacity:.9}
+@keyframes holoFlicker{0%,100%{opacity:1}7%{opacity:.82}8%{opacity:1}43%{opacity:.9}44%{opacity:1}71%{opacity:.75;transform:perspective(700px) rotateX(10deg) translateX(2px)}72%{opacity:1}}
+@keyframes holoRoll{to{background-position:0 6px}}
+@keyframes holoBand{0%{top:-25%}100%{top:105%}}
+@keyframes holoBeam{0%,100%{opacity:.85}50%{opacity:1}}
+@keyframes holoDrift{from{transform:scale(1.06) translate(-2%,-1%)}to{transform:scale(1.18) translate(2%,1.5%)}}
+@media (prefers-reduced-motion:reduce){.holo-clip,.holo-scan,.holo-scan::after,.holo-beam,.holo-media img{animation:none}}
 .st-box{padding:0; border:0; background:#000; border-radius:10px; width:min(92vw,980px); overflow:visible}
 .st-box::backdrop{background:rgba(0,0,0,.78); backdrop-filter:blur(4px)}
 .st-box video{display:block; width:100%; border-radius:10px}
 .st-x{position:absolute; top:-40px; right:0; width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,.4); background:rgba(0,0,0,.5); color:#fff; font-size:1.2rem; cursor:pointer}
-@media (max-width:760px){.stage-grid{grid-template-columns:repeat(2,1fr); grid-auto-rows:150px}.st,.st.wide{grid-column:span 2}.st.big{grid-column:span 2; grid-row:span 2}.st:not(.wide):not(.big){grid-column:span 1}}
+
 @media (prefers-reduced-motion:reduce){.st,.st-media img,.st-sheen,.st-badge,.st-wave b{animation:none}}
 </style>
 </head>
@@ -374,16 +401,9 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="ai">
-    <div class="card">
-      <div class="era">2026 · AI-native</div>
-      <h2 class="split">Six people. <em>The work of fifty.</em></h2>
-      <p>Instnt runs on a team of six, with AI agents doing much of the engineering, sales and operations work a larger company would hire for.</p>
-      <p>I gave the <a href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener">opening keynote at TiECon East 2026</a> on why insurance becomes the governance layer for AI.</p>
-    </div>
-  </section>
+  <section class="chapter wrap yearpad" id="y2026" aria-label="2026"></section>
 
-  <section class="chapter right wrap" id="keynote">
+  <section class="chapter wrap" id="keynote">
     <div class="card">
       <div class="era">2026 · TiECon East keynote</div>
       <h2 class="split">Who pays when <em>the machine is wrong?</em></h2>
@@ -392,7 +412,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="brahma">
+  <section class="chapter right wrap" id="brahma">
     <div class="card">
       <div class="era">2026 · Asyml8</div>
       <h2 class="split">Brahma: <em>run AI on the devices you already have</em></h2>
@@ -408,7 +428,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter right wrap" id="jarvis">
+  <section class="chapter wrap" id="jarvis">
     <div class="card">
       <div class="era">2025 · Brahma begins</div>
       <h2 class="split">It started as <em>Jarvis, on a Raspberry Pi</em></h2>
@@ -420,6 +440,15 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
         <li>A scale-up box on a TRX50 AI TOP board with a 96-core Threadripper PRO 7995WX, 2 TB of DDR5 ECC memory and 20 TB of NVMe storage</li>
       </ul>
       <div class="stack"><span>In the stack</span><i>Raspberry Pi 5</i><i>Compute modules</i><i>DeepSeek-R1</i><i>Ollama</i><i>Threadripper PRO</i><i>DDR5 ECC</i></div>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="ai">
+    <div class="card">
+      <div class="era">2026 · AI-native</div>
+      <h2 class="split">Six people. <em>The work of fifty.</em></h2>
+      <p>Instnt runs on a team of six, with AI agents doing much of the engineering, sales and operations work a larger company would hire for.</p>
+      <p>I gave the <a href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener">opening keynote at TiECon East 2026</a> on why insurance becomes the governance layer for AI.</p>
     </div>
   </section>
 
@@ -614,20 +643,25 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 
   <section class="wrap" id="stage">
     <div class="stage-head"><div class="era">Speaking</div><h2>On stage</h2><p>Keynotes, panels, demos, podcasts and interviews.</p></div>
-    <div class="stage-grid">
-      <a href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener" class="st big" style="--i:0"><span class="st-media"><img src="media/stage/keynote.jpg" alt="" loading="lazy" decoding="async"><video muted loop playsinline preload="none" data-src="media/stage/keynote_prev.mp4"></video></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>TiECon East · 2026</small>Opening keynote: who pays when the machine is wrong?</span></a>
-      <button type="button" class="st wide" style="--i:1" data-play="media/stage/webinar_2025_full.mp4"><span class="st-media"><img src="media/stage/webinar_2025.jpg" alt="" loading="lazy" decoding="async"><video muted loop playsinline preload="none" data-src="media/stage/webinar_2025.mp4"></video></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>Webinar · 2025</small>Protecting Margins: an identity fraud panel with Munich Re, Accredited and Howden</span></button>
-      <a href="https://www.linkedin.com/in/sunilmadhu/recent-activity/all/" target="_blank" rel="noopener" class="st pod" style="--i:2"><span class="st-media"><i class="st-wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>Podcast · 2026</small>The C-Suite Podcast</span></a>
-      <a href="https://ppacc.player.fm/series/insurtechsio/the-founders-journey-ai-fraud-prevention-and-insurance-with-sunil-madhu" target="_blank" rel="noopener" class="st pod" style="--i:3"><span class="st-media"><i class="st-wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>Podcast · 2024</small>The Founders Journey: AI, fraud prevention and insurance</span></a>
-      <a href="https://instnt.ai/resources/videos/" target="_blank" rel="noopener" class="st wide" style="--i:4"><span class="st-media"><img src="media/stage/instnt_2021.jpg" alt="" loading="lazy" decoding="async"><video muted loop playsinline preload="none" data-src="media/stage/instnt_2021.mp4"></video></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>Interview · 2021</small>On camera: why Instnt</span></a>
-      <a href="https://www.newswire.com/view/content/sunil-madhu-ceo-founder-of-instnt-to-speak-at-finovatespring-2022-to-21709823" target="_blank" rel="noopener" class="st " style="--i:5"><span class="st-media"><img src="media/stage/finovatespring_2022.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>FinovateSpring · 2022</small>Speaker</span></a>
-      <a href="https://www.einpresswire.com/article/550318228/instnt-to-launch-instnt-accepttm-showcasing-a-new-approach-to-digital-customer-onboarding" target="_blank" rel="noopener" class="st text" style="--i:6"><span class="st-media"><i class="st-mark" aria-hidden="true">On<br>stage</i></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>FinovateFall · 2021</small>On stage: launching Instnt Accept</span></a>
-      <a href="https://www.pymnts.com/authentication/2017/socure-ceo-sunil-madhu-on-digital-to-physical-id-verification-beyond-selfie-pay/" target="_blank" rel="noopener" class="st " style="--i:7"><span class="st-media"><img src="media/stage/pymnts_2017.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>PYMNTS · 2017</small>Interview: digital-to-physical ID verification</span></a>
-      <a href="https://insights.som.yale.edu/insights/can-we-secure-online-identities" target="_blank" rel="noopener" class="st " style="--i:8"><span class="st-media"><img src="media/stage/yale_2017.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>Yale Insights · 2017</small>Interview: can we secure online identities?</span></a>
-      <a href="https://www.youtube.com/watch?v=ChOQ5_LciCM" target="_blank" rel="noopener" class="st wide" style="--i:9"><span class="st-media"><img src="media/stage/socure_2015.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>Video · 2015</small>Sunil Madhu, founder and CEO, Socure</span></a>
-      <a href="https://finovate.com/?p=60183" target="_blank" rel="noopener" class="st " style="--i:10"><span class="st-media"><img src="media/stage/finovate_2015.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>FinovateFall · 2015</small>On stage: Socure Perceive</span></a>
-      <a href="https://www.youtube.com/watch?v=WUMLAS4kzHI" target="_blank" rel="noopener" class="st " style="--i:11"><span class="st-media"><img src="media/stage/bai_2014.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>BAI Retail Delivery · 2014</small>Demo: social biometrics in risk and compliance</span></a>
-      <a href="https://finovate.com/videos/finovatefall-2013-socure" target="_blank" rel="noopener" class="st wide" style="--i:12"><span class="st-media"><img src="media/stage/finovate_2013.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>FinovateFall · 2013</small>On stage: Socure's first demo</span></a>
+    <div class="holo-deck">
+    <div class="holo-floor" aria-hidden="true"></div>
+    <p class="holo-hint" aria-hidden="true">Hover a thumbnail to project it</p>
+    <div class="holo" aria-hidden="true"><div class="holo-beam"></div><div class="holo-clip"><div class="holo-media"></div><div class="holo-scan"></div></div><div class="holo-cap"></div></div>
+    <div class="holo-strip">
+      <a class="th" href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/keynote.jpg" data-vid="media/stage/keynote_prev.mp4" style="--i:0"><span class="th-face"><img src="media/stage/keynote.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">▶</span><span class="th-cap"><small>TiECon East · 2026</small>Opening keynote: who pays when the machine is wrong?</span></a>
+      <button type="button" class="th" data-play="media/stage/webinar_2025_full.mp4" data-kind="img" data-img="media/stage/webinar_2025.jpg" data-vid="media/stage/webinar_2025.mp4" style="--i:1"><span class="th-face"><img src="media/stage/webinar_2025.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">▶</span><span class="th-cap"><small>Webinar · 2025</small>Protecting Margins: an identity fraud panel with Munich Re, Accredited and Howden</span></button>
+      <a class="th" href="https://www.linkedin.com/in/sunilmadhu/recent-activity/all/" target="_blank" rel="noopener" data-kind="pod" style="--i:2"><span class="th-face"><i class="th-wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>Podcast · 2026</small>The C-Suite Podcast</span></a>
+      <a class="th" href="https://ppacc.player.fm/series/insurtechsio/the-founders-journey-ai-fraud-prevention-and-insurance-with-sunil-madhu" target="_blank" rel="noopener" data-kind="pod" style="--i:3"><span class="th-face"><i class="th-wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>Podcast · 2024</small>The Founders Journey: AI, fraud prevention and insurance</span></a>
+      <a class="th" href="https://instnt.ai/resources/videos/" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/instnt_2021.jpg" data-vid="media/stage/instnt_2021.mp4" style="--i:4"><span class="th-face"><img src="media/stage/instnt_2021.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">▶</span><span class="th-cap"><small>Interview · 2021</small>On camera: why Instnt</span></a>
+      <a class="th" href="https://www.newswire.com/view/content/sunil-madhu-ceo-founder-of-instnt-to-speak-at-finovatespring-2022-to-21709823" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/finovatespring_2022.jpg" style="--i:5"><span class="th-face"><img src="media/stage/finovatespring_2022.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>FinovateSpring · 2022</small>Speaker</span></a>
+      <a class="th" href="https://www.einpresswire.com/article/550318228/instnt-to-launch-instnt-accepttm-showcasing-a-new-approach-to-digital-customer-onboarding" target="_blank" rel="noopener" data-kind="text" style="--i:6"><span class="th-face"><i class="th-mark" aria-hidden="true">On<br>stage</i></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>FinovateFall · 2021</small>On stage: launching Instnt Accept</span></a>
+      <a class="th" href="https://www.pymnts.com/authentication/2017/socure-ceo-sunil-madhu-on-digital-to-physical-id-verification-beyond-selfie-pay/" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/pymnts_2017.jpg" style="--i:7"><span class="th-face"><img src="media/stage/pymnts_2017.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>PYMNTS · 2017</small>Interview: digital-to-physical ID verification</span></a>
+      <a class="th" href="https://insights.som.yale.edu/insights/can-we-secure-online-identities" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/yale_2017.jpg" style="--i:8"><span class="th-face"><img src="media/stage/yale_2017.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>Yale Insights · 2017</small>Interview: can we secure online identities?</span></a>
+      <a class="th" href="https://www.youtube.com/watch?v=ChOQ5_LciCM" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/socure_2015.jpg" style="--i:9"><span class="th-face"><img src="media/stage/socure_2015.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">▶</span><span class="th-cap"><small>Video · 2015</small>Sunil Madhu, founder and CEO, Socure</span></a>
+      <a class="th" href="https://finovate.com/?p=60183" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/finovate_2015.jpg" style="--i:10"><span class="th-face"><img src="media/stage/finovate_2015.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">↗</span><span class="th-cap"><small>FinovateFall · 2015</small>On stage: Socure Perceive</span></a>
+      <a class="th" href="https://www.youtube.com/watch?v=WUMLAS4kzHI" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/bai_2014.jpg" style="--i:11"><span class="th-face"><img src="media/stage/bai_2014.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">▶</span><span class="th-cap"><small>BAI Retail Delivery · 2014</small>Demo: social biometrics in risk and compliance</span></a>
+      <a class="th" href="https://finovate.com/videos/finovatefall-2013-socure" target="_blank" rel="noopener" data-kind="img" data-img="media/stage/finovate_2013.jpg" style="--i:12"><span class="th-face"><img src="media/stage/finovate_2013.jpg" alt="" loading="lazy" decoding="async"></span><span class="th-badge" aria-hidden="true">▶</span><span class="th-cap"><small>FinovateFall · 2013</small>On stage: Socure's first demo</span></a>
+    </div>
     </div>
     <dialog class="st-box" id="stBox"><video controls playsinline></video><button type="button" class="st-x" aria-label="Close">×</button></dialog>
   </section>
@@ -986,7 +1020,7 @@ const SAME_PIC={"media/stills/slide_01.jpg":"media/stills/keynote_cover.jpg"};
 const FACE_RE=/media\/portraits\/|fb_car_selfie|yt_ChOQ5_LciCM/,FACE_MAX=1;
 const IMG_KEY=ITEMS.map((it,k)=>it.thumb?(SAME_PIC[it.thumb]||it.thumb):"item:"+k);
 const IS_FACE=ITEMS.map(it=>!!(it.thumb&&FACE_RE.test(it.thumb)));
-const ERA_OF_SECTION={top:"ai",ai:"ai",keynote:"keynote",brahma:"brahma",jarvis:"jarvis",instnt:"instnt",instnt2:"instnt2",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
+const ERA_OF_SECTION={top:"ai",y2026:"ai",ai:"ai",keynote:"keynote",brahma:"brahma",jarvis:"jarvis",instnt:"instnt",instnt2:"instnt2",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
 // real items go to prints you will actually pass: the camera's path through the section is sampled, the
 // nearest visible prints at each point get real items, and an item is only reused far from where it already hangs
 const _pv=new THREE.Vector3(),_tc=new THREE.PerspectiveCamera();
@@ -1583,7 +1617,7 @@ buildPrints();
 /* ================= The year of each period =================
    Entering a period, its year rolls into focus behind the story, catches a streak of light, holds, and dissolves
    before the next period arrives. */
-const YEARS={ai:["2026","AI-native"],instnt:["2025","Instnt"],socure:["2019","Socure"],hopskoch:["2011","Hopskoch"],gulf:["1999","IBM and the Gulf"],origins:["1986","Education"]};
+const YEARS={y2026:["2026","AI-native"],instnt:["2025","Instnt"],socure:["2019","Socure"],hopskoch:["2011","Hopskoch"],gulf:["1999","IBM and the Gulf"],origins:["1986","Education"]};
 const yearfx=document.getElementById("yearfx"),yfNum=document.getElementById("yfNum"),yfLabel=document.getElementById("yfLabel"),yfFlare=yearfx.querySelector(".yf-flare");
 let yearShown=null,yearTL=null,yearSec=null;
 function currentSection(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}return id;}
@@ -1626,7 +1660,7 @@ addEventListener("scroll",()=>{clearTimeout(yearCheck.t);yearCheck.t=setTimeout(
 const HOLD={i:-1,k:0,e:0,target:0,pos:new THREE.Vector3(),q:new THREE.Quaternion(),scl:new THREE.Vector3(1,1,1),M:new THREE.Matrix4(),item:null,video:null,tex:null};
 const HOLD_D=3.2,tV=new THREE.Vector3(),tQ=new THREE.Quaternion(),tS=new THREE.Vector3(),fwdV=new THREE.Vector3(),upV=new THREE.Vector3(),prj=new THREE.Vector3();
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),ptr={x:-1,y:-1,in:false};let hoverN=0,modalOpen=false;
-const NOPICK="a,button,input,textarea,select,iframe,video,label,.card,.panel,.contact-head,.booking,.dock,.bar,.stats,.modal,.vlayer,#career";
+const NOPICK=".holo-deck,a,button,input,textarea,select,iframe,video,label,.card,.panel,.contact-head,.booking,.dock,.bar,.stats,.modal,.vlayer,#career";
 /* when the story moves to another company, every print spins once on its wire and comes back
    showing that company's news; the nearest ones turn first */
 const ERA={cur:null,dirty:false};
@@ -1761,7 +1795,7 @@ modal.addEventListener("keydown",e=>{if(e.key==="Tab"){const f=[...modal.querySe
 /* ================= Story progress ================= */
 let P=0;
 // the opening (portrait to warehouse) is timed to the 2026 chapters, so adding chapters later in the story doesn't stretch it
-let EK=1;function updateEK(){const ai=document.getElementById("ai"),H=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+let EK=1;function updateEK(){const ai=document.getElementById("y2026"), /* the opening breaks apart over this step */H=Math.max(1,document.documentElement.scrollHeight-innerHeight);
   if(ai)EK=Math.min(1.4,Math.max(.5,(ai.getBoundingClientRect().top+scrollY+ai.offsetHeight)/H/.199));}
 updateEK();addEventListener("resize",updateEK);addEventListener("load",updateEK);
 function camAt(p){ // camera rig along the warehouse
@@ -1902,28 +1936,39 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   window.musicDuck=on=>{if(!ready)return;if(on){ducked=playing();if(ducked)player.pauseVideo();}else if(ducked){ducked=false;player.playVideo();}};
 })();
 
-/* ================= On stage: entrance, tilt and hover previews ================= */
+/* ================= On stage: a row of thumbnails; hovering one projects it as a hologram ================= */
 (function(){
-  const grid=document.querySelector(".stage-grid");if(!grid)return;const tiles=[...grid.querySelectorAll(".st")];
-  if(window.gsap&&window.ScrollTrigger&&!REDUCED){
-    gsap.set(tiles,{opacity:0,z:-260,rotationX:()=>gsap.utils.random(-70,-35),rotationY:()=>gsap.utils.random(-30,30),scale:.72,filter:"blur(10px)"});
-    ScrollTrigger.create({trigger:grid,start:"top 85%",once:true,onEnter:()=>gsap.to(tiles,{opacity:1,z:0,rotationX:0,rotationY:0,scale:1,filter:"blur(0px)",duration:1.25,ease:"expo.out",stagger:{each:.07,from:"random"},clearProps:"transform,filter"})});
-  }
-  const fine=matchMedia("(hover:hover) and (pointer:fine)").matches;
-  tiles.forEach(t=>{
-    const v=t.querySelector("video");
-    const play=()=>{if(!v)return;if(!v.src)v.src=v.dataset.src;v.play().then(()=>t.classList.add("playing")).catch(()=>{});};
-    const stop=()=>{if(!v)return;v.pause();t.classList.remove("playing");};
-    if(fine){
-      t.addEventListener("pointerenter",play);
-      t.addEventListener("pointermove",e=>{if(REDUCED)return;const r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;t.style.setProperty("--ry",(x*12).toFixed(2)+"deg");t.style.setProperty("--rx",(-y*10).toFixed(2)+"deg");});
-      t.addEventListener("pointerleave",()=>{stop();t.style.setProperty("--rx","0deg");t.style.setProperty("--ry","0deg");});
-    } else if(v&&"IntersectionObserver" in window){new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.intersectionRatio>.6?play():stop()),{threshold:[0,.6,1]}).observe(t);}
-    if(t.dataset.play)t.addEventListener("click",()=>{const box=document.getElementById("stBox"),bv=box.querySelector("video");
-      stopAuto();window.musicDuck&&window.musicDuck(true);bv.src=t.dataset.play;box.showModal();bv.play().catch(()=>{});
+  const deck=document.querySelector(".holo-deck");if(!deck)return;
+  const strip=deck.querySelector(".holo-strip"),holo=deck.querySelector(".holo"),media=deck.querySelector(".holo-media"),cap=deck.querySelector(".holo-cap");
+  const thumbs=[...strip.querySelectorAll(".th")],beam=deck.querySelector(".holo-beam");let cur=null,hideT=0;
+  if("IntersectionObserver" in window)new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){deck.classList.add("in");o.disconnect();}}),{threshold:.2}).observe(deck);else deck.classList.add("in");
+  function place(t){ // the clip floats above the thumbnail; the beam runs from the thumbnail's emitter up to the clip
+    const d=deck.getBoundingClientRect(),r=t.getBoundingClientRect();
+    const hw=Math.min(340,Math.max(220,d.width*.3)),cx=r.left+r.width/2-d.left,x=Math.max(10,Math.min(d.width-hw-10,cx-hw/2));
+    const room=r.top-d.top,hb=Math.max(30,room-hw*.5625-58),foot=cx-x,tw=r.width*.16;
+    holo.style.setProperty("--hw",hw+"px");holo.style.setProperty("--hx",x+"px");holo.style.setProperty("--hb",hb+"px");
+    holo.style.bottom=(d.bottom-r.top)+"px";
+    beam.style.clipPath=`polygon(0 0,100% 0,${foot+tw}px 100%,${foot-tw}px 100%)`;}
+  function show(t){clearTimeout(hideT);if(cur===t){place(t);return;}if(cur)cur.classList.remove("lit");cur=t;t.classList.add("lit");
+    media.querySelectorAll("video").forEach(v=>v.pause());media.innerHTML="";const k=t.dataset.kind;
+    if(t.dataset.vid){const v=document.createElement("video");v.muted=true;v.defaultMuted=true;v.loop=true;v.playsInline=true;v.setAttribute("muted","");v.src=t.dataset.vid;if(t.dataset.img)v.poster=t.dataset.img;media.appendChild(v);v.play().catch(()=>{});}
+    else if(t.dataset.img){const im=new Image();im.src=t.dataset.img;im.alt="";media.appendChild(im);}
+    else if(k==="pod"){media.innerHTML='<i class="holo-wave">'+"<b></b>".repeat(14)+"</i>";}
+    else media.innerHTML='<i class="holo-mark">On<br>stage</i>';
+    const c=t.querySelector(".th-cap"),sm=c&&c.querySelector("small");cap.textContent=c?((sm?sm.textContent.trim()+" · ":"")+c.textContent.replace(sm?sm.textContent:"","").replace(/\s+/g," ").trim()):"";
+    place(t);deck.classList.remove("on");void holo.offsetWidth;deck.classList.add("on");}
+  function hide(){hideT=setTimeout(()=>{deck.classList.remove("on");if(cur){cur.classList.remove("lit");cur=null;}media.querySelectorAll("video").forEach(v=>v.pause());},120);}
+  const touch=e=>e.pointerType==="touch"||e.pointerType==="pen";
+  thumbs.forEach(t=>{
+    t.addEventListener("pointerenter",e=>{if(!touch(e))show(t);});t.addEventListener("pointerleave",e=>{if(!touch(e))hide();});
+    t.addEventListener("focus",()=>show(t));t.addEventListener("blur",hide);
+    t.addEventListener("click",e=>{
+      if(e.pointerType==="touch"&&cur!==t){e.preventDefault();show(t);return;} // on touch: first tap projects, second tap opens
+      if(t.dataset.play){e.preventDefault();const box=document.getElementById("stBox"),bv=box.querySelector("video");
+        stopAuto();window.musicDuck&&window.musicDuck(true);bv.src=t.dataset.play;box.showModal();bv.play().catch(()=>{});}
       if(window.track)track("open",{label:t.textContent.trim().slice(0,80)+" · stage",target:"stage"});});
-    else t.addEventListener("click",()=>{if(window.track)track("open",{label:t.textContent.trim().slice(0,80)+" · stage",target:"stage"});});
   });
+  strip.addEventListener("scroll",()=>{if(cur)place(cur);},{passive:true});addEventListener("resize",()=>{if(cur)place(cur);});
   const box=document.getElementById("stBox");
   const close=()=>{const bv=box.querySelector("video");bv.pause();bv.removeAttribute("src");bv.load();if(box.open)box.close();window.musicDuck&&window.musicDuck(false);};
   box.querySelector(".st-x").addEventListener("click",close);box.addEventListener("click",e=>{if(e.target===box)close();});box.addEventListener("cancel",e=>{e.preventDefault();close();});
