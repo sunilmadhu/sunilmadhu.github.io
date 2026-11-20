@@ -1065,7 +1065,10 @@ function loopCamera(){
     fdot.classList.toggle("pinch",cam.pinched);
     cam.palm=(n>=3&&!cam.pinched)?(cam.palm||0)+1:0; cam.fist=(n===0&&!cam.pinched&&reach<1.12)?(cam.fist||0)+1:0;
     if(pointing)pointAt(h[8],now);
-    if(cam.palm>=2)handScroll(1);   // open palm: scroll down now, whatever the eyes are doing
+    // open palm: walk on. Not while a print is held or open, and right after a stop the palm must be held about half a
+    // second, so the fingers opening as a fist relaxes don't restart the walk
+    const palmNeed=performance.now()-(auto.stopAt||0)<2500?8:2;
+    if(cam.palm>=palmNeed&&HOLD.i<0&&!document.body.classList.contains("holding")&&!(typeof modalOpen!=="undefined"&&modalOpen)&&!document.querySelector(".st-box[open]"))handScroll(1);
     if(cam.fist===1){handScroll(0);cam.fistY=h[9].y;}  // a fist stops at once
     // pulling the closed fist down (about a tenth of the frame) scrolls back up
     if(cam.fist>1&&cam.fistY!=null&&h[9].y-cam.fistY>.1){handScroll(-1);cam.fistY=null;}
@@ -1128,6 +1131,7 @@ function drawSel(){
 }
 // auto-scroll runs on its own animation loop so it stays smooth whatever the camera frame rate is
 const auto={dir:0,v:0,raf:0,t:0};
+function stopAuto(){setAutoScroll(0);auto.v=0;auto.stopAt=performance.now();} // a hard stop: no glide-out
 function setAutoScroll(dir){
   dir=+dir; if(auto.dir===dir)return;auto.dir=dir;camView.classList.toggle("scrolling",dir!==0);
   if(dir&&!auto.raf){auto.t=performance.now();auto.raf=requestAnimationFrame(autoStep);}
@@ -1139,7 +1143,7 @@ const EYES={hist:[],reading:false,pauseUntil:0,handAt:0,lastCard:null};
 const paused=()=>performance.now()<EYES.pauseUntil;
 function handScroll(dir){ // hand gestures overrule the eyes
   const now=performance.now();EYES.pauseUntil=0;EYES.reading=false;EYES.handAt=now;EYES.lastCard=READ_BEST;
-  if(dir===0){setAutoScroll(0);auto.v=0;if(window.lenis)lenis.scrollTo(lenis.scroll,{immediate:true});}
+  if(dir===0){stopAuto();if(window.lenis)lenis.scrollTo(lenis.scroll,{immediate:true});}
   else{const was=auto.dir;setAutoScroll(dir);if(was!==dir||Math.abs(auto.v)<innerHeight*.07)auto.v=dir*innerHeight*WALK;}
   if(window.track&&was0(dir))track("gesture",{label:dir>0?"palm: scroll":dir<0?"fist pull: reverse":"fist: stop"});}
 let _lastHand=null;function was0(d){const ch=d!==_lastHand;_lastHand=d;return ch;}
@@ -1184,7 +1188,7 @@ function autoStep(t){
   if(!auto.dir&&EYES.pauseUntil)EYES.pauseUntil=0;
 }
 // any wheel, touch or key scroll by the visitor takes over from the hand
-["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>setAutoScroll(0),{passive:true}));
+["wheel","touchstart","keydown"].forEach(e=>addEventListener(e,()=>{if(auto.dir||Math.abs(auto.v)>1)stopAuto();},{passive:true}));
 detectCamera();
 const fold=document.getElementById("fold"),foldCam=document.getElementById("foldCam");
 function foldState(){const live=cam.on||cam.starting;fold.classList.toggle("gone",scrollY>60||live);foldCam.hidden=camBtn.hidden||live;}
@@ -1561,7 +1565,7 @@ function ambientTick(now){
   AMB.i=best;AMB.video=v;AMB.tex=t;AMB.loud=false;
   U.uActive.value=best;U.uLive.value=t;U.uLiveOn.value=1;}
 function pickUp(i){
-  if(!isReal(i))return;stopAmbient();const it=ITEMS[aCell[i]];if(!it)return;
+  if(!isReal(i))return;stopAmbient();stopAuto();/* selecting a polaroid stops the walk */const it=ITEMS[aCell[i]];if(!it)return;
   if(window.track)track("open",{label:(it.cap||it.title||"").slice(0,80)+" · "+it.type,target:it.era});
   if(HOLD.i>=0&&HOLD.i!==i)release(true);
   HOLD.i=i;HOLD.target=1;HOLD.item=it;U.uActive.value=i;U.uHover.value=-1;document.documentElement.classList.remove("pick");
@@ -1609,7 +1613,7 @@ addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(modalOpen)closeModa
 const modal=document.getElementById("modal"),mCard=modal.querySelector(".m-card"),mMedia=document.getElementById("mMedia"),mSrc=document.getElementById("mSrc"),
       mTitle=document.getElementById("mTitle"),mText=document.getElementById("mText"),mLink=document.getElementById("mLink"),mX=document.getElementById("mX");
 let lastFocus=null;
-function openModal(it){
+function openModal(it){stopAuto();
   modalOpen=true;lastFocus=document.activeElement;
   mCard.classList.toggle("photo",it.type==="photo");
   mMedia.innerHTML="";mMedia.classList.remove("paper");
@@ -1792,7 +1796,7 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
       t.addEventListener("pointerleave",()=>{stop();t.style.setProperty("--rx","0deg");t.style.setProperty("--ry","0deg");});
     } else if(v&&"IntersectionObserver" in window){new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.intersectionRatio>.6?play():stop()),{threshold:[0,.6,1]}).observe(t);}
     if(t.dataset.play)t.addEventListener("click",()=>{const box=document.getElementById("stBox"),bv=box.querySelector("video");
-      window.musicDuck&&window.musicDuck(true);bv.src=t.dataset.play;box.showModal();bv.play().catch(()=>{});
+      stopAuto();window.musicDuck&&window.musicDuck(true);bv.src=t.dataset.play;box.showModal();bv.play().catch(()=>{});
       if(window.track)track("open",{label:t.textContent.trim().slice(0,80)+" · stage",target:"stage"});});
     else t.addEventListener("click",()=>{if(window.track)track("open",{label:t.textContent.trim().slice(0,80)+" · stage",target:"stage"});});
   });
