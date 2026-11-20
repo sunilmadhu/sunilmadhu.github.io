@@ -320,7 +320,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
       <div class="era">2026 · Asyml8</div>
       <h2 class="split">Brahma: <em>run AI on the devices you already have</em></h2>
       <div class="role">Founder, CEO, CTO and developer #1</div>
-      <p>My new company, Asyml8, builds Brahma, a graph-native AI mesh. It runs open-weight Mixture-of-Experts language models across ordinary Macs, PCs, Raspberry Pis and cloud machines, with no GPU or datacenter required.</p>
+      <p>My new company, Asyml8, builds Brahma, a graph-native AI mesh I have been researching and developing since 2025. It runs open-weight Mixture-of-Experts language models across ordinary Macs, PCs, Raspberry Pis and cloud machines, with no GPU or datacenter required.</p>
       <ul>
         <li>Splits a model into a graph of attention heads, KV heads, neuron groups and experts spread across machines, and shows which parts fired for each token</li>
         <li>Prompts and replies stay on your own node; only vectors travel between machines</li>
@@ -340,9 +340,24 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="instnt">
+  <section class="chapter wrap" id="jarvis">
     <div class="card">
-      <div class="era">2019 – now · Instnt</div>
+      <div class="era">2025 · Brahma begins</div>
+      <h2 class="split">It started as <em>Jarvis, on a Raspberry Pi</em></h2>
+      <div class="role">Research and development</div>
+      <p>In February 2025 I started researching how to run AI without a datacenter. The first test was Jarvis: DeepSeek-R1 running on a single Raspberry Pi 5 with an NVMe drive, CPU only, answering questions on a seven-inch screen.</p>
+      <p>From there it grew into a cluster of small machines and one big one, so Brahma could learn to split a model across whatever hardware is at hand.</p>
+      <ul>
+        <li>Clusters of Raspberry Pi compute modules on DeskPi Super6C boards, with Pi 5 and Orange Pi nodes</li>
+        <li>A scale-up box on a TRX50 AI TOP board with a 96-core Threadripper PRO 7995WX, 2 TB of DDR5 ECC memory and 20 TB of NVMe storage</li>
+      </ul>
+      <div class="stack"><span>In the stack</span><i>Raspberry Pi 5</i><i>Compute modules</i><i>DeepSeek-R1</i><i>Ollama</i><i>Threadripper PRO</i><i>DDR5 ECC</i></div>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="instnt">
+    <div class="card">
+      <div class="era">2024 – now · Instnt</div>
       <h2 class="split">The harder question: <em>who pays when the machine is wrong?</em></h2>
       <div class="role">Founder &amp; CEO</div>
       <p>Fraud losses were treated as a cost of doing business. I founded Instnt to make identity fraud losses insurable for financial institutions for the first time. Its AI underwriting platform prices the risk, and its agency arm places the coverage with Munich Re and Swiss Re.</p>
@@ -352,6 +367,22 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
         <li>Underwriting AI developed with Munich Re</li>
         <li>Plugs into an existing fraud stack with one line of JavaScript</li>
       </ul>
+    </div>
+  </section>
+
+  <section class="chapter wrap" id="instnt2">
+    <div class="card">
+      <div class="era">2019 – 2023 · Instnt</div>
+      <h2 class="split">Building Instnt: <em>insured customer acceptance</em></h2>
+      <div class="role">Founder &amp; CEO</div>
+      <p>I incorporated Instnt in 2019 on one thesis: identity fraud losses should be insurable for financial institutions, like any other operating risk. The first products put a fraud-loss guarantee behind onboarding itself.</p>
+      <ul>
+        <li>Instnt Accept, 2021: fully managed customer onboarding, launched at FinovateFall</li>
+        <li>Instnt Access, 2022: single-click sign-up and portable KYC</li>
+        <li>Multipass, 2023: a reusable identity held as a verifiable credential in a wallet</li>
+        <li>Money20/20 booths in 2022 and 2023, and our own NYC Fintech Panel on managed acceptance</li>
+      </ul>
+      <div class="stack"><span>In the stack</span><i>Verifiable credentials</i><i>Decentralized ID</i><i>Portable KYC</i><i>Device signals</i><i>No-code workflows</i></div>
     </div>
   </section>
 
@@ -459,7 +490,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
       <div class="builds">
         <article class="build">
           <a class="b-shot" href="https://mybrahma.com" target="_blank" rel="noopener"><img src="media/builds/brahma.webp" width="960" height="420" loading="lazy" decoding="async" alt="The mybrahma.com home page"><span>mybrahma.com</span></a>
-          <div class="b-meta"><span>2026 – now</span><span>Asyml8</span><span class="tag">Founder</span></div>
+          <div class="b-meta"><span>2025 – now</span><span>Asyml8</span><span class="tag">Founder</span></div>
           <h3>Brahma</h3>
           <p>A graph-native AI mesh. It breaks an open-weight language model into small graph vertices (attention heads, neuron groups and experts) and spreads them across ordinary Macs, PCs, Raspberry Pis and cloud machines, which find each other and answer prompts together. No GPU or datacenter. Prompts and replies stay on your own node; only vectors travel between machines.</p>
           <p><b class="b-k">In the market</b>Open source under AGPL-3.0 and heading into private beta at <a class="src" href="https://mybrahma.com" target="_blank" rel="noopener">mybrahma.com</a>.</p>
@@ -683,10 +714,10 @@ const NEWS=[
    text:["Brahma splits a model into a graph of attention heads, KV heads, neuron groups and experts spread across machines, and shows which parts fired for each token."]},
 
   // Instnt, 2019 – now
-  {era:"instnt",type:"article",y:2021,source:"Instnt · Funding",date:"January 2021",cap:"Seed, 2021",title:"Instnt closes a $7M seed round",url:"https://www.cbinsights.com/company/instnt/financials",linkText:"See the funding history",
-   text:["The round brought Instnt's total funding to about $10 million."]},
+  {era:"instnt",type:"article",y:2021,source:"Instnt · Funding",date:"January 2021",cap:"Seed, 2021",title:"Instnt closes its seed round",url:"https://www.cbinsights.com/company/instnt/financials",linkText:"See the funding history",
+   text:["The seed round funded the first insured onboarding products."]},
   {era:"instnt",type:"article",y:2021,source:"EIN Presswire",date:"September 8, 2021",cap:"Instnt Accept",title:"Instnt launches Instnt Accept at FinovateFall 2021",url:"https://www.einpresswire.com/article/550318228/instnt-to-launch-instnt-accepttm-showcasing-a-new-approach-to-digital-customer-onboarding",linkText:"Read the announcement",
-   text:["Instnt Accept was billed as the first fully managed customer onboarding solution, backed by up to $100 million a year in fraud loss warranty."]},
+   text:["Instnt Accept was billed as the first fully managed customer onboarding solution, backed by a fraud loss warranty."]},
   {era:"instnt",type:"article",y:2021,source:"Accesswire",date:"December 13, 2021",cap:"Meet Instnt",title:"Meet Instnt: insured customer acceptance for millennial and Gen Z customers",url:"https://www.accessnewswire.com/newsroom/en/business-and-professional-services/meet-instnt-the-startup-built-by-a-serial-entrepreneur-thats-disr-676781",linkText:"Read the story",
    text:["A profile of Instnt as the first fully managed, insured customer acceptance platform, which absorbs fraud loss liability so businesses can accept more genuine customers."]},
   {era:"instnt",type:"article",y:2022,source:"Newswire",date:"May 2022",cap:"FinovateSpring '22",title:"Sunil Madhu speaks at FinovateSpring 2022",url:"https://www.newswire.com/view/content/sunil-madhu-ceo-founder-of-instnt-to-speak-at-finovatespring-2022-to-21709823",linkText:"Read the announcement",
@@ -694,7 +725,7 @@ const NEWS=[
   {era:"instnt",type:"article",y:2022,source:"Finovate",date:"September 2022",cap:"FinovateFall '22",title:"Instnt demos at FinovateFall 2022",url:"https://finovate.com/category/instnt",linkText:"See it on Finovate",
    text:["Instnt returned to the Finovate stage in New York to demo its insured onboarding platform."]},
   {era:"instnt",type:"article",y:2022,source:"Newswire",date:"October 27, 2022",cap:"Instnt Access",title:"Instnt Access brings single-click customer onboarding",url:"https://www.newswire.com/news/instnt-launches-instnt-access-to-help-businesses-onboard-customers-21860155",linkText:"Read the announcement",
-   text:["Instnt Access let businesses onboard customers in one click while shifting up to $100 million of fraud loss liability off their balance sheets."]},
+   text:["Instnt Access let businesses onboard customers in one click while shifting fraud loss liability off their balance sheets."]},
   {era:"instnt",type:"article",y:2023,source:"Accesswire",date:"",cap:"Multipass",title:"Instnt unveils Multipass, an insured, decentralized consumer identity",url:"https://www.accessnewswire.com/newsroom/en/computers-technology-and-internet/instnt-launches-multipass-an-insured-decentralized-consumer-identi-795363",linkText:"Read the announcement",
    text:["Multipass extended Instnt's insured approach to a reusable consumer identity."]},
   {era:"instnt",type:"article",y:2024,source:"The Fintech Magazine",date:"March 5, 2024",cap:"Fintech Magazine",title:"A new way to KYC",url:"https://ffnews.com/thought-leadership/exclusive-a-new-way-to-kyc-sunil-madhu-instnt-in-the-fintech-magazine",linkText:"Read on FF News",
@@ -791,8 +822,47 @@ const NEWS=[
    text:["An MSc in Computer Information Systems at Glasgow Caledonian University."]},
 ];
 ITEMS.push(...NEWS);
+// ---- Brahma's start, 2025: Jarvis on a Raspberry Pi, then the scale-up box (Sunil's own footage)
+const BUILD=[
+  {era:"jarvis",type:"video",y:2025,src:"media/jarvis/jarvis_first_boot.mp4",thumb:"media/jarvis/jarvis_pi_board.jpg",cap:"Jarvis, Feb '25",source:"Brahma R&D · February 2025",title:"Jarvis boots on a Raspberry Pi 5",text:["The first night: a Raspberry Pi 5 with an NVMe drive and active cooling, about to run a language model with no GPU."]},
+  {era:"jarvis",type:"video",y:2025,src:"media/jarvis/jarvis_thinking.mp4",thumb:"media/jarvis/jarvis_terminal.jpg",cap:"First answers",source:"Brahma R&D · February 2025",title:"DeepSeek-R1 thinking on the Pi, CPU only",text:["Ollama reported no GPU and ran in CPU-only mode. The model still reasoned its way to an answer, one token at a time."]},
+  {era:"jarvis",type:"video",y:2025,src:"media/jarvis/jarvis_pi5.mp4",thumb:"media/jarvis/jarvis_pi5.jpg",cap:"Pi 5 + NVMe",source:"Brahma R&D · February 2025",title:"A Pi 5 on an NVMe hat, under test",text:["The single-board machine that became the first Brahma node."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/jarvis_screen.jpg",cap:"Deepseek 1.5B",source:"Brahma R&D · February 2025",title:"The test bench screen",text:["Notes and a terminal side by side on a seven-inch screen while the first model loaded."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/super6c.jpg",cap:"Super6C",source:"Brahma R&D · 2025",title:"DeskPi Super6C cluster boards",text:["Six compute modules per board: the small-machine side of Brahma's test cluster."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/rackmate.jpg",cap:"RackMate",source:"Brahma R&D · 2025",title:"A desktop rack for the cluster",text:["A DeskPi RackMate to hold the Pi boards, switch and power in one place."]},
+  {era:"jarvis",type:"video",y:2025,src:"media/jarvis/scaleup_ram.mp4",thumb:"media/jarvis/scaleup_ram_t.jpg",cap:"2 TB of RAM",source:"Brahma R&D · the scale-up box",title:"Unboxing the DDR5 ECC memory",text:["256 GB registered DDR5 modules for the scale-up box: 2 TB in all."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/rdimm.jpg",cap:"DDR5 RDIMM",source:"Brahma R&D · the scale-up box",title:"256 GB DDR5 ECC RDIMMs",text:["Enough memory to hold the largest open-weight models without a GPU."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/threadripper.jpg",cap:"Threadripper",source:"Brahma R&D · the scale-up box",title:"Threadripper PRO 7995WX: 96 cores, 192 threads",text:["The CPU at the centre of the scale-up box."]},
+  {era:"jarvis",type:"video",y:2025,src:"media/jarvis/scaleup_board.mp4",thumb:"media/jarvis/scaleup_board_t.jpg",cap:"TRX50 AI TOP",source:"Brahma R&D · the scale-up box",title:"The TRX50 AI TOP motherboard",text:["Eight DDR5 ECC slots, four PCIe x16 slots and dual 10GbE: the board that ties the box together."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/trx50_box.jpg",cap:"AI TOP",source:"Brahma R&D · the scale-up box",title:"TRX50 AI TOP, sTR5",text:["The workstation board for the scale-up box."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/ssd_stack.jpg",cap:"20 TB NVMe",source:"Brahma R&D · the scale-up box",title:"Ten 2 TB NVMe drives",text:["20 TB of fast storage for model weights and experiments."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/trx50_back.jpg",cap:"The spec",source:"Brahma R&D · the scale-up box",title:"TRX50 AI TOP, from the back of the box",text:["DDR5 ECC RDIMM, PCIe 5.0, dual 10GbE, Wi-Fi 7 and USB4."]},
+  {era:"jarvis",type:"photo",y:2025,thumb:"media/jarvis/gpus_trx50.jpg",cap:"Scale-up parts",source:"Brahma R&D · the scale-up box",title:"The parts for the scale-up box",text:["Board, CPU, memory and cards, laid out before the build."]},
+
+// ---- Instnt marketing, 2019 – 2026 (from the Instnt marketing drive)
+  {era:"instnt2",type:"video",y:2019,src:"media/instnt/brand_film_2019.mp4",thumb:"media/instnt/brand_film_2019.jpg",cap:"Instnt, 2019",source:"Instnt · 2019",title:"Instnt's first brand film",text:["The film made for Instnt's launch in 2019: the spark of an instant decision."]},
+  {era:"instnt2",type:"video",y:2022,src:"media/instnt/loop_2022.mp4",thumb:"media/instnt/loop_2022.jpg",cap:"Access, 2022",source:"Instnt Access · 2022",title:"Instnt Access in motion",text:["The product loop for Instnt Access: sign-up and sign-in across devices, with fraud loss protection behind it."]},
+  {era:"instnt2",type:"photo",y:2022,thumb:"media/instnt/money2020_2022.jpg",cap:"Money20/20 '22",source:"Money20/20 · October 2022",title:"The Instnt booth at Money20/20 2022",text:["Instnt's LED booth on the Money20/20 floor in Las Vegas."]},
+  {era:"instnt2",type:"photo",y:2023,thumb:"media/instnt/puppy_2023.jpg",cap:"Instnt pup",source:"Money20/20 · 2023",title:"Instnt's Money20/20 2023 mascot",text:["After the #instntbunny of 2022, a pup carried the Instnt badge at Money20/20 2023."]},
+  {era:"instnt2",type:"photo",y:2023,thumb:"media/instnt/multipass_2023.jpg",cap:"Multipass",source:"Money20/20 · October 2023",title:"Multipass credentials in the wallet",text:["Multipass held a verified identity as reusable credentials on the phone."]},
+  {era:"instnt2",type:"photo",y:2023,thumb:"media/instnt/kyc_flow_2023.jpg",cap:"Fraud defense",source:"Instnt · 2023",title:"How Instnt's onboarding fit together",text:["Document verification, KYC checks and one-time passcodes, orchestrated in one flow."]},
+  {era:"instnt2",type:"photo",y:2023,thumb:"media/instnt/nyc_panel_2023_1.jpg",cap:"NYC panel '23",source:"Instnt's NYC Fintech Panel · September 2023",title:"The ROI of managed acceptance",text:["Instnt hosted a panel in New York on managed acceptance with a fraud liability shift, followed by a happy hour."]},
+  {era:"instnt2",type:"photo",y:2023,thumb:"media/instnt/nyc_panel_2023_3.jpg",cap:"Panel + happy hour",source:"Instnt's NYC Fintech Panel · September 2023",title:"Instnt's NYC Fintech Panel",text:["The invitation for the 2023 panel and happy hour in New York."]},
+  {era:"instnt",type:"photo",y:2024,thumb:"media/instnt/risklive_2024.jpg",cap:"Risk Live '24",source:"Risk Live North America · October 2024",title:"Instnt sponsors a panel at Risk Live",text:["Instnt was a panel sponsor at Risk Live North America 2024 in Nashville."]},
+  {era:"instnt",type:"photo",y:2025,thumb:"media/instnt/protecting_margins_2025.jpg",cap:"Protecting Margins",source:"Instnt webinar · November 2025",title:"Protecting Margins: an identity fraud panel",text:["A webinar with Munich Re, Accredited and Howden on protecting margins from identity fraud."]},
+  {era:"instnt",type:"video",y:2025,src:"media/instnt/recovery_30_days_2025.mp4",thumb:"media/instnt/recovery_30_days_2025.jpg",cap:"30-day recovery",source:"Instnt · 2025",title:"Recovery within 30 days",text:["Without coverage, losses hit the P&L. With Instnt, recovery comes within 30 days."]},
+  {era:"instnt",type:"video",y:2025,src:"media/instnt/insurable_2025.mp4",thumb:"media/instnt/insurable_2025.jpg",cap:"Insurable",source:"Instnt · 2025",title:"For the first time, identity fraud is insurable",text:["30-day claims and A-rated coverage. Why carry the risk when you can insure it?"]},
+  {era:"instnt",type:"video",y:2025,src:"media/instnt/fraud_loss_insurance_card_2025.mp4",thumb:"media/instnt/fraud_loss_insurance_card_2025.jpg",cap:"The trump card",source:"Instnt · 2025",title:"Fraud Loss Insurance",text:["Fraud loss insurance as the card to play when fraud gets through."]},
+  {era:"instnt",type:"photo",y:2025,thumb:"media/instnt/cheetah_2025.jpg",cap:"Sprint ahead",source:"Instnt · 2025",title:"As fraud losses sprint ahead, Instnt keeps you ahead",text:["From Instnt's 2025 campaign."]},
+  {era:"instnt",type:"photo",y:2025,thumb:"media/instnt/approach_2025.jpg",cap:"How do you approach fraud?",source:"Instnt · 2025",title:"How is your institution approaching fraud today?",text:["From Instnt's 2025 campaign to banks and credit unions."]},
+  {era:"instnt",type:"video",y:2026,src:"media/instnt/fintech_meetup_2026.mp4",thumb:"media/instnt/fintech_meetup_2026.jpg",cap:"Fintech Meetup '26",source:"Fintech Meetup · March 2026",title:"Stop absorbing fraud losses. Start insuring them.",text:["Instnt's ad loop for Fintech Meetup 2026, backed by Munich Re and Swiss Re."]},
+  {era:"instnt",type:"photo",y:2026,thumb:"media/instnt/meetup26_menu.jpg",cap:"Speakeasy '26",source:"Fintech Meetup · March 2026",title:"The Instnt speakeasy at Fintech Meetup",text:["The cocktail menu at Instnt's Fintech Meetup speakeasy: the Instnt Approval, the Charge-Off and Zero Fraud Loss."]},
+  {era:"instnt",type:"photo",y:2026,thumb:"media/instnt/meetup26_venue.jpg",cap:"Speakeasy setup",source:"Fintech Meetup · March 2026",title:"Gift bags at the Instnt speakeasy",text:["Setting up for the Instnt speakeasy at Fintech Meetup 2026."]},
+];
+ITEMS.push(...BUILD);
+
 // "In the stack" cards, taken from each chapter's own stack row, so the shorter periods have more to show
-const STACK_ERA={brahma:"brahma",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf"};
+const STACK_ERA={brahma:"brahma",jarvis:"jarvis",instnt2:"instnt2",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf"};
 for(const [sid,era] of Object.entries(STACK_ERA)){const sec=document.getElementById(sid);if(!sec)continue;
   const label=(sec.querySelector(".era")||{}).textContent||"",para=(sec.querySelector("p")||{}).textContent||"";
   sec.querySelectorAll(".stack i").forEach(el=>ITEMS.push({era,type:"stack",kicker:"In the stack",title:el.textContent,source:"In the stack",date:label,cap:label.split(" · ")[0],text:[para]}));}
@@ -813,7 +883,10 @@ function eraOf(it){
   if(/p_bw/.test(t))return "undated"; // no date, so it stays off the period walls
   return "instnt";
 }
-ITEMS.forEach(it=>it.era=eraOf(it));
+const yearOf=it=>it.y||+((/(19|20)\d\d/.exec([it.date,it.title,it.cap,it.source].join(" "))||[0])[0]);
+ITEMS.forEach(it=>{it.era=eraOf(it); // seven years of Instnt get two walls: 2019 – 2023, then 2024 – now
+  const y=yearOf(it);if(it.era==="instnt"&&y&&y<=2023)it.era="instnt2";
+  if(it.also)it.also=it.also.map(e=>e==="instnt"&&y<=2023?"instnt2":e);});
 const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
 SETS.brahma=SETS.ai=[...new Set([...SETS.brahma,...SETS.ai])]; // both chapters are 2026
 // prints that show the same picture count as one, and faces are kept apart: at most one face in view at a time
@@ -821,7 +894,7 @@ const SAME_PIC={"media/stills/slide_01.jpg":"media/stills/keynote_cover.jpg"};
 const FACE_RE=/media\/portraits\/|fb_car_selfie|yt_ChOQ5_LciCM/,FACE_MAX=1;
 const IMG_KEY=ITEMS.map((it,k)=>it.thumb?(SAME_PIC[it.thumb]||it.thumb):"item:"+k);
 const IS_FACE=ITEMS.map(it=>!!(it.thumb&&FACE_RE.test(it.thumb)));
-const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",instnt:"instnt",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
+const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",jarvis:"jarvis",instnt:"instnt",instnt2:"instnt2",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
 // real items go to prints you will actually pass: the camera's path through the section is sampled, the
 // nearest visible prints at each point get real items, and an item is only reused far from where it already hangs
 const _pv=new THREE.Vector3(),_tc=new THREE.PerspectiveCamera();
@@ -835,8 +908,8 @@ function assignEra(era){
     for(let nx=sec.nextElementSibling;nx&&ERA_OF_SECTION[nx.id]==="keep";nx=nx.nextElementSibling)end=nx.getBoundingClientRect().top+scrollY+nx.offsetHeight; // chapters that keep this wall
     p0=clamp((top-innerHeight*.7)/max,0,1);p1=clamp(end/max,0,1);}
   // where a print will hang at scroll progress ps (same rule as the render loop); null while it's up in the rafters
-  const posAt=(p,ps)=>{const mo=Math.max(1-smooth(.1,.22,ps),smooth(.88,.97,ps)),a=smooth(p.seed*.4,p.seed*.4+.6,mo);if(p.stored&&a<.5)return null;
-    const endB=smooth(.88,.97,ps)>1-smooth(.1,.22,ps),bx=endB?0:START.x,by=endB?0:START.y,bz=endB?END_Z:START.z;
+  const posAt=(p,ps)=>{const mo=Math.max(1-smooth(.1*EK,.22*EK,ps),smooth(.88,.97,ps)),a=smooth(p.seed*.4,p.seed*.4+.6,mo);if(p.stored&&a<.5)return null;
+    const endB=smooth(.88,.97,ps)>1-smooth(.1*EK,.22*EK,ps),bx=endB?0:START.x,by=endB?0:START.y,bz=endB?END_Z:START.z;
     return _pv.set(lerp(p.fx,bx+p.rel.x,a),lerp(p.stored?15+p.seed*4:p.fy,by+p.rel.y,a),lerp(p.fz,bz+p.rel.z,a));};
   // where the camera will be: 14 points through the section; which prints each point can see
   _tc.copy(camera);const SAMPLES=30,VIS=24,Ls=[],seenFrom=new Map();
@@ -848,9 +921,15 @@ function assignEra(era){
   // nearest prints first; an item goes up only where no copy of it, and no print with the same picture, can be
   // seen from any of the same points, and where no other face is already in view
   const showing=Ls.map(()=>new Set()),faces=Ls.map(()=>0),uses=new Map(set.map(k=>[k,0]));
-  for(let sIdx=0;sIdx<SAMPLES;sIdx++)for(const i of Ls[sIdx]){if(out[i]<PH_BASE)continue;const from=seenFrom.get(i);
-    let pick=-1;for(const k of set){const key=IMG_KEY[k];if(from.some(q=>showing[q].has(key)||(IS_FACE[k]&&faces[q]>=FACE_MAX)))continue;if(pick<0||uses.get(k)<uses.get(pick))pick=k;}
-    if(pick<0)continue;out[i]=pick;uses.set(pick,uses.get(pick)+1);from.forEach(q=>{showing[q].add(IMG_KEY[pick]);if(IS_FACE[pick])faces[q]++;});}
+  // round-robin over the camera points: each point gets its next-nearest print in turn, so a wall with few items
+  // spreads them along the whole walk instead of spending them all where the chapter begins
+  const cur=Ls.map(()=>0),tried=new Set();let moved=true;
+  while(moved){moved=false;
+    for(let sIdx=0;sIdx<SAMPLES;sIdx++){const L=Ls[sIdx];
+      while(cur[sIdx]<L.length){const i=L[cur[sIdx]++];if(out[i]<PH_BASE||tried.has(i))continue;tried.add(i);moved=true;const from=seenFrom.get(i);
+        let pick=-1;for(const k of set){const key=IMG_KEY[k];if(from.some(q=>showing[q].has(key)||(IS_FACE[k]&&faces[q]>=FACE_MAX)))continue;if(pick<0||uses.get(k)<uses.get(pick))pick=k;}
+        if(pick>=0){out[i]=pick;uses.set(pick,uses.get(pick)+1);from.forEach(q=>{showing[q].add(IMG_KEY[pick]);if(IS_FACE[pick])faces[q]++;});}
+        break;}}}
   return out;}
 function sectionEra(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}const e=ERA_OF_SECTION[id];return e==="keep"?(ERA.cur||"instnt"):(e||"all");}
 
@@ -1114,7 +1193,7 @@ const imgCache={};
 function loadImg(src){return imgCache[src]||(imgCache[src]=new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;}));}
 function cover(g,im,x,y,w,h){const k=Math.max(w/im.width,h/im.height),iw=im.width*k,ih=im.height*k;g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.drawImage(im,x+(w-iw)/2,y+(h-ih)/2,iw,ih);g.restore();}
 function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(/\s+/);let line="",n=0;for(const w of words){const t=line?line+" "+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(n===maxLines-1?line+"…":line,x,y+n*lh);n++;line=w;if(n>=maxLines)return n;}else line=t;}if(line){g.fillText(line,x,y+n*lh);n++;}return n;}
-const ERA_HUE={brahma:32,ai:32,instnt:172,patents:212,socure:215,hopskoch:320,identity:265,gulf:28,origins:140,undated:0};
+const ERA_HUE={brahma:32,ai:32,jarvis:44,instnt:172,instnt2:186,patents:212,socure:215,hopskoch:320,identity:265,gulf:28,origins:140,undated:0};
 function drawArtFor(g,it,x,y,w,h){ // a generated picture for the piece: blurry at a distance, the headline below sharpens up close
   let sd=7;for(const c of it.title)sd=Math.imul(sd^c.charCodeAt(0),16777619);const R=rng(sd>>>0);
   drawScene(g,R,x,y,w,h,(sd>>>3)%4,ERA_HUE[it.era]);}
@@ -1182,7 +1261,7 @@ async function drawItem(i){const it=ITEMS[i],c=i%CX,r=Math.floor(i/CX),x0=c*CW+P
   g.translate(x0+PW/2,y0+PH*.905);g.rotate(((i*37)%7-3)*.008);g.fillStyle="#2b2722";g.textAlign="center";
   let fs=30;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;while(g.measureText(it.cap).width>PW*.86&&fs>18){fs-=2;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;}
   g.fillText(it.cap,0,0);g.restore();itemTex.needsUpdate=true;}
-const PH_N=36, PH_BASE=ITEMS.length; // placeholder cells live after the real items in the atlas
+const PH_N=28, PH_BASE=ITEMS.length; // placeholder cells live after the real items in the atlas
 const isReal=i=>aCell&&aCell[i]<PH_BASE;
 function softText(g,draw){ // text drawn only as its own blur, so it reads as handwriting you can't quite make out
   g.save();g.shadowColor=g.fillStyle;g.shadowBlur=3.2;g.shadowOffsetX=0;g.shadowOffsetY=0;g.globalAlpha=.55;draw();g.restore();}
@@ -1332,7 +1411,7 @@ buildPrints();
 /* ================= The year of each period =================
    Entering a period, its year rolls into focus behind the story, catches a streak of light, holds, and dissolves
    before the next period arrives. */
-const YEARS={brahma:["2026","Asyml8"],instnt:["2019","Instnt · 2019 – now"],patents:["2015","Patents · 2015 – 2023"],socure:["2011","Socure · 2011 – 2019"],
+const YEARS={brahma:["2026","Asyml8"],jarvis:["2025","Brahma begins · 2025"],instnt:["2024","Instnt · 2024 – now"],instnt2:["2019","Instnt · 2019 – 2023"],patents:["2015","Patents · 2015 – 2023"],socure:["2011","Socure · 2011 – 2019"],
   hopskoch:["2010","Hopskoch · 2010 – 2012"],identity:["1999","The identity years · 1999 – 2010"],gulf:["1990s","IBM and the Gulf"],origins:["1986","Education · 1986 – 1992"]};
 const yearfx=document.getElementById("yearfx"),yfNum=document.getElementById("yfNum"),yfLabel=document.getElementById("yfLabel"),yfFlare=yearfx.querySelector(".yf-flare");
 let yearShown=null,yearTL=null,yearSec=null;
@@ -1482,9 +1561,13 @@ modal.addEventListener("keydown",e=>{if(e.key==="Tab"){const f=[...modal.querySe
 
 /* ================= Story progress ================= */
 let P=0;
+// the opening (portrait to warehouse) is timed to the 2026 chapters, so adding chapters later in the story doesn't stretch it
+let EK=1;function updateEK(){const ai=document.getElementById("ai"),H=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  if(ai)EK=Math.min(1.4,Math.max(.5,(ai.getBoundingClientRect().top+scrollY+ai.offsetHeight)/H/.199));}
+updateEK();addEventListener("resize",updateEK);addEventListener("load",updateEK);
 function camAt(p){ // camera rig along the warehouse
-  const a=smooth(.06,.17,p); // the reveal: step in and to the side
-  const travel=smooth(.17,.9,p);
+  const a=smooth(.06*EK,.17*EK,p); // the reveal: step in and to the side
+  const travel=smooth(.17*EK,.9,p);
   const x=lerp(0,2.2,a)*(1-travel)+Math.sin(travel*Math.PI*3)*1.1*travel*(1-smooth(.85,.95,p));
   const y=lerp(0,.6,a)*(1-travel)+.3*Math.sin(travel*Math.PI*2);
   const z=lerp(10,5.5,a)+(END_Z-5.5)*travel;
@@ -1501,7 +1584,7 @@ function frame(now){
   const sv=(scrollY-lastScroll)/Math.max(dt,1e-3);lastScroll=scrollY;scrollVel=lerp(scrollVel,sv,.12);
   const airPush=REDUCED?0:clamp(scrollVel/1400,-1.6,1.6);
   const cam=camAt(P);
-  const assembledStart=1-smooth(.1,.22,P), assembledEnd=smooth(.88,.97,P);
+  const assembledStart=1-smooth(.1*EK,.22*EK,P), assembledEnd=smooth(.88,.97,P);
   const mosaic=Math.max(assembledStart,assembledEnd);
   // looking around: a small orbit near the portrait, a wider sway in flight
   const sway=lerp(.9,.16,mosaic);
