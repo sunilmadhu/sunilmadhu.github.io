@@ -123,6 +123,12 @@ button.chip:hover{border-color:rgba(255,255,255,.35)}
 a.b-shot:hover img,a.b-shot:focus-visible img{filter:none}
 .b-shot span{position:absolute; left:10px; bottom:8px; font-family:var(--mono); font-size:.62rem; letter-spacing:.06em; color:var(--text); background:rgba(10,10,10,.74); padding:3px 7px; border-radius:3px}
 a.b-shot span::after{content:" ↗"}
+.build.shot-only{padding:0; border-radius:10px; overflow:hidden; transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s}
+.build.shot-only:hover{transform:translateY(-4px); box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.build.shot-only .b-shot{margin:0; border-bottom:0}
+.b-shot .b-two{display:flex; gap:6px; background:none; padding:0}
+.b-shot .b-two a{font-family:var(--mono); font-size:.62rem; letter-spacing:.06em; color:var(--text); background:rgba(10,10,10,.74); padding:3px 7px; border-radius:3px; text-decoration:none}
+.b-shot .b-two a::after{content:" ↗"}
 .build .b-meta{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; font-family:var(--mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--dim)}
 .build .b-meta span:nth-child(2){color:var(--text)}
 .build h3{font-size:clamp(1.35rem,2vw,1.7rem); line-height:1.15; letter-spacing:-.015em; margin:10px 0 10px}
@@ -264,6 +270,43 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
   .ledger td{border:0; padding:2px 0}
 }
 @media (prefers-reduced-motion:reduce){ .word{transform:none !important; opacity:1 !important} }
+
+/* ---- On stage: a collage of talks that flies in, drifts, and plays on hover ---- */
+#stage{padding:12vh clamp(16px,4vw,48px) 10vh; position:relative}
+.stage-head{max-width:1200px; margin:0 auto 28px}.stage-head h2{font-size:clamp(2rem,4.6vw,3.6rem); margin:.1em 0 .2em}.stage-head p{color:var(--muted)}
+.stage-grid{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(6,1fr); grid-auto-rows:clamp(120px,13vw,170px); grid-auto-flow:dense; gap:12px; perspective:1400px}
+.st{position:relative; display:block; grid-column:span 2; border-radius:12px; overflow:hidden; background:#0d0d12; border:1px solid rgba(255,255,255,.08); color:var(--text); text-decoration:none; cursor:pointer; padding:0; font:inherit; text-align:left;
+  transform-style:preserve-3d; transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateZ(0); transition:transform .25s ease-out, box-shadow .3s, border-color .3s;
+  animation:stFloat 9s ease-in-out infinite; animation-delay:calc(var(--i) * -1.3s)}
+.st.big{grid-column:span 4; grid-row:span 2}.st.wide{grid-column:span 4}
+.st:hover,.st:focus-visible{box-shadow:0 22px 50px rgba(0,0,0,.55),0 0 0 1px rgba(232,179,107,.55); border-color:rgba(232,179,107,.55); z-index:2}
+.st-media{position:absolute; inset:0; overflow:hidden}
+.st-media img,.st-media video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.st-media img{animation:stKen 18s ease-in-out infinite alternate; animation-delay:calc(var(--i) * -2.1s); filter:saturate(.9) brightness(.82); transition:filter .4s}
+.st-media video{opacity:0; transition:opacity .45s}
+.st.playing .st-media video{opacity:1}.st:hover .st-media img{filter:none}
+.st::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.82)); pointer-events:none}
+.st-sheen{position:absolute; inset:-40%; background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%); transform:translateX(-70%); animation:stSheen 7s ease-in-out infinite; animation-delay:calc(var(--i) * .55s); pointer-events:none; z-index:1}
+.st-badge{position:absolute; top:10px; right:10px; z-index:2; width:30px; height:30px; display:grid; place-items:center; border-radius:50%; background:rgba(10,10,10,.6); border:1px solid rgba(255,255,255,.25); font-size:.72rem; animation:stPulse 2.6s ease-in-out infinite}
+.st-cap{position:absolute; left:14px; right:14px; bottom:12px; z-index:2; font-size:.92rem; line-height:1.25; transform:translateY(4px); transition:transform .35s}
+.st.big .st-cap{font-size:1.35rem}.st-cap small{display:block; font-family:var(--mono); font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent,#e8b36b); margin-bottom:4px}
+.st:hover .st-cap{transform:translateY(0)}
+.st.pod,.st.text{background:radial-gradient(120% 120% at 20% 0%,#2a1d3f 0%,#0d0d12 60%)}
+.st-wave{position:absolute; left:14px; right:14px; top:22%; height:42%; display:flex; align-items:center; gap:4px}
+.st-wave b{flex:1; height:30%; border-radius:2px; background:linear-gradient(#e8b36b,#a86d24); animation:stWave 1.2s ease-in-out infinite; animation-delay:calc(var(--k,0) * -.13s)}
+.st-wave b:nth-child(3n){--k:3}.st-wave b:nth-child(3n+1){--k:5}.st-wave b:nth-child(4n){--k:8}.st-wave b:nth-child(5n){--k:11}
+.st-mark{position:absolute; top:16px; left:14px; font-family:var(--serif,Georgia,serif); font-style:italic; font-size:2.1rem; line-height:.95; color:rgba(232,179,107,.85)}
+@keyframes stKen{from{transform:scale(1.04) translate(-1.5%,-1%)}to{transform:scale(1.16) translate(1.5%,1.2%)}}
+@keyframes stSheen{0%,70%{transform:translateX(-70%)}100%{transform:translateX(70%)}}
+@keyframes stFloat{0%,100%{translate:0 0}50%{translate:0 -5px}}
+@keyframes stPulse{0%,100%{box-shadow:0 0 0 0 rgba(232,179,107,.0)}50%{box-shadow:0 0 0 6px rgba(232,179,107,.18)}}
+@keyframes stWave{0%,100%{height:18%}50%{height:96%}}
+.st-box{padding:0; border:0; background:#000; border-radius:10px; width:min(92vw,980px); overflow:visible}
+.st-box::backdrop{background:rgba(0,0,0,.78); backdrop-filter:blur(4px)}
+.st-box video{display:block; width:100%; border-radius:10px}
+.st-x{position:absolute; top:-40px; right:0; width:32px; height:32px; border-radius:50%; border:1px solid rgba(255,255,255,.4); background:rgba(0,0,0,.5); color:#fff; font-size:1.2rem; cursor:pointer}
+@media (max-width:760px){.stage-grid{grid-template-columns:repeat(2,1fr); grid-auto-rows:150px}.st,.st.wide{grid-column:span 2}.st.big{grid-column:span 2; grid-row:span 2}.st:not(.wide):not(.big){grid-column:span 1}}
+@media (prefers-reduced-motion:reduce){.st,.st-media img,.st-sheen,.st-badge,.st-wave b{animation:none}}
 </style>
 </head>
 <body>
@@ -274,7 +317,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
 <header class="bar">
   <a class="mark" href="#top" aria-label="Back to top">© 2026 Built by me ♥. All rights reserved.</a>
   <nav aria-label="Chapters">
-    <a href="#brahma">Asyml8</a><a href="#instnt">Instnt</a><a href="#socure">Socure</a><a href="#numbers">Record</a><a href="#patents">Patents</a><a href="#contact">Contact</a>
+    <a href="#brahma">Asyml8</a><a href="#instnt">Instnt</a><a href="#socure">Socure</a><a href="#numbers">Record</a><a href="#stage">Stage</a><a href="#patents">Patents</a><a href="#contact">Contact</a>
   </nav>
 </header>
 <div class="dock" id="dock">
@@ -315,6 +358,24 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
+  <section class="chapter wrap" id="ai">
+    <div class="card">
+      <div class="era">2026 · AI-native</div>
+      <h2 class="split">Six people. <em>The work of fifty.</em></h2>
+      <p>Instnt runs on a team of six, with AI agents doing much of the engineering, sales and operations work a larger company would hire for.</p>
+      <p>I gave the <a href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener">opening keynote at TiECon East 2026</a> on why insurance becomes the governance layer for AI.</p>
+    </div>
+  </section>
+
+  <section class="chapter right wrap" id="keynote">
+    <div class="card">
+      <div class="era">2026 · TiECon East keynote</div>
+      <h2 class="split">Who pays when <em>the machine is wrong?</em></h2>
+      <div class="role">Opening keynote, TiECon East 2026</div>
+      <p>Eight segments from the talk hang on these walls, from the cold open to the five principles. Open one to hear it, or watch the whole keynote on <a class="src" href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener">Vimeo</a>.</p>
+    </div>
+  </section>
+
   <section class="chapter wrap" id="brahma">
     <div class="card">
       <div class="era">2026 · Asyml8</div>
@@ -331,16 +392,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter right wrap" id="ai">
-    <div class="card">
-      <div class="era">2026 · AI-native</div>
-      <h2 class="split">Six people. <em>The work of fifty.</em></h2>
-      <p>Instnt runs on a team of six, with AI agents doing much of the engineering, sales and operations work a larger company would hire for.</p>
-      <p>I gave the <a href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener">opening keynote at TiECon East 2026</a> on why insurance becomes the governance layer for AI.</p>
-    </div>
-  </section>
-
-  <section class="chapter wrap" id="jarvis">
+  <section class="chapter right wrap" id="jarvis">
     <div class="card">
       <div class="era">2025 · Brahma begins</div>
       <h2 class="split">It started as <em>Jarvis, on a Raspberry Pi</em></h2>
@@ -355,7 +407,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter right wrap" id="instnt">
+  <section class="chapter wrap" id="instnt">
     <div class="card">
       <div class="era">2024 – now · Instnt</div>
       <h2 class="split">The harder question: <em>who pays when the machine is wrong?</em></h2>
@@ -370,7 +422,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="instnt2">
+  <section class="chapter right wrap" id="instnt2">
     <div class="card">
       <div class="era">2019 – 2023 · Instnt</div>
       <h2 class="split">Building Instnt: <em>insured customer acceptance</em></h2>
@@ -386,7 +438,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter right wrap" id="patents">
+  <section class="chapter wrap" id="patents">
     <div class="card">
       <div class="era">2015 – 2023 · Patents</div>
       <h2 class="split">Nine US patents on <em>how AI reads identity</em></h2>
@@ -398,7 +450,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="socure">
+  <section class="chapter right wrap" id="socure">
     <div class="card">
       <div class="era">2011 – 2019 · Socure</div>
       <h2 class="split">One question for banks: <em>is this person real?</em></h2>
@@ -415,7 +467,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter right wrap" id="hopskoch">
+  <section class="chapter wrap" id="hopskoch">
     <div class="card">
       <div class="era">2010 – 2012 · Hopskoch</div>
       <h2 class="split">The first company <em>of my own</em></h2>
@@ -429,7 +481,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="identity">
+  <section class="chapter right wrap" id="identity">
     <div class="card">
       <div class="era">1999 – 2010 · The identity architect</div>
       <h2 class="split">A decade inside <em>identity and access</em></h2>
@@ -443,7 +495,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter right wrap" id="gulf">
+  <section class="chapter wrap" id="gulf">
     <div class="card">
       <div class="era">The 1990s · IBM and the Gulf</div>
       <h2 class="split">Where the work started: <em>decision systems and early AI</em></h2>
@@ -454,7 +506,7 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
     </div>
   </section>
 
-  <section class="chapter wrap" id="origins">
+  <section class="chapter right wrap" id="origins">
     <div class="card">
       <div class="era">1986 – 1992 · Education</div>
       <h2 class="split">Before all of it: <em>computer science</em> in Scotland</h2>
@@ -477,7 +529,6 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
   <section class="wrap" id="career" style="padding:6vh clamp(16px,4vw,48px) 10vh">
     <div class="panel">
       <h2>What I built</h2>
-      <p class="builds-lede">Products I founded or architected, and where they are today.</p>
       <ol class="firsts">
         <li><b>Single sign-on at national scale.</b> I helped build single sign-on for Fortune 500 companies and most of the US federal government.</li>
         <li><b>Identity standards.</b> I contributed to SAML and XACML, the OASIS standards for federated login and fine-grained access policy.</li>
@@ -488,60 +539,26 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
         <li><b>Brahma, built on my own</b>, with a big leg up from AI.</li>
       </ol>
       <div class="builds">
-        <article class="build">
+        <article class="build shot-only" aria-label="Asyml8">
           <a class="b-shot" href="https://mybrahma.com" target="_blank" rel="noopener"><img src="media/builds/brahma.webp" width="960" height="420" loading="lazy" decoding="async" alt="The mybrahma.com home page"><span>mybrahma.com</span></a>
-          <div class="b-meta"><span>2025 – now</span><span>Asyml8</span><span class="tag">Founder</span></div>
-          <h3>Brahma</h3>
-          <p>A graph-native AI mesh. It breaks an open-weight language model into small graph vertices (attention heads, neuron groups and experts) and spreads them across ordinary Macs, PCs, Raspberry Pis and cloud machines, which find each other and answer prompts together. No GPU or datacenter. Prompts and replies stay on your own node; only vectors travel between machines.</p>
-          <p><b class="b-k">In the market</b>Open source under AGPL-3.0 and heading into private beta at <a class="src" href="https://mybrahma.com" target="_blank" rel="noopener">mybrahma.com</a>.</p>
-          <p><b class="b-k">My part</b>I built it on my own, with AI as my engineering team: the Python mesh, native Rust expert kernels and a one-command installer. On a single Apple M4 Max it runs IBM Granite at 57.8 tokens a second with the Rust kernels, against 29.8 with standard PyTorch kernels. On a MacBook CPU it answers at 28 to 34 tokens a second <a class="src" href="https://mybrahma.com" target="_blank" rel="noopener">mybrahma.com</a>.</p>
         </article>
-        <article class="build">
+        <article class="build shot-only" aria-label="Instnt">
           <a class="b-shot" href="https://instnt.ai" target="_blank" rel="noopener"><img src="media/builds/instnt.webp" width="960" height="420" loading="lazy" decoding="async" alt="The instnt.ai home page"><span>instnt.ai</span></a>
-          <div class="b-meta"><span>2019 – now</span><span>Instnt</span><span class="tag">Founder</span></div>
-          <h3>Fraud Loss Insurance</h3>
-          <p>Insurance that moves identity fraud losses off a lender's balance sheet. An AI underwriting platform prices the fraud risk, and Instnt Insurance Agency places the coverage with A-rated insurers. It plugs into an existing fraud stack with one line of JavaScript.</p>
-          <p><b class="b-k">In the market</b>Live at <a class="src" href="https://instnt.ai" target="_blank" rel="noopener">instnt.ai</a>. Sold to banks, credit unions, lenders and fintechs to move fraud-loss exposure off their books <a class="src" href="https://www.newswire.com/view/content/beyond-credit-defaults-instnt-makes-lenders-fraud-proof-with-no-22148306" target="_blank" rel="noopener">Newswire</a>. Munich Re provides reinsurance capacity, alongside Accredited and Howden <a class="src" href="https://www.finextra.com/pressarticle/106120/instnt-partners-munich-re-to-bolster-id-fraud-loss-insurance-coverage" target="_blank" rel="noopener">Finextra</a>, and the product is now offered in California <a class="src" href="https://www.insurtechinsights.com/instnt-expands-fraud-loss-insurance-offering-to-california/" target="_blank" rel="noopener">Insurtech Insights</a>.</p>
-          <p><b class="b-k">My part</b>Founded the company, built the underwriting platform with Munich Re and set up the agency that places the policies. The platform includes Beema, the engine that prices fraud loss insurance, and the Instnt Agent, a 25 KB script tag that reads device, behavior and journey signals and returns an insurance decision. It runs on a small team, with AI agents doing much of the work.</p>
         </article>
-        <article class="build">
+        <article class="build shot-only" aria-label="Socure">
           <a class="b-shot" href="https://www.socure.com" target="_blank" rel="noopener"><img src="media/builds/socure.webp" width="960" height="420" loading="lazy" decoding="async" alt="The socure.com home page"><span>socure.com</span></a>
-          <div class="b-meta"><span>2011 – 2019</span><span>Socure</span><span class="tag">Founder</span></div>
-          <h3>Identity verification from the open internet</h3>
-          <p>Socure answers one question for banks: is this person real? Before ChatGPT or TensorFlow, I built the first semantic graph AI and ML platform on social and online data, with an auto-ML fabric that trained and tuned its own models, years before AutoML had a name. On top of it sat the first real-time API for identity verification and KYC, scoring people from semantic models of their online behavior and network connections, plus computer vision to match faces against online profiles.</p>
-          <p><b class="b-k">In the market</b>Live at <a class="src" href="https://www.socure.com" target="_blank" rel="noopener">socure.com</a>. Socure's RiskOS platform runs the Sigma Identity, Synthetic and First-Party Fraud models, Socure Verify and Predictive DocV for more than 3,000 customers. It closed the second quarter of 2026 with $364 million in annual recurring revenue and raised at a $5.2 billion valuation in August 2026 <a class="src" href="https://www.summitpartners.com/news/socure-announces-strategic-growth-investment-from-summit-partners" target="_blank" rel="noopener">Summit Partners</a>.</p>
-          <p><b class="b-k">My part</b>Founder, CEO and CTO, later Chief Strategy Officer. I wrote the first models and product, and the engine I built in Scala is still the core of the platform; later products came in through acquisitions. I took Socure from zero to double-digit millions in ARR, and hired my co-founder to scale sales on the blueprint I built.</p>
         </article>
-        <article class="build">
+        <article class="build shot-only" aria-label="Hopskoch">
           <figure class="b-shot"><img src="media/builds/hopskoch.webp" width="960" height="420" loading="lazy" decoding="async" alt="Hopskoch's 360° seamless storytelling across websites, social, mobile and ad networks"><span>Hopskoch, 2013</span></figure>
-          <div class="b-meta"><span>2010 – 2012</span><span>Hopskoch</span><span class="tag">Founder</span></div>
-          <h3>Transmedia marketing on social data</h3>
-          <p>The first transmedia marketing platform built on social data: one campaign, run end to end across websites, social networks, mobile apps and ad networks, using rules engines, statistical models and the semantic web.</p>
-          <p><b class="b-k">In the market</b>Several thousand early users shaped its gamification features, and it ran enterprise pilots in the US, Europe and China. Working with social data there showed me it could also tell whether a person is who they claim to be. That idea became Socure. Hopskoch was later acquired by WPP in a private sale <a class="src" href="https://alleywatch.com/2016/12/this-nyc-startup-just-raised-13m-to-ensure-your-identity-is-socure/" target="_blank" rel="noopener">AlleyWatch</a>.</p>
-          <p><b class="b-k">My part</b>Founder, CEO and Chairman. I bootstrapped it and led product and sales.</p>
         </article>
-        <article class="build">
+        <article class="build shot-only" aria-label="Securent, then Cisco">
           <a class="b-shot" href="https://www.cisco.com" target="_blank" rel="noopener"><img src="media/builds/cisco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The cisco.com home page"><span>cisco.com</span></a>
-          <div class="b-meta"><span>2006 – 2010</span><span>Securent, then Cisco</span><span class="tag">Architect</span></div>
-          <h3>Entitlement management</h3>
-          <p>Securent's Entitlement Management Solution used the XACML standard to decide, enforce and audit who can do what inside any application, from one place.</p>
-          <p><b class="b-k">In the market</b>Cisco bought Securent for about $100 million in 2007 <a class="src" href="https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2007/m11/cisco-announces-definitive-agreement-to-acquire-securent.html" target="_blank" rel="noopener">Cisco</a>, and the product shipped as Cisco Enterprise Policy Manager <a class="src" href="https://www3-realm.cisco.com/en/US/prod/collateral/vpndevc/ps9519/ps9530/data_sheet_c78-453502.html" target="_blank" rel="noopener">Cisco data sheet</a>.</p>
-          <p><b class="b-k">My part</b>Senior Solutions Architect at Securent, where I worked on XACML-based policy and helped drive the sale. At Cisco I was Chief Architect for Policy Management across WebEx, NAC and Call Manager.</p>
         </article>
-        <article class="build">
+        <article class="build shot-only" aria-label="Netegrity, then CA">
           <a class="b-shot" href="https://www.ca.com" target="_blank" rel="noopener"><img src="media/builds/ca.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ca.com home page, now Broadcom"><span>ca.com, now Broadcom</span></a>
-          <div class="b-meta"><span>1999 – 2006</span><span>Netegrity, then CA</span><span class="tag">Architect</span></div>
-          <h3>SiteMinder single sign-on</h3>
-          <p>One login across every web application in an enterprise, with access policy managed in one place and federation over SAML.</p>
-          <p><b class="b-k">In the market</b>CA bought Netegrity for $430 million in 2004 <a class="src" href="https://www.sec.gov/Archives/edgar/data/0000840824/000104746904030593/a2144593zdfan14a.htm" target="_blank" rel="noopener">SEC filing</a>. SiteMinder is still sold as Symantec SiteMinder by Broadcom, now on release 12.9, and still guards applications inside banks and large enterprises <a class="src" href="https://www.broadcom.com/products/identity/siteminder" target="_blank" rel="noopener">Broadcom</a>.</p>
-          <p><b class="b-k">My part</b>Senior Architect. I helped build single sign-on for Fortune 500 companies and most of the US federal government, worked with Oracle and Sun on identity at scale, and stayed on through the move to CA.</p>
         </article>
-        <article class="build">
-          <figure class="b-shot"><img src="media/builds/ibm_texaco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ibm.com and texaco.com home pages"><span>ibm.com · texaco.com</span></figure>
-          <div class="b-meta"><span>The 1990s</span><span>IBM and Texaco</span><span class="tag">Engineer</span></div>
-          <h3>Where it started</h3>
-          <p>Decision processing systems and early AI at IBM, then machine learning at scale. At Texaco (now Chevron) I ran IT across the Middle East on Wang VS 6000 mainframes: wide-area networks, an SAP rollout and Y2K compliance.</p>
-          <p><b class="b-k">My part</b>Systems Administrator, then IT Manager for the Middle East at Texaco.</p>
+        <article class="build shot-only" aria-label="IBM and Texaco">
+          <figure class="b-shot"><img src="media/builds/ibm_texaco.webp" width="960" height="420" loading="lazy" decoding="async" alt="The ibm.com and texaco.com home pages"><span class="b-two"><a href="https://www.ibm.com" target="_blank" rel="noopener">ibm.com</a><a href="https://www.texaco.com" target="_blank" rel="noopener">texaco.com</a></span></figure>
         </article>
       </div>
       <div class="facts">
@@ -550,6 +567,26 @@ footer{position:relative; z-index:3; padding:24px clamp(16px,4vw,48px) 30px; dis
         <div><h3>Education</h3><p>MSc, Computer Information Systems, Glasgow Caledonian University, 1992</p><p>BSc, Computer Science, University of Strathclyde, 1990</p></div>
       </div>
     </div>
+  </section>
+
+  <section class="wrap" id="stage">
+    <div class="stage-head"><div class="era">Speaking</div><h2>On stage</h2><p>Keynotes, panels, demos, podcasts and interviews.</p></div>
+    <div class="stage-grid">
+      <a href="https://vimeo.com/1234854972/8b1d84da79" target="_blank" rel="noopener" class="st big" style="--i:0"><span class="st-media"><img src="media/stage/keynote.jpg" alt="" loading="lazy" decoding="async"><video muted loop playsinline preload="none" data-src="media/stage/keynote_prev.mp4"></video></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>TiECon East · 2026</small>Opening keynote: who pays when the machine is wrong?</span></a>
+      <button type="button" class="st wide" style="--i:1" data-play="media/stage/webinar_2025_full.mp4"><span class="st-media"><img src="media/stage/webinar_2025.jpg" alt="" loading="lazy" decoding="async"><video muted loop playsinline preload="none" data-src="media/stage/webinar_2025.mp4"></video></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>Webinar · 2025</small>Protecting Margins: an identity fraud panel with Munich Re, Accredited and Howden</span></button>
+      <a href="https://www.linkedin.com/in/sunilmadhu/recent-activity/all/" target="_blank" rel="noopener" class="st pod" style="--i:2"><span class="st-media"><i class="st-wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>Podcast · 2026</small>The C-Suite Podcast</span></a>
+      <a href="https://ppacc.player.fm/series/insurtechsio/the-founders-journey-ai-fraud-prevention-and-insurance-with-sunil-madhu" target="_blank" rel="noopener" class="st pod" style="--i:3"><span class="st-media"><i class="st-wave" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b></i></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>Podcast · 2024</small>The Founders Journey: AI, fraud prevention and insurance</span></a>
+      <a href="https://instnt.ai/resources/videos/" target="_blank" rel="noopener" class="st wide" style="--i:4"><span class="st-media"><img src="media/stage/instnt_2021.jpg" alt="" loading="lazy" decoding="async"><video muted loop playsinline preload="none" data-src="media/stage/instnt_2021.mp4"></video></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>Interview · 2021</small>On camera: why Instnt</span></a>
+      <a href="https://www.newswire.com/view/content/sunil-madhu-ceo-founder-of-instnt-to-speak-at-finovatespring-2022-to-21709823" target="_blank" rel="noopener" class="st " style="--i:5"><span class="st-media"><img src="media/stage/finovatespring_2022.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>FinovateSpring · 2022</small>Speaker</span></a>
+      <a href="https://www.einpresswire.com/article/550318228/instnt-to-launch-instnt-accepttm-showcasing-a-new-approach-to-digital-customer-onboarding" target="_blank" rel="noopener" class="st text" style="--i:6"><span class="st-media"><i class="st-mark" aria-hidden="true">On<br>stage</i></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>FinovateFall · 2021</small>On stage: launching Instnt Accept</span></a>
+      <a href="https://www.pymnts.com/authentication/2017/socure-ceo-sunil-madhu-on-digital-to-physical-id-verification-beyond-selfie-pay/" target="_blank" rel="noopener" class="st " style="--i:7"><span class="st-media"><img src="media/stage/pymnts_2017.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>PYMNTS · 2017</small>Interview: digital-to-physical ID verification</span></a>
+      <a href="https://insights.som.yale.edu/insights/can-we-secure-online-identities" target="_blank" rel="noopener" class="st " style="--i:8"><span class="st-media"><img src="media/stage/yale_2017.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>Yale Insights · 2017</small>Interview: can we secure online identities?</span></a>
+      <a href="https://www.youtube.com/watch?v=ChOQ5_LciCM" target="_blank" rel="noopener" class="st wide" style="--i:9"><span class="st-media"><img src="media/stage/socure_2015.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>Video · 2015</small>Sunil Madhu, founder and CEO, Socure</span></a>
+      <a href="https://finovate.com/?p=60183" target="_blank" rel="noopener" class="st " style="--i:10"><span class="st-media"><img src="media/stage/finovate_2015.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">↗</span><span class="st-cap"><small>FinovateFall · 2015</small>On stage: Socure Perceive</span></a>
+      <a href="https://www.youtube.com/watch?v=WUMLAS4kzHI" target="_blank" rel="noopener" class="st " style="--i:11"><span class="st-media"><img src="media/stage/bai_2014.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>BAI Retail Delivery · 2014</small>Demo: social biometrics in risk and compliance</span></a>
+      <a href="https://finovate.com/videos/finovatefall-2013-socure" target="_blank" rel="noopener" class="st wide" style="--i:12"><span class="st-media"><img src="media/stage/finovate_2013.jpg" alt="" loading="lazy" decoding="async"></span><span class="st-sheen" aria-hidden="true"></span><span class="st-badge" aria-hidden="true">▶</span><span class="st-cap"><small>FinovateFall · 2013</small>On stage: Socure's first demo</span></a>
+    </div>
+    <dialog class="st-box" id="stBox"><video controls playsinline></video><button type="button" class="st-x" aria-label="Close">×</button></dialog>
   </section>
 
   <section class="contact wrap" id="contact">
@@ -860,6 +897,17 @@ const BUILD=[
   {era:"instnt",type:"photo",y:2026,thumb:"media/instnt/meetup26_venue.jpg",cap:"Speakeasy setup",source:"Fintech Meetup · March 2026",title:"Gift bags at the Instnt speakeasy",text:["Setting up for the Instnt speakeasy at Fintech Meetup 2026."]},
 ];
 ITEMS.push(...BUILD);
+// ---- the TiECon East 2026 keynote, in eight segments with sound
+ITEMS.push(
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg1.mp4",thumb:"media/keynote/seg1.jpg",cap:"Keynote 1/8",source:"TiECon East 2026 · Cold open",title:"Who here used AI this morning?",text:["“The principles are timeless. The org chart is not.”","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg2.mp4",thumb:"media/keynote/seg2.jpg",cap:"Keynote 2/8",source:"TiECon East 2026 · Then: Socure, 2011",title:"2011: one question for banks",text:["No ChatGPT, no TensorFlow. Just one question for banks: is this person real?","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg3.mp4",thumb:"media/keynote/seg3.jpg",cap:"Keynote 3/8",source:"TiECon East 2026 · Now: six people",title:"A week at Instnt",text:["Five departments’ worth of work, six people. “That doesn’t make me a genius. It makes me a polymath by necessity.”","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg4.mp4",thumb:"media/keynote/seg4.jpg",cap:"Keynote 4/8",source:"TiECon East 2026 · What’s on my phone",title:"The good, the ridiculous and the dark",text:["A traffic light countdown for a light you haven’t reached yet: infrastructure plus rules equals product.","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg5.mp4",thumb:"media/keynote/seg5.jpg",cap:"Keynote 5/8",source:"TiECon East 2026 · Who pulls up the ladder",title:"Open the models. Own the standard.",text:["China gives its models away and writes the rules for deploying them.","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg6.mp4",thumb:"media/keynote/seg6.jpg",cap:"Keynote 6/8",source:"TiECon East 2026 · Seventy gigabytes",title:"Making these machines fair is still our job",text:["Aaron Swartz wanted knowledge to be free. The companies that took a thousand times more got a business model.","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg7.mp4",thumb:"media/keynote/seg7.jpg",cap:"Keynote 7/8",source:"TiECon East 2026 · Insurance is the governance layer",title:"Every dangerous technology became mainstream the day it became insurable",text:["In 1866 Hartford insured steam boilers, and inspection became the standard before any regulator acted.","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"},
+  {era:"keynote",keynote:true,type:"video",y:2026,src:"media/keynote/seg8.mp4",thumb:"media/keynote/seg8.jpg",cap:"Keynote 8/8",source:"TiECon East 2026 · Five principles",title:"The timeless part",text:["Your model is not your moat. Build for the auditor. Hire for judgment. Capital efficiency is a design choice. Be insurable.","Watch the whole keynote on Vimeo."],url:"https://vimeo.com/1234854972/8b1d84da79",linkText:"Watch on Vimeo"}
+);
 
 // "In the stack" cards, taken from each chapter's own stack row, so the shorter periods have more to show
 const STACK_ERA={brahma:"brahma",jarvis:"jarvis",instnt2:"instnt2",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf"};
@@ -889,12 +937,13 @@ ITEMS.forEach(it=>{it.era=eraOf(it); // seven years of Instnt get two walls: 201
   if(it.also)it.also=it.also.map(e=>e==="instnt"&&y<=2023?"instnt2":e);});
 const SETS={all:ITEMS.map((_,k)=>k)};ITEMS.forEach((it,k)=>[it.era,...(it.also||[])].forEach(e=>(SETS[e]=SETS[e]||[]).push(k)));
 SETS.brahma=SETS.ai=[...new Set([...SETS.brahma,...SETS.ai])]; // both chapters are 2026
+SETS.keynote=ITEMS.map((it,k)=>it.keynote||/media\/stills\/(slide_|keynote_cover)|tiecon_clip/.test((it.thumb||"")+(it.src||""))?k:-1).filter(k=>k>=0);
 // prints that show the same picture count as one, and faces are kept apart: at most one face in view at a time
 const SAME_PIC={"media/stills/slide_01.jpg":"media/stills/keynote_cover.jpg"};
 const FACE_RE=/media\/portraits\/|fb_car_selfie|yt_ChOQ5_LciCM/,FACE_MAX=1;
 const IMG_KEY=ITEMS.map((it,k)=>it.thumb?(SAME_PIC[it.thumb]||it.thumb):"item:"+k);
 const IS_FACE=ITEMS.map(it=>!!(it.thumb&&FACE_RE.test(it.thumb)));
-const ERA_OF_SECTION={top:"brahma",brahma:"brahma",ai:"ai",jarvis:"jarvis",instnt:"instnt",instnt2:"instnt2",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
+const ERA_OF_SECTION={top:"ai",ai:"ai",keynote:"keynote",brahma:"brahma",jarvis:"jarvis",instnt:"instnt",instnt2:"instnt2",patents:"keep",socure:"socure",hopskoch:"hopskoch",identity:"identity",gulf:"gulf",origins:"origins"};
 // real items go to prints you will actually pass: the camera's path through the section is sampled, the
 // nearest visible prints at each point get real items, and an item is only reused far from where it already hangs
 const _pv=new THREE.Vector3(),_tc=new THREE.PerspectiveCamera();
@@ -1091,7 +1140,7 @@ const paused=()=>performance.now()<EYES.pauseUntil;
 function handScroll(dir){ // hand gestures overrule the eyes
   const now=performance.now();EYES.pauseUntil=0;EYES.reading=false;EYES.handAt=now;EYES.lastCard=READ_BEST;
   if(dir===0){setAutoScroll(0);auto.v=0;if(window.lenis)lenis.scrollTo(lenis.scroll,{immediate:true});}
-  else{const was=auto.dir;setAutoScroll(dir);if(was!==dir||Math.abs(auto.v)<innerHeight*.15)auto.v=dir*innerHeight*.2;}
+  else{const was=auto.dir;setAutoScroll(dir);if(was!==dir||Math.abs(auto.v)<innerHeight*.07)auto.v=dir*innerHeight*WALK;}
   if(window.track&&was0(dir))track("gesture",{label:dir>0?"palm: scroll":dir<0?"fist pull: reverse":"fist: stop"});}
 let _lastHand=null;function was0(d){const ch=d!==_lastHand;_lastHand=d;return ch;}
 function eyeSample(f,now){
@@ -1116,16 +1165,17 @@ function eyeSample(f,now){
 }
 let READ_EL=null,READ_BEST=null;
 function readingShare(){ // how much of the middle of the screen is covered by something to read (0 to 1)
-  READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking")];
+  READ_EL=READ_EL||[...document.querySelectorAll(".card,.panel,.contact-head,.stats,.booking,.stage-head")];
   const a=innerHeight*.15,b=innerHeight*.85;let best=0;
   READ_BEST=null;for(const el of READ_EL){const r=el.getBoundingClientRect();const v=Math.max(0,Math.min(r.bottom,b)-Math.max(r.top,a))/(b-a);if(v>best){best=v;READ_BEST=el;}}
   return best;
 }
+const WALK=.09; // the walk: about a tenth of a screen a second, slow enough to see every print
 function autoStep(t){
   const dt=Math.min(.05,(t-auto.t)/1000);auto.t=t;
   const max=document.documentElement.scrollHeight-innerHeight;
   // a steady glide, about a fifth of a screen a second; it holds still while your eyes are reading a card
-  const hold=paused(),want=hold?0:auto.dir*innerHeight*.2;
+  const hold=paused(),want=hold?0:auto.dir*innerHeight*WALK;
   auto.v+=(want-auto.v)*Math.min(1,dt*(hold?4:2));
   const y=window.lenis?lenis.scroll:scrollY;
   if((auto.dir>0&&y>=max-1)||(auto.dir<0&&y<=1))setAutoScroll(0);
@@ -1193,7 +1243,7 @@ const imgCache={};
 function loadImg(src){return imgCache[src]||(imgCache[src]=new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;}));}
 function cover(g,im,x,y,w,h){const k=Math.max(w/im.width,h/im.height),iw=im.width*k,ih=im.height*k;g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.drawImage(im,x+(w-iw)/2,y+(h-ih)/2,iw,ih);g.restore();}
 function wrapText(g,text,x,y,maxW,lh,maxLines){const words=text.split(/\s+/);let line="",n=0;for(const w of words){const t=line?line+" "+w:w;if(g.measureText(t).width>maxW&&line){g.fillText(n===maxLines-1?line+"…":line,x,y+n*lh);n++;line=w;if(n>=maxLines)return n;}else line=t;}if(line){g.fillText(line,x,y+n*lh);n++;}return n;}
-const ERA_HUE={brahma:32,ai:32,jarvis:44,instnt:172,instnt2:186,patents:212,socure:215,hopskoch:320,identity:265,gulf:28,origins:140,undated:0};
+const ERA_HUE={brahma:32,ai:32,keynote:262,jarvis:44,instnt:172,instnt2:186,patents:212,socure:215,hopskoch:320,identity:265,gulf:28,origins:140,undated:0};
 function drawArtFor(g,it,x,y,w,h){ // a generated picture for the piece: blurry at a distance, the headline below sharpens up close
   let sd=7;for(const c of it.title)sd=Math.imul(sd^c.charCodeAt(0),16777619);const R=rng(sd>>>0);
   drawScene(g,R,x,y,w,h,(sd>>>3)%4,ERA_HUE[it.era]);}
@@ -1261,7 +1311,7 @@ async function drawItem(i){const it=ITEMS[i],c=i%CX,r=Math.floor(i/CX),x0=c*CW+P
   g.translate(x0+PW/2,y0+PH*.905);g.rotate(((i*37)%7-3)*.008);g.fillStyle="#2b2722";g.textAlign="center";
   let fs=30;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;while(g.measureText(it.cap).width>PW*.86&&fs>18){fs-=2;g.font=`600 ${fs}px Caveat, 'Bradley Hand', cursive`;}
   g.fillText(it.cap,0,0);g.restore();itemTex.needsUpdate=true;}
-const PH_N=28, PH_BASE=ITEMS.length; // placeholder cells live after the real items in the atlas
+const PH_N=20, PH_BASE=ITEMS.length; // placeholder cells live after the real items in the atlas
 const isReal=i=>aCell&&aCell[i]<PH_BASE;
 function softText(g,draw){ // text drawn only as its own blur, so it reads as handwriting you can't quite make out
   g.save();g.shadowColor=g.fillStyle;g.shadowBlur=3.2;g.shadowOffsetX=0;g.shadowOffsetY=0;g.globalAlpha=.55;draw();g.restore();}
@@ -1411,8 +1461,7 @@ buildPrints();
 /* ================= The year of each period =================
    Entering a period, its year rolls into focus behind the story, catches a streak of light, holds, and dissolves
    before the next period arrives. */
-const YEARS={brahma:["2026","Asyml8"],jarvis:["2025","Brahma begins · 2025"],instnt:["2024","Instnt · 2024 – now"],instnt2:["2019","Instnt · 2019 – 2023"],patents:["2015","Patents · 2015 – 2023"],socure:["2011","Socure · 2011 – 2019"],
-  hopskoch:["2010","Hopskoch · 2010 – 2012"],identity:["1999","The identity years · 1999 – 2010"],gulf:["1990s","IBM and the Gulf"],origins:["1986","Education · 1986 – 1992"]};
+const YEARS={ai:["2026","AI-native"],instnt:["2025","Instnt"],socure:["2019","Socure"],hopskoch:["2011","Hopskoch"],gulf:["1999","IBM and the Gulf"],origins:["1986","Education"]};
 const yearfx=document.getElementById("yearfx"),yfNum=document.getElementById("yfNum"),yfLabel=document.getElementById("yfLabel"),yfFlare=yearfx.querySelector(".yf-flare");
 let yearShown=null,yearTL=null,yearSec=null;
 function currentSection(){let id="top";for(const sec of document.querySelectorAll("main > section[id]")){if(sec.getBoundingClientRect().top<innerHeight*.55)id=sec.id;}return id;}
@@ -1490,8 +1539,29 @@ function hoverPick(){if(POINT.sel>=0)return;const i=(ptr.in&&HOLD.i<0&&!modalOpe
 addEventListener("pointermove",e=>{ptr.x=e.clientX;ptr.y=e.clientY;ptr.in=e.pointerType==="mouse";},{passive:true});
 document.addEventListener("mouseleave",()=>{ptr.in=false;});
 const vlayer=document.getElementById("vlayer"),vwin=document.getElementById("vwin"),vx=document.getElementById("vx");
+/* In the keynote chapter, the keynote print nearest the middle of the view plays its segment inside the wall,
+   with sound once the visitor has turned the site's sound on, otherwise silently. Opening a print takes over. */
+const AMB={i:-1,video:null,tex:null,at:0,loud:false};
+function stopAmbient(){if(AMB.i<0)return;if(AMB.video){AMB.video.pause();AMB.video.removeAttribute("src");AMB.video.load();}
+  if(AMB.tex)AMB.tex.dispose();if(AMB.loud)window.musicDuck&&window.musicDuck(false);
+  if(HOLD.i<0){U.uLiveOn.value=0;U.uLive.value=blankTex;U.uActive.value=-1;}AMB.i=-1;AMB.video=AMB.tex=null;AMB.loud=false;}
+function ambientTick(now){
+  if(now-AMB.at<400)return;AMB.at=now;
+  if(ERA.cur!=="keynote"||HOLD.i>=0||REDUCED){stopAmbient();return;}
+  const v3=new THREE.Vector3();let best=-1,bs=1e9,keep=false;
+  for(let i=0;i<N;i++){if(!isReal(i)||prints[i].swap)continue;const it=ITEMS[aCell[i]];if(!it||!it.keynote)continue;
+    v3.copy(prints[i].pos);const d=v3.distanceTo(camera.position);if(d>18)continue;v3.project(camera);if(v3.z>1||Math.abs(v3.x)>.95||Math.abs(v3.y)>.95)continue;
+    if(i===AMB.i)keep=true;const sc=d+Math.abs(v3.x)*6+Math.abs(v3.y)*4;if(sc<bs){bs=sc;best=i;}}
+  if(keep||best<0){if(best<0)stopAmbient();return;}
+  stopAmbient();const it=ITEMS[aCell[best]];
+  const v=document.createElement("video");v.src=it.src;v.playsInline=true;v.loop=true;v.preload="auto";
+  const loud=!!(window.siteSoundOn&&window.siteSoundOn());v.muted=!loud;
+  v.play().catch(()=>{v.muted=true;v.play().catch(()=>{});});
+  const t=new THREE.VideoTexture(v);t.encoding=THREE.sRGBEncoding;t.minFilter=THREE.LinearFilter;
+  AMB.i=best;AMB.video=v;AMB.tex=t;AMB.loud=loud&&!v.muted;if(AMB.loud)window.musicDuck&&window.musicDuck(true);
+  U.uActive.value=best;U.uLive.value=t;U.uLiveOn.value=1;}
 function pickUp(i){
-  if(!isReal(i))return;const it=ITEMS[aCell[i]];if(!it)return;
+  if(!isReal(i))return;stopAmbient();const it=ITEMS[aCell[i]];if(!it)return;
   if(window.track)track("open",{label:(it.cap||it.title||"").slice(0,80)+" · "+it.type,target:it.era});
   if(HOLD.i>=0&&HOLD.i!==i)release(true);
   HOLD.i=i;HOLD.target=1;HOLD.item=it;U.uActive.value=i;U.uHover.value=-1;document.documentElement.classList.remove("pick");
@@ -1629,7 +1699,7 @@ function frame(now){
     mesh.instanceMatrix.needsUpdate=true;wireGeo.attributes.position.needsUpdate=true;
     wires.material.opacity=.3*(1-.6*mosaic);
   }
-  eraTick(now);
+  eraTick(now);ambientTick(now);
   if(ERA.dirty&&mesh){mesh.geometry.attributes.aCell.needsUpdate=true;ERA.dirty=false;}
   renderer.render(scene,camera);
   updatePoint(now);
@@ -1642,6 +1712,17 @@ addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 /* ================= Scroll story ================= */
 gsap.registerPlugin(ScrollTrigger);
 let lenis=null;
+// On a Mac, natural scrolling turns a mouse wheel's "down" into scrolling up, which walked visitors backward.
+// For a mouse wheel on a Mac (not a trackpad), wheel down now walks forward. Trackpads, keys and hand gestures are unchanged.
+const IS_MAC=/Mac/i.test(navigator.platform||navigator.userAgent);
+function isMouseWheel(e){if(e.deltaMode===1)return true;if(e.ctrlKey)return false;
+  if(typeof e.wheelDeltaY==="number"&&e.wheelDeltaY!==0)return Math.abs(e.wheelDeltaY)!==Math.abs(e.deltaY)*3; // trackpads report wheelDeltaY = -3 x deltaY
+  return false;}
+if(IS_MAC)addEventListener("wheel",e=>{if(e.deltaX&&Math.abs(e.deltaX)>Math.abs(e.deltaY))return;if(!isMouseWheel(e))return;
+  if(e.target&&e.target.closest&&e.target.closest(".modal,#cal,iframe,.vlayer"))return;
+  e.preventDefault();e.stopImmediatePropagation();const d=-(e.deltaMode===1?e.deltaY*40:e.deltaY);
+  if(window.lenis){const max=lenis.limit||document.documentElement.scrollHeight-innerHeight;lenis.scrollTo(clamp((lenis.targetScroll??lenis.scroll)+d,0,max));}else scrollBy(0,d);
+},{capture:true,passive:false});
 if(!REDUCED&&window.Lenis){lenis=new Lenis({lerp:.08,smoothWheel:true});window.lenis=lenis;lenis.on("scroll",ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0);}
 document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{const el=document.querySelector(a.getAttribute("href"));if(el){e.preventDefault();lenis?lenis.scrollTo(el,{offset:-20}):el.scrollIntoView({behavior:REDUCED?"auto":"smooth"});}}));
 ScrollTrigger.create({start:0,end:"max",onUpdate:s=>{P=s.progress;document.getElementById("progress").style.transform=`scaleX(${s.progress})`;}});
@@ -1688,8 +1769,36 @@ const MUSIC={playlist:"PLKHoKKDEmUAE", startVolume:45};
   muteBtn.addEventListener("click",()=>{if(!ready)return;player.isMuted()?soundOn():soundOff();});
   document.getElementById("nextBtn").addEventListener("click",()=>{if(ready){player.nextVideo();setTimeout(updateUI,600);}});
   setInterval(()=>{if(ready)updateUI();},4000);
+  window.siteSoundOn=()=>ready&&!userMuted&&!player.isMuted()&&(!navigator.userActivation||navigator.userActivation.hasBeenActive);
   let ducked=false;
   window.musicDuck=on=>{if(!ready)return;if(on){ducked=playing();if(ducked)player.pauseVideo();}else if(ducked){ducked=false;player.playVideo();}};
+})();
+
+/* ================= On stage: entrance, tilt and hover previews ================= */
+(function(){
+  const grid=document.querySelector(".stage-grid");if(!grid)return;const tiles=[...grid.querySelectorAll(".st")];
+  if(window.gsap&&window.ScrollTrigger&&!REDUCED){
+    gsap.set(tiles,{opacity:0,z:-260,rotationX:()=>gsap.utils.random(-70,-35),rotationY:()=>gsap.utils.random(-30,30),scale:.72,filter:"blur(10px)"});
+    ScrollTrigger.create({trigger:grid,start:"top 85%",once:true,onEnter:()=>gsap.to(tiles,{opacity:1,z:0,rotationX:0,rotationY:0,scale:1,filter:"blur(0px)",duration:1.25,ease:"expo.out",stagger:{each:.07,from:"random"},clearProps:"transform,filter"})});
+  }
+  const fine=matchMedia("(hover:hover) and (pointer:fine)").matches;
+  tiles.forEach(t=>{
+    const v=t.querySelector("video");
+    const play=()=>{if(!v)return;if(!v.src)v.src=v.dataset.src;v.play().then(()=>t.classList.add("playing")).catch(()=>{});};
+    const stop=()=>{if(!v)return;v.pause();t.classList.remove("playing");};
+    if(fine){
+      t.addEventListener("pointerenter",play);
+      t.addEventListener("pointermove",e=>{if(REDUCED)return;const r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;t.style.setProperty("--ry",(x*12).toFixed(2)+"deg");t.style.setProperty("--rx",(-y*10).toFixed(2)+"deg");});
+      t.addEventListener("pointerleave",()=>{stop();t.style.setProperty("--rx","0deg");t.style.setProperty("--ry","0deg");});
+    } else if(v&&"IntersectionObserver" in window){new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.intersectionRatio>.6?play():stop()),{threshold:[0,.6,1]}).observe(t);}
+    if(t.dataset.play)t.addEventListener("click",()=>{const box=document.getElementById("stBox"),bv=box.querySelector("video");
+      window.musicDuck&&window.musicDuck(true);bv.src=t.dataset.play;box.showModal();bv.play().catch(()=>{});
+      if(window.track)track("open",{label:t.textContent.trim().slice(0,80)+" · stage",target:"stage"});});
+    else t.addEventListener("click",()=>{if(window.track)track("open",{label:t.textContent.trim().slice(0,80)+" · stage",target:"stage"});});
+  });
+  const box=document.getElementById("stBox");
+  const close=()=>{const bv=box.querySelector("video");bv.pause();bv.removeAttribute("src");bv.load();if(box.open)box.close();window.musicDuck&&window.musicDuck(false);};
+  box.querySelector(".st-x").addEventListener("click",close);box.addEventListener("click",e=>{if(e.target===box)close();});box.addEventListener("cancel",e=>{e.preventDefault();close();});
 })();
 /* ================= Let's talk: Calendly hung like a print ================= */
 const BOOKING={url:"https://calendly.com/sunilmadhu/external-meeting"};
